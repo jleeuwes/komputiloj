@@ -1,0 +1,30 @@
+#!/bin/sh
+# periodically print date and load average to the bar
+
+xwrite() {
+	file="$1"; shift
+	echo -n "$@" | wmiir write "$file"
+}
+
+wmiir remove /bar/status 2>/dev/null && sleep 2
+wmiir create /bar/status
+xwrite /bar/status/colors '#ffffff #000000 #000000'
+
+info=""
+
+while xwrite /bar/status/data $info
+do
+  vleft=`amixer get PCM|grep 'Left:'`
+  mute=`echo $vleft|egrep -o '\[(on|off)\]'`
+  if [ "$mute" = "[on]" ]; then
+    volume=`echo $vleft|egrep -o '[0-9]+\%'`
+  else
+    volume="---"
+  fi
+  stat=`cat ~/.ikben`
+  date=`date '+%A %e %B %Y - %H:%M:%S'`
+  info="[ s:$stat | v:$volume ] $date"
+  
+  #leuke balans vinden:
+	sleep 0.5
+done
