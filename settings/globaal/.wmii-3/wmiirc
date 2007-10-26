@@ -40,7 +40,10 @@ WMII_SELCOLORS='#ffffff #650e59 #420832'
 WMII_NORMCOLORS='#aaaaaa #000000 #444444'
 
 #kies een willekeurige wallpaper
-feh --bg-scale `~/bin/kiesmaar ~/images/wallpaper-roulette/*`
+
+if [ -e ~/wallpapers ]; then
+  display -window root -resize 1280x1024 -backdrop `~/bin/kiesmaar ~/wallpapers/*`
+fi
 
 # dark background
 #WMII_NORMCOLORS='#e0e0e0 #0a0a0a #202020'
