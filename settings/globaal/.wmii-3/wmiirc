@@ -162,6 +162,7 @@ $MODKEY-Tab
 $MODKEY-Shift-Tab
 $MODKEY-Control-Shift-$LEFT
 $MODKEY-Control-Shift-$RIGHT
+$MODKEY-Scroll_Lock
 EOF
 
 # EVENT LOOP
@@ -254,6 +255,9 @@ do
 	    amixer set PCM 5%+;;
 	  XF86AudioLowerVolume )
 	    amixer set PCM 5%-;;
+
+	  $MODKEY-Scroll_Lock )
+	    lock;;
 	  
     $MODKEY-Tab )
       xwrite /ctl view `next_tag`;;
