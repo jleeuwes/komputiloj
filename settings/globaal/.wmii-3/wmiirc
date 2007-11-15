@@ -25,7 +25,7 @@ prev_tag() {
 
 
 
-MODKEY=Mod4
+MODKEY=Mod1
 #MODKEY=Multi_key #kapot!
 UP=Up
 DOWN=Down
