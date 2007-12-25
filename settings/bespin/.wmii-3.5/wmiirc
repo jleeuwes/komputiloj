@@ -154,6 +154,10 @@ eventstuff() {
 		wmiir xwrite /view/sel/geom +0 +0 +24 +0
 	Key $MODKEY-F12
 		lock
+	Key $MODKEY-Delete
+		eject
+	Key $MODKEY-grave
+		~/bin/zegtijd &
 !
 	for i in 0 1 2 3 4 5 6 7 8 9; do
 		cat <<!
@@ -242,9 +246,11 @@ conf_which() {
 pgrep gnome-settings-daemon || eval 'gnome-settings-daemon &'
 pgrep gnome-power-manager || eval 'gnome-power-manager &'
 
-
 #kies een willekeurige wallpaper
 ~/images/zet-wallpaper &
+#laat het sneeuwen
+pkill xsnow
+~/bin/sneeuw &
 
 # Stop any running instances of wmiirc
 echo Start wmiirc | wmiir write /event || exit 1
