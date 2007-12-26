@@ -246,11 +246,8 @@ conf_which() {
 pgrep gnome-settings-daemon || eval 'gnome-settings-daemon &'
 pgrep gnome-power-manager || eval 'gnome-power-manager &'
 
-#kies een willekeurige wallpaper
-~/images/zet-wallpaper &
-#laat het sneeuwen
-pkill xsnow
-~/bin/sneeuw &
+#start actuele desktop-decoratie
+~/bin/desktop-decoratie &
 
 # Stop any running instances of wmiirc
 echo Start wmiirc | wmiir write /event || exit 1
