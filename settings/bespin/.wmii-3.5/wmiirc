@@ -154,6 +154,16 @@ eventstuff() {
 		wmiir xwrite /view/sel/geom +0 +0 +24 +0
 	Key $MODKEY-F12
 		lock
+	Key $MODKEY-Print
+		~/bin/shoot
+	Key $MODKEY-Shift-Print
+	  ~/bin/shoot "$(wmiir read /client/sel/ctl)"
+	Key $MODKEY-Control-Print
+	  shot=$(~/bin/shoot)
+		eog $shot &
+	Key $MODKEY-Control-Shift-Print
+	  shot=$(~/bin/shoot "$(wmiir read /client/sel/ctl)")
+	  eog $shot &
 	Key $MODKEY-Delete
 		eject
 	Key $MODKEY-grave
