@@ -44,6 +44,13 @@ status() {
           '|' $(date '+%e %B %Y %H:%M:%S')
 }
 
+# hippe functie van Jeroen
+volgende() {
+  current=$1
+  shift 1
+  echo $@ $@|awk "{for(x=1;x<=NF;x++)if(\$x~\"$current\"){print \$(x+1); break}}"
+}
+
 # Event processing
 #  Processed later by `wmiiloop' and evaled.
 #  Duplicate the eval line and replace 'eval' with 'echo' for details.
@@ -168,6 +175,16 @@ eventstuff() {
 		eject
 	Key $MODKEY-grave
 		~/bin/zegtijd &
+	Key $MODKEY-Tab
+		wmiir xwrite /ctl view $(volgende `wmiir read /tag/sel/ctl` `wmiir ls /tag|grep -v sel|xargs`)
+	Key $MODKEY-Shift-Tab
+		wmiir xwrite /ctl view $(volgende `wmiir read /tag/sel/ctl` `wmiir ls /tag|grep -v sel|tac|xargs`)
+	Key $MODKEY-F5
+	  all=`ls /tmp|grep ns\.jeroen|xargs`
+	  current=`basename $WMII_NS_DIR`
+	  next=$(volgende $current $all)
+	  addr='unix!'/tmp/$next/wmii
+	  wmiir -a $addr xwrite /ctl view `wmiir -a $addr read /tag/sel/ctl`
 !
 	for i in 0 1 2 3 4 5 6 7 8 9; do
 		cat <<!
