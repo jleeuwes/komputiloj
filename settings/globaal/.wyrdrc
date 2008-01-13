@@ -1,0 +1,11 @@
+include "/etc/wyrdrc"
+include "~/settings/globaal/wyrd-theme-aes2"
+
+set week_starts_monday="true"
+set number_weeks="true"
+
+set schedule_12_hour="false"
+set selection_12_hour="false"
+set status_12_hour="false"
+set description_12_hour="false"
+
