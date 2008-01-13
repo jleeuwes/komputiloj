@@ -44,7 +44,7 @@ color calendar_level1 default default
 color calendar_level2 default white
 
 # calendar days with hight activity
-color calendar_level3 default yellow
+color calendar_level3 white black
 
 # the current day in the calendar window (if it is visible)
 color calendar_today white red
