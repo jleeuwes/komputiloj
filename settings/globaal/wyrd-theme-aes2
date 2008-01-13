@@ -41,7 +41,7 @@ set busy_level4="3"
 color calendar_level1 default default
 
 # calendar days with medium activity
-color calendar_level2 default white
+color calendar_level2 black white
 
 # calendar days with hight activity
 color calendar_level3 white black
