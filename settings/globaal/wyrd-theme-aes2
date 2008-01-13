@@ -32,11 +32,6 @@ color status default yellow
 color calendar_labels default default
 
 
-set busy_level1="0"
-set busy_level2="1"
-set busy_level3="2"
-set busy_level4="3"
-
 # calendar days with low activity
 color calendar_level1 default default
 
