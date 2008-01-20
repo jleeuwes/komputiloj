@@ -9,9 +9,9 @@ color timed_current white red
  
 # a nonempty timeslot in the day-schedule window, indented to level x
 color timed_reminder1 white red
-color timed_reminder2 white red
-color timed_reminder3 white red
-color timed_reminder4 white red
+color timed_reminder2 white yellow
+color timed_reminder3 white green
+color timed_reminder4 white magenta
 
 # an entry in the untimed reminders window
 color untimed_reminder default default
