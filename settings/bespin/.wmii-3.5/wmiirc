@@ -40,7 +40,8 @@ status() {
   else
     bat=b
   fi
-  echo -n "$bat:$(acpi -bTA|egrep -o [0-9]+%)" \
+  echo -n `rhythmbox-client --no-start --print-playing-format '%ta - %tt %te/%td'` \
+          '|' "$bat:$(acpi -bTA|egrep -o [0-9]+%)" \
           '|' $(date '+%e %B %Y %H:%M:%S')
 }
 
