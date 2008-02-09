@@ -1,0 +1,15 @@
+Config { font = "-*-fixed-medium-r-*-*-13-*-*-*-*-*-*-*"
+       , bgColor = "#500070"
+       , fgColor = "white"
+       , position = Static { xpos = 0 , ypos = 0, width = 1280, height = 15 }
+       , commands = [ Run Cpu ["-L","10","-H","50","--low","#00a000", "--normal","#a0a000","--high","#a00000"] 10
+                    , Run Memory ["-t","Mem: <usedratio>%"] 10
+                    , Run Swap [] 10
+                    , Run StdinReader
+                    , Run Battery [] 10
+    		            , Run Com "date" ["+\"%e %B %Y %H:%M:%S\""] "date" 10
+                    ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "%StdinReader% } %cpu% | %memory% | %swap% { %battery% | %date%"
+       }
