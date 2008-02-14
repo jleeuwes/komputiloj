@@ -11,5 +11,5 @@ Config { font = "-*-fixed-medium-r-*-*-13-*-*-*-*-*-*-*"
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%StdinReader% } %cpu% | %memory% | %swap% { %battery% | %date%"
+       , template = "%StdinReader% } { %battery% | %date%"
        }

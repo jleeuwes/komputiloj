@@ -3,6 +3,9 @@ import XMonad
 import XMonad.Layout.Tabbed
 import XMonad.Layout.WindowNavigation
 import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.UrgencyHook
+import XMonad.Layout.NoBorders
+import XMonad.Layout.Grid
 
 import qualified XMonad.StackSet as W
 import Data.Map (union, fromList)
@@ -10,11 +13,11 @@ import Data.Map (union, fromList)
 
 
 
-main = xmonad configuur
+main = xmonad $ withUrgencyHook NoUrgencyHook configuur
 
 
 
-kBorderNormaal = "#c0c0c0"
+kBorderNormaal = "white"
 kBorderSelect  = "black"
 kBalk          = "#500070"
 datFont        = "-*-fixed-medium-r-*-*-13-*-*-*-*-*-*-*" 
@@ -28,7 +31,7 @@ wextra totaal xs = xs ++ map show [l+1..l+1+n]
 configuur = defaultConfig {
         terminal           = "gnome-terminal",
         borderWidth        = 2,
-        workspaces         = wextra 9["com","tekst","web","mail","terminals"],
+        workspaces         = ["com","tekst","web","mail","terminals","6","7","8","muziek"],
         normalBorderColor  = kBorderNormaal,
         focusedBorderColor = kBorderSelect,
         defaultGaps        = [(15,0,0,0)],
@@ -37,13 +40,13 @@ configuur = defaultConfig {
         
         logHook = dynamicLog,
         layoutHook = layouts,
-        manageHook = composeAll []
+        manageHook = manageer
     }
 
 
 
 
-layouts = windowNavigation (tiled ||| Mirror tiled ||| tabbed shrinkText tabconf ||| Full)
+layouts = windowNavigation (tiled ||| Mirror tiled ||| noBorders (tabbed shrinkText tabconf) ||| Grid ||| noBorders Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -60,18 +63,28 @@ layouts = windowNavigation (tiled ||| Mirror tiled ||| tabbed shrinkText tabconf
 
 
 
+manageer  = composeAll [
+    className   =? "Firefox-bin" --> doF (W.shift "web")
+    , className =? "Pidgin"  --> doF (W.shift "com")
+    , className =? "Thunderbird-bin" --> doF (W.shift "mail")
+    , className =? "Rhythmbox" --> doF (W.shift "muziek")
+  ]
+
+
+
+
 tabconf = TConf {
     activeColor = "white",
     inactiveColor = kBalk,
-    urgentColor = "white",
+    urgentColor = "#a040c0",
     
     activeBorderColor   = "white",
-    inactiveBorderColor = kBalk,
-    urgentBorderColor   = "white",
+    inactiveBorderColor = "#200040",
+    urgentBorderColor   = "#200040",
     
     activeTextColor     = "black",
     inactiveTextColor   = "white",
-    urgentTextColor     = kBalk,
+    urgentTextColor     = "white",
     
     fontName = datFont,
     tabSize  = 15
@@ -111,6 +124,8 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList [
     
     -- launch dmenu
     , ((modMask,               xK_p     ), spawn ("exe=`dmenu_path | dmenu -nb \\#500070 -nf white -sb white -sf black` && eval \"exec $exe\""))
+
+    , ((modMask              , xK_BackSpace), focusUrgent)
 
   ]
 
