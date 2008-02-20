@@ -20,7 +20,7 @@ main = xmonad $ withUrgencyHook NoUrgencyHook configuur
 kBorderNormaal = "white"
 kBorderSelect  = "black"
 kBalk          = "#500070"
-datFont        = "-*-fixed-medium-r-*-*-13-*-*-*-*-*-*-*" 
+datFont        = "-*-terminus-medium-*-*-*-13-*-*-*-*-*-*-*" 
 
 
 wextra totaal xs = xs ++ map show [l+1..l+1+n]
@@ -46,7 +46,7 @@ configuur = defaultConfig {
 
 
 
-layouts = windowNavigation (tiled ||| Mirror tiled ||| noBorders (tabbed shrinkText tabconf) ||| Grid ||| noBorders Full)
+layouts = windowNavigation (tiled ||| Mirror tiled ||| tabbed shrinkText tabconf ||| Grid ||| noBorders Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -123,7 +123,7 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList [
     , ((modMask .|. shiftMask, xK_Down ), sendMessage $ Swap D)
     
     -- launch dmenu
-    , ((modMask,               xK_p     ), spawn ("exe=`dmenu_path | dmenu -nb \\#500070 -nf white -sb white -sf black` && eval \"exec $exe\""))
+    , ((modMask,               xK_p     ), spawn ("exe=`dmenu_path | dmenu -nb \\#500070 -nf white -sb white -sf black -fn " ++ datFont ++ "` && eval \"exec $exe\""))
 
     , ((modMask              , xK_BackSpace), focusUrgent)
 

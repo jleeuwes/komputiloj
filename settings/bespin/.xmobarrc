@@ -1,4 +1,4 @@
-Config { font = "-*-fixed-medium-r-*-*-13-*-*-*-*-*-*-*"
+Config { font = "-*-terminus-medium-*-*-*-13-*-*-*-*-*-*-*"
        , bgColor = "#500070"
        , fgColor = "white"
        , position = Static { xpos = 0 , ypos = 0, width = 1280, height = 15 }
