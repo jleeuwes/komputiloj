@@ -125,6 +125,8 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList [
     -- launch dmenu
     , ((modMask,               xK_p     ), spawn ("exe=`dmenu_path | dmenu -nb \\#500070 -nf white -sb white -sf black -fn " ++ datFont ++ "` && eval \"exec $exe\""))
 
+    , ((modMask,               xK_F12   ), spawn ("gnome-screensaver-command --lock"))
+
     , ((modMask              , xK_BackSpace), focusUrgent)
 
   ]
