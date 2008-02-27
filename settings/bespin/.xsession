@@ -3,8 +3,11 @@
 #env DISPLAY=:0.0 wmii   #we wachten op deze om af te sluiten
 
 if xrandr --screen 1 --prop; then
+  echo Meerdere schermen
   export DISPLAY=:0.1
   xsetroot -display :0.0 -solid black
+else
+  echo Enkel scherm
 fi
 
 unclutter -idle 1 -root &
@@ -21,4 +24,4 @@ mkfifo $PIPE
 
 ~/bin/xmobar < $PIPE &
 
-ssh-agent -t 60 ~/bin/xmonad > $PIPE
+ssh-agent ~/bin/xmonad > $PIPE
