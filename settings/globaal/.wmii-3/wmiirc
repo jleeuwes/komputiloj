@@ -100,8 +100,8 @@ $MODKEY-comma
 $MODKEY-f
 $MODKEY-period
 $MODKEY-slash
-$MODKEY-Home
-$MODKEY-End
+$MODKEY-p
+$MODKEY-a
 $MODKEY-Insert
 $MODKEY-0
 $MODKEY-1
@@ -129,7 +129,7 @@ $MODKEY-Shift-$RIGHT
 $MODKEY-Shift-$UP
 $MODKEY-Shift-$DOWN
 $MODKEY-Shift-space
-$MODKEY-Delete
+$MODKEY-Shift-c
 $MODKEY-Shift-Insert
 $MODKEY-Shift-KP_0
 $MODKEY-Shift-KP_1
@@ -211,9 +211,9 @@ do
 			xwrite /view/sel/mode max;;
 		$MODKEY-f)
 			xwrite /view/0/sel/geom 0 0 east south;;
-		$MODKEY-Home)
+		$MODKEY-a)
 			`proglist $HOME/.wmii-3 | wmiimenu` &;;
-		$MODKEY-End)
+		$MODKEY-p)
 			PATH="$OLD_PATH" wmiisetsid `wmiimenu <$PROGS_FILE` &;;
 		$MODKEY-Insert)
 			xwrite /ctl view "`wmiir read /tags | wmiimenu`" &;;
@@ -233,7 +233,7 @@ do
 			xwrite /view/sel/sel/ctl swap up;;
 		$MODKEY-Shift-space)
 			xwrite /view/sel/sel/ctl sendto toggle;;
-		$MODKEY-Delete)
+		$MODKEY-Shift-c)
 			xwrite /view/sel/sel/ctl kill;;
 		$MODKEY-Shift-Insert)
 			xwrite /view/sel/sel/tags "`wmiir read /tags | wmiimenu`" &;;
