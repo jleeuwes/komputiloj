@@ -13,7 +13,9 @@ import Data.Map (union, fromList)
 
 
 
-main = xmonad $ withUrgencyHook NoUrgencyHook configuur
+-- withUrgencyHook veroorzaakt de pidgin-crash
+-- main = xmonad $ withUrgencyHook NoUrgencyHook configuur
+main = xmonad configuur
 
 
 
