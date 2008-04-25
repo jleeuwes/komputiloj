@@ -1,7 +1,7 @@
 Config { font = "-*-terminus-medium-*-*-*-13-*-*-*-*-*-*-*"
-       , bgColor = "#500070"
+       , bgColor = "black"
        , fgColor = "white"
-       , position = Static { xpos = 0 , ypos = 0, width = 1280, height = 15 }
+       , position = Static { xpos = 0 , ypos = 785, width = 1280, height = 15 }
        , commands = [ Run Cpu ["-L","10","-H","50","--low","#00a000", "--normal","#a0a000","--high","#a00000"] 10
                     , Run Memory ["-t","Mem: <usedratio>%"] 10
                     , Run Swap [] 10

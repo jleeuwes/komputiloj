@@ -36,7 +36,7 @@ configuur = defaultConfig {
         workspaces         = ["com","tekst","web","mail","terminals","6","7","8","muziek"],
         normalBorderColor  = kBorderNormaal,
         focusedBorderColor = kBorderSelect,
-        defaultGaps        = [(15,0,0,0)],
+        defaultGaps        = [(0,15,0,0)],
         
         keys = (\c -> extraKeys c `union` keys defaultConfig c),
         
