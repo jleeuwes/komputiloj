@@ -21,7 +21,7 @@ main = xmonad configuur
 
 kBorderNormaal = "white"
 kBorderSelect  = "black"
-kBalk          = "#500070"
+kBalk          = "black"
 datFont        = "-*-terminus-medium-*-*-*-13-*-*-*-*-*-*-*" 
 
 
@@ -77,16 +77,16 @@ manageer  = composeAll [
 
 tabconf = TConf {
     activeColor = "white",
-    inactiveColor = kBalk,
-    urgentColor = "#a040c0",
+    inactiveColor = "black",
+    urgentColor = "#a0ffd0",
     
     activeBorderColor   = "white",
-    inactiveBorderColor = "#200040",
-    urgentBorderColor   = "#200040",
+    inactiveBorderColor = "black",
+    urgentBorderColor   = "black",
     
     activeTextColor     = "black",
     inactiveTextColor   = "white",
-    urgentTextColor     = "white",
+    urgentTextColor     = "black",
     
     fontName = datFont,
     tabSize  = 15
@@ -125,7 +125,7 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList [
     , ((modMask .|. shiftMask, xK_Down ), sendMessage $ Swap D)
     
     -- launch dmenu
-    , ((modMask,               xK_p     ), spawn ("exe=`dmenu_path | dmenu -nb \\#500070 -nf white -sb white -sf black -fn " ++ datFont ++ "` && eval \"exec $exe\""))
+    , ((modMask,               xK_p     ), spawn ("exe=`dmenu_path | dmenu -b -nb black -nf white -sb white -sf black -fn " ++ datFont ++ "` && eval \"exec $exe\""))
 
     , ((modMask,               xK_F12   ), spawn ("gnome-screensaver-command --lock"))
 
