@@ -80,9 +80,9 @@ tabconf = TConf {
     inactiveColor = "black",
     urgentColor = "#a0ffd0",
     
-    activeBorderColor   = "white",
-    inactiveBorderColor = "black",
-    urgentBorderColor   = "black",
+    activeBorderColor   = "#444444",
+    inactiveBorderColor = "#444444",
+    urgentBorderColor   = "#444444",
     
     activeTextColor     = "black",
     inactiveTextColor   = "white",
