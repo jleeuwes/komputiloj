@@ -39,10 +39,13 @@ color calendar_level1 default default
 color calendar_level2 black white
 
 # calendar days with hight activity
-color calendar_level3 white black
+color calendar_level3 black yellow
 
 # the current day in the calendar window (if it is visible)
 color calendar_today white red
+
+# ongedocumenteerd: de geselecteerde dag in de kalender
+color calendar_selection white black
 
 # the vertical line to the left of the timed reminders window
 color left_divider default yellow
