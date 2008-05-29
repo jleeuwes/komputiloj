@@ -7,7 +7,7 @@ Config { font = "-*-terminus-medium-*-*-*-13-*-*-*-*-*-*-*"
                     , Run Swap [] 10
                     , Run StdinReader
                     , Run Battery ["-L","20","-H","50","--low","#f00000", "--normal","#f0a000","--high","#00f000"] 10
-    		            , Run Com "date" ["+\"%e %B %Y %H:%M:%S\""] "date" 10
+    		            , Run Com "date" ["+\"%a %e %B %Y %H:%M:%S\""] "date" 10
                     ]
        , sepChar = "%"
        , alignSep = "}{"
