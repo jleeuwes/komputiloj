@@ -66,7 +66,7 @@ layouts = windowNavigation (tiled ||| Mirror tiled ||| tabbed shrinkText tabconf
 
 
 manageer  = composeAll [
-    className   =? "Firefox-bin" --> doF (W.shift "web")
+    className   =? "Firefox-bin" --> doF (W.focusDown . W.shift "web")
     , className =? "Pidgin"  --> doF (W.shift "com")
     , className =? "Thunderbird-bin" --> doF (W.shift "mail")
     , className =? "Rhythmbox" --> doF (W.shift "muziek")
@@ -75,7 +75,7 @@ manageer  = composeAll [
 
 
 
-tabconf = TConf {
+tabconf = Theme {
     activeColor = "white",
     inactiveColor = "black",
     urgentColor = "#a0ffd0",
@@ -89,7 +89,9 @@ tabconf = TConf {
     urgentTextColor     = "black",
     
     fontName = datFont,
-    tabSize  = 15
+    
+    decoWidth = 100,
+    decoHeight = 15
   }
 
 
