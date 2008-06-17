@@ -1,5 +1,6 @@
 :syntax enable
-:set mouse=a
+:set ignorecase
+:set mouse=
 :set number
 :set autoindent
 :set expandtab
