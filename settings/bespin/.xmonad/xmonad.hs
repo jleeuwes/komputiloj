@@ -14,8 +14,8 @@ import Data.Map (union, fromList)
 
 
 -- withUrgencyHook veroorzaakt de pidgin-crash
--- main = xmonad $ withUrgencyHook NoUrgencyHook configuur
-main = xmonad configuur
+main = xmonad $ withUrgencyHook NoUrgencyHook configuur
+-- main = xmonad configuur
 
 
 
@@ -40,11 +40,20 @@ configuur = defaultConfig {
         
         keys = (\c -> extraKeys c `union` keys defaultConfig c),
         
-        logHook = dynamicLog,
+        logHook = dynamicLogWithPP logPP,
         layoutHook = layouts,
         manageHook = manageer
     }
 
+logPP = defaultPP {
+    ppCurrent = \i -> "<fc=#ffff00>[" ++ i ++ "]</fc>",
+    ppVisible = \i -> i,
+    ppHidden  = \i -> i,
+    ppHiddenNoWindows = \i -> "",
+    ppUrgent = \i -> "<fc=#ff00ff>" ++ i ++ "</fc>",
+    ppSep = " | ",
+    ppWsSep = " "
+  }
 
 
 
