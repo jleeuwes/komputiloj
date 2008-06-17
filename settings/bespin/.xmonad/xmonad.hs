@@ -75,7 +75,7 @@ layouts = windowNavigation (tiled ||| Mirror tiled ||| tabbed shrinkText tabconf
 
 
 manageer  = composeAll [
-    className   =? "Firefox-bin" --> doF (W.focusDown . W.shift "web")
+    className   =? "Firefox" --> doF (W.focusDown . W.shift "web")
     , className =? "Pidgin"  --> doF (W.shift "com")
     , className =? "Thunderbird-bin" --> doF (W.shift "mail")
     , className =? "Rhythmbox" --> doF (W.shift "muziek")
