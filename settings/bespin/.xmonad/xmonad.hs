@@ -61,7 +61,7 @@ logPP = defaultPP {
 layouts = windowNavigation $
               onWorkspace "com" Grid $
               onWorkspace "tekst" (tiled ||| Mirror tiled) $
-              onWorkspaces ["web","mail"] (tabs) $
+              onWorkspaces ["web","mail"] (tabs ||| Grid) $
               (tiled ||| Mirror tiled ||| tabs ||| Grid ||| full)
         where full = noBorders Full
               tiled = Tall nmaster delta ratio
@@ -73,7 +73,8 @@ layouts = windowNavigation $
 
 
 manageer  = composeAll [
-    className   =? "Firefox" --> doF (W.focusDown . W.shift "web")
+    -- className   =? "Firefox" --> doF (W.focusDown . W.shift "web")
+    className   =? "Firefox" --> doF (W.shift "web")
     , className =? "Pidgin"  --> doF (W.shift "com")
     , className =? "Thunderbird-bin" --> doF (W.shift "mail")
     , className =? "Rhythmbox" --> doF (W.shift "muziek")
