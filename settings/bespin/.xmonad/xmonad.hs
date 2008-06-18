@@ -20,8 +20,8 @@ main = xmonad $ withUrgencyHook NoUrgencyHook configuur
 
 
 
-kBorderNormaal = "white"
-kBorderSelect  = "black"
+kBorderNormaal = "black"
+kBorderSelect  = "white"
 kBalk          = "black"
 datFont        = "-*-terminus-medium-*-*-*-13-*-*-*-*-*-*-*" 
 
@@ -33,7 +33,7 @@ wextra totaal xs = xs ++ map show [l+1..l+1+n]
 
 configuur = defaultConfig {
         terminal           = "gnome-terminal",
-        borderWidth        = 2,
+        borderWidth        = 1,
         workspaces         = ["com","tekst","web","mail","terminals","6","7","8","muziek"],
         normalBorderColor  = kBorderNormaal,
         focusedBorderColor = kBorderSelect,
@@ -60,13 +60,13 @@ logPP = defaultPP {
 
 layouts = windowNavigation $
               onWorkspace "com" Grid $
-              onWorkspace "tekst" (tiled ||| Mirror tiled) $
+              onWorkspace "tekst" (mirrorTiled ||| tiled) $
               onWorkspaces ["web","mail"] (tabs ||| Grid) $
-              (tiled ||| Mirror tiled ||| tabs ||| Grid ||| full)
+              (tiled ||| mirrorTiled ||| tabs ||| Grid ||| full)
         where full = noBorders Full
-              tiled = Tall nmaster delta ratio
+              tiled       =          Tall nmaster delta (3/5)
+              mirrorTiled = Mirror $ Tall nmaster delta (4/5)
               nmaster = 1
-              ratio = 3/5
               delta = 3/100
               tabs  = tabbed shrinkText tabconf
 
