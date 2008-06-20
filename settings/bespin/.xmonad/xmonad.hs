@@ -5,6 +5,7 @@ import XMonad.Layout.Tabbed
 import XMonad.Layout.WindowNavigation
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.UrgencyHook
+import XMonad.Hooks.SetWMName
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Grid
 
@@ -137,9 +138,14 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList [
     -- launch dmenu
     , ((modMask,               xK_p     ), spawn ("exe=`dmenu_path | dmenu -b -nb black -nf white -sb white -sf black -fn " ++ datFont ++ "` && eval \"exec $exe\""))
 
+    -- scherm locken
     , ((modMask,               xK_F12   ), spawn ("gnome-screensaver-command --lock"))
 
+    -- naar aandachtvragend venster
     , ((modMask              , xK_BackSpace), focusUrgent)
+
+    -- hack de WM-naam om Java misschien te laten werken
+    , ((modMask .|. controlMask .|. shiftMask, xK_z), setWMName "LG3D")
 
   ]
 
