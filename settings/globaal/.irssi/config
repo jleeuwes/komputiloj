@@ -252,7 +252,7 @@ settings = {
     beep_msg_level = "MSGS NOTICES DCC DCCMSGS HILIGHT";
     autolog = "yes";
   };
-  "fe-text" = { };
+  "fe-text" = { actlist_sort = "refnum"; };
 };
 logs = {
   "~/irclogs/comingout/log-%Y-%m-%d" = {
