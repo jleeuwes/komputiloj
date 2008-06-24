@@ -33,6 +33,7 @@ wextra totaal xs = xs ++ map show [l+1..l+1+n]
 
 
 configuur = defaultConfig {
+        modMask            = mod4Mask,
         terminal           = "gnome-terminal",
         borderWidth        = 1,
         workspaces         = ["com","tekst","web","mail","terminals","6","7","8","muziek"],
