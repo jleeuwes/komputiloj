@@ -3,6 +3,7 @@
 #env DISPLAY=:0.0 wmii   #we wachten op deze om af te sluiten
 
 if xrandr --screen 1 --prop; then
+  #twee schermen zonder Xinerama
   SCHERMEN=2
 
   echo Meerdere schermen

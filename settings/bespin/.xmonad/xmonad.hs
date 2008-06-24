@@ -49,7 +49,7 @@ configuur = defaultConfig {
 
 logPP = defaultPP {
     ppCurrent = \i -> "<fc=#ffff00>[" ++ i ++ "]</fc>",
-    ppVisible = \i -> i,
+    ppVisible = \i -> "<fc=#ff7700>(" ++ i ++ ")</fc>",
     ppHidden  = \i -> i,
     ppHiddenNoWindows = \i -> "",
     ppUrgent = \i -> "<fc=#ff00ff>" ++ i ++ "</fc>",
@@ -105,7 +105,7 @@ tabconf = Theme {
 
 
 
-extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList [
+extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList ([
 
     -- Kleinere master
     ((modMask, xK_minus), sendMessage Shrink)
@@ -147,5 +147,12 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList [
     -- hack de WM-naam om Java misschien te laten werken
     , ((modMask .|. controlMask .|. shiftMask, xK_z), setWMName "LG3D")
 
-  ]
+  ] ++
+    -- overgenomen van http://paste.lisp.org/display/58874, snap er zo snel geen hol van:
+    -- mod-{w,e,r} %! Switch to physical/Xinerama screens 1, 2, or 3
+    -- mod-shift-{w,e,r} %! Move client to screen 1, 2, or 3
+    [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
+        | (key, sc) <- zip [xK_Page_Down, xK_Page_Up] [0..]
+        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+  )
 
