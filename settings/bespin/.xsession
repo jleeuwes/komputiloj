@@ -33,6 +33,6 @@ mkfifo $PIPE
 
 ssh-agent ~/bin/xmonad > $PIPE
 
-if [ "$SCHERMEN" = "2" ]; then
+#if [ "$SCHERMEN" = "2" ]; then
   #xset -display :0.0 dpms force on
-fi
+#fi
