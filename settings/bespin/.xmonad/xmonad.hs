@@ -8,16 +8,18 @@ import XMonad.Hooks.UrgencyHook
 import XMonad.Hooks.SetWMName
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Grid
+import XMonad.Util.Run (spawnPipe)
 
 import qualified XMonad.StackSet as W
 import Data.Map (union, fromList)
-
+import System.IO (hPutStrLn)
 
 
 
 -- withUrgencyHook veroorzaakt de pidgin-crash
-main = xmonad $ withUrgencyHook NoUrgencyHook configuur
--- main = xmonad configuur
+main = do
+  pijp <- spawnPipe "xmobar"
+  xmonad $ withUrgencyHook NoUrgencyHook $ configuur pijp
 
 
 
@@ -32,10 +34,10 @@ wextra totaal xs = xs ++ map show [l+1..l+1+n]
         n = totaal - l
 
 
-configuur = defaultConfig {
+configuur pijp = defaultConfig {
         modMask            = mod4Mask,
         terminal           = "gnome-terminal",
-        borderWidth        = 1,
+        borderWidth        = 2,
         workspaces         = ["com","tekst","web","mail","terminals","6","7","8","muziek"],
         normalBorderColor  = kBorderNormaal,
         focusedBorderColor = kBorderSelect,
@@ -43,21 +45,39 @@ configuur = defaultConfig {
         
         keys = (\c -> extraKeys c `union` keys defaultConfig c),
         
-        logHook = dynamicLogWithPP logPP,
+        logHook = dynamicLogWithPP $ logPP pijp,
         layoutHook = layouts,
         manageHook = manageer
     }
 
-logPP = defaultPP {
+logPP pijp = defaultPP {
     ppCurrent = \i -> "<fc=#ffff00>[" ++ i ++ "]</fc>",
     ppVisible = \i -> "<fc=#ff7700>(" ++ i ++ ")</fc>",
-    ppHidden  = \i -> i,
+    ppHidden  = \i -> "<fc=#707070>" ++ i ++ "</fc>",
     ppHiddenNoWindows = \i -> "",
-    ppUrgent = \i -> "<fc=#ff00ff>" ++ i ++ "</fc>",
-    ppSep = " | ",
-    ppWsSep = " "
+    ppUrgent = \i -> "<fc=#ff00ff>" ++ schoon i ++ "*</fc>",
+    ppSep = " ",
+    ppWsSep = " ",
+
+    ppLayout = layoutCode,
+    ppOrder = \[ws, l, t] -> [l, ws, t],
+
+    ppOutput = hPutStrLn pijp
   }
 
+schoon = schoon' False
+schoon' _       [] = []
+schoon' _   ('<':xs) = schoon' True xs
+schoon' _   ('>':xs) = schoon' False xs
+schoon' True  (_:xs) = schoon' True xs
+schoon' False (x:xs) = x : schoon' False xs
+
+layoutCode "Grid" = "#"
+layoutCode "Tall" = "|"
+layoutCode "Mirror Tall" = "-"
+layoutCode "Tabbed Simplest" = "T"
+layoutCode "Full" = "F"
+layoutCode i      = '?' : i
 
 
 layouts = windowNavigation $

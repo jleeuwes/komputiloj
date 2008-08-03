@@ -1,4 +1,4 @@
-Config { font = "-*-terminus-medium-*-*-*-13-*-*-*-*-*-*-*"
+Config { font = "-misc-fixed-bold-*-*-*-13-*-*-*-*-*-*-*"
        , bgColor = "black"
        , fgColor = "white"
        , position = Bottom
@@ -8,8 +8,9 @@ Config { font = "-*-terminus-medium-*-*-*-13-*-*-*-*-*-*-*"
                     , Run StdinReader
                     , Run Battery ["-L","10","-H","50","--low","#f00000", "--normal","#f0a000","--high","#00f000"] 10
     		            , Run Com "date" ["+\"%a %e %B %Y %H:%M:%S\""] "date" 10
+                    , Run Com "bash" ["-c", "\"rhythmbox-client --no-start --print-playing|xargs -0 echo\""] "playing" 10
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%StdinReader% } { %battery% | %date%"
+       , template = "%StdinReader% } { <fc=#7070EE>%playing%</fc> | %battery% | %date%"
        }
