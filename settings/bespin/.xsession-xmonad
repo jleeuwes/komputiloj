@@ -25,12 +25,18 @@ if test -z "$DBUS_SESSION_BUS_ADDRESS" ; then
   echo "D-Bus per-session daemon address is: $DBUS_SESSION_BUS_ADDRESS"
 fi
 
-unclutter -idle 1 -root &
 gnome-settings-daemon &
-~/bin/desktop-decoratie &
+
+~/bin/desktop-decoratie
+
+#sleep 2
 
 #zet muiscursor op achtergrond goed (verdraaid simpel achteraf):
 xsetroot -cursor_name arrow
+unclutter -idle 1 -root &
+
+#compose key enzo (vet!)
+$(sleep 10 && setxkbmap) &
 
 #PIPE=$HOME/.xmonad-log
 
@@ -41,7 +47,9 @@ xsetroot -cursor_name arrow
 
 #ssh-agent ~/bin/xmonad > $PIPE
 
+ivman -c /etc/ivman
 ssh-agent ~/bin/xmonad
+pkill ivman #beetje bruut
 
 #if [ "$SCHERMEN" = "2" ]; then
   #xset -display :0.0 dpms force on

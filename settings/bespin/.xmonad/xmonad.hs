@@ -26,7 +26,7 @@ main = do
 kBorderNormaal = "black"
 kBorderSelect  = "white"
 kBalk          = "black"
-datFont        = "-*-terminus-medium-*-*-*-13-*-*-*-*-*-*-*" 
+datFont        = "-misc-fixed-bold-*-*-*-13-*-*-*-*-*-*-*"
 
 
 wextra totaal xs = xs ++ map show [l+1..l+1+n]

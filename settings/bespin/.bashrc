@@ -79,6 +79,15 @@ if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
 
+function iks() {
+  IKS=$1
+  [ -z "$IKS" ] && IKS=xmonad
+  if [ "$IKS" = "-" ]; then
+    rm -f ~/.xsession
+  else
+    ln -sf ~/settings/bespin/.xsession-$IKS ~/.xsession
+  fi
+}
 
 # toon dingen die je niet moet vergeten!
 #~/bin/doe top 5 dead
