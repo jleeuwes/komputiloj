@@ -254,17 +254,11 @@ settings = {
   };
   "fe-text" = { actlist_sort = "refnum"; };
 };
-logs = {
-  "~/irclogs/comingout/log-%Y-%m-%d" = {
-    auto_open = "yes";
-    level = "ALL";
-    items = ( { type = "target"; name = "#comingout.nl"; } );
-  };
-};
+logs = { };
 
 
 hilights = (
-  { text = "Jeroen"; nick = "yes"; word = "yes"; color = "%U"; },
-  { text = "JeroenL"; nick = "yes"; word = "yes"; color = "%U"; },
+  { text = "JeroenL?"; nick = "yes"; word = "yes"; color = "%U"; },
   { text = "jleeuwes"; nick = "yes"; word = "yes"; color = "%U"; }
 );
+ignores = ( );
