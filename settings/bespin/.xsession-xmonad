@@ -33,7 +33,7 @@ gnome-settings-daemon &
 
 #zet muiscursor op achtergrond goed (verdraaid simpel achteraf):
 xsetroot -cursor_name arrow
-unclutter -idle 1 -root &
+$(sleep 10 && unclutter -idle 1 -root) &
 
 #compose key enzo (vet!)
 $(sleep 10 && setxkbmap) &
