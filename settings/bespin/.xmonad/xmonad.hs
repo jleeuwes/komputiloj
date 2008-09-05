@@ -9,19 +9,26 @@ import XMonad.Hooks.SetWMName
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Grid
 import XMonad.Util.Run (spawnPipe)
+import XMonad.Util.Loggers
 
 import qualified XMonad.StackSet as W
 import Data.Map (union, fromList)
 import System.IO (hPutStrLn)
 
 
+dzenCmd = "dzen2 -e '' -fg white -bg black -ta l -h 15 -x 0 -y 785 -fn " ++ datFont
 
--- withUrgencyHook veroorzaakt de pidgin-crash
+-- withUrgencyHook veroorzaakt de pidgin-crash -- NIET MEER \o/
 main = do
-  pijp <- spawnPipe "xmobar"
+  pijp <- spawnPipe dzenCmd
   xmonad $ withUrgencyHook NoUrgencyHook $ configuur pijp
 
 
+-- voor leesbare foutmeldingen bij compileerfouten, voeg regel toe in /etc/X11/app-defaults/Xmessage-color:
+-- *Text*foreground: white
+
+iconPath = "/home/jeroen/.xmonad/icons/"
+iconsFor = ["com", "tekst", "web", "mail", "terminals", "muziek"]
 
 kBorderNormaal = "black"
 kBorderSelect  = "white"
@@ -51,24 +58,43 @@ configuur pijp = defaultConfig {
     }
 
 logPP pijp = defaultPP {
-    ppCurrent = \i -> "<fc=#ffff00>[" ++ i ++ "]</fc>",
-    ppVisible = \i -> "<fc=#ff7700>(" ++ i ++ ")</fc>",
-    ppHidden  = \i -> "<fc=#707070>" ++ i ++ "</fc>",
+    -- ppCurrent = \i -> "^fg(#ffff00)[" ++ i ++ "]^fg()",
+    ppCurrent = \i -> "^fg(black)^bg(white)" ++ blokje i ++ "^fg()^bg()",
+    ppVisible = \i -> "^fg(#ff7700)(" ++ blokje i ++ ")^fg()",
+    ppHidden  = \i -> "^fg(#707070)" ++ blokje i ++ "^fg()",
     ppHiddenNoWindows = \i -> "",
-    ppUrgent = \i -> "<fc=#ff00ff>" ++ schoon i ++ "*</fc>",
+    ppUrgent = \i -> "^fg()^bg(#d000d0)" ++ blokje (schoon i) ++ "^fg()^bg()",
     ppSep = " ",
-    ppWsSep = " ",
+    ppWsSep = "",
 
     ppLayout = layoutCode,
-    ppOrder = \[ws, l, t] -> [l, ws, t],
+    ppOrder = order,
+
+    ppExtras = [return Nothing],
 
     ppOutput = hPutStrLn pijp
   }
+  where order (ws:l:t:rest) = l : ws : t : rest
+        order gek           = gek
+
+
+blokje = marge 5 . icon
+
+icon ws | ws `elem` iconsFor = concat ["^i(", iconPath, ws, ".xbm", ")"]
+        | otherwise          = safe ws
+
+marge m txt = concat ["^p(", ms, ")", txt, "^p(", ms, ")"]
+  where ms = show m
+
+safe [] = []
+safe ('^':xs) = '^' : '^' : safe xs
+safe (x:xs)   = x : safe xs
 
 schoon = schoon' False
 schoon' _       [] = []
-schoon' _   ('<':xs) = schoon' True xs
-schoon' _   ('>':xs) = schoon' False xs
+schoon' _   ('^':'^':xs) = schoon' False xs
+schoon' _   ('^':xs) = schoon' True xs
+schoon' _   (')':xs) = schoon' False xs
 schoon' True  (_:xs) = schoon' True xs
 schoon' False (x:xs) = x : schoon' False xs
 
