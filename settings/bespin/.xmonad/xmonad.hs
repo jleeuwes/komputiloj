@@ -13,7 +13,11 @@ import XMonad.Util.Loggers
 
 import qualified XMonad.StackSet as W
 import Data.Map (union, fromList)
+import Data.List (isSuffixOf)
+import Data.Char
 import System.IO (hPutStrLn)
+import System.IO.Unsafe
+import System.Directory (getDirectoryContents)
 
 
 dzenCmd = "dzen2 -e '' -fg white -bg black -ta l -h 15 -x 0 -y 785 -fn " ++ datFont
@@ -28,7 +32,15 @@ main = do
 -- *Text*foreground: white
 
 iconPath = "/home/jeroen/.xmonad/icons/"
-iconsFor = ["com", "tekst", "web", "mail", "terminals", "muziek"]
+wsIconPath = iconPath ++ "workspaces/"
+lIconPath  = iconPath ++ "layouts/"
+
+iconsFor idir = unsafePerformIO $ do
+  dir <- getDirectoryContents idir
+  return [take (length f - 4) f | f <- dir, ".xbm" `isSuffixOf` f] -- filter (isSuffixOf ".xbm") dir
+
+wsIconsFor = iconsFor wsIconPath
+lIconsFor  = iconsFor lIconPath
 
 kBorderNormaal = "black"
 kBorderSelect  = "white"
@@ -60,14 +72,14 @@ configuur pijp = defaultConfig {
 logPP pijp = defaultPP {
     -- ppCurrent = \i -> "^fg(#ffff00)[" ++ i ++ "]^fg()",
     ppCurrent = \i -> "^fg(black)^bg(white)" ++ blokje i ++ "^fg()^bg()",
-    ppVisible = \i -> "^fg(#ff7700)(" ++ blokje i ++ ")^fg()",
-    ppHidden  = \i -> "^fg(#707070)" ++ blokje i ++ "^fg()",
+    ppVisible = \i -> "^fg(black)^bg(#ff7700)" ++ blokje i ++ "^fg()^bg()",
+    ppHidden  = \i -> "^fg(#707070)^bg(#202020)" ++ blokje i ++ "^fg()^bg()",
     ppHiddenNoWindows = \i -> "",
-    ppUrgent = \i -> "^fg()^bg(#d000d0)" ++ blokje (schoon i) ++ "^fg()^bg()",
-    ppSep = " ",
+    ppUrgent = \i -> "^fg(#ff00ff)" ++ blokje (schoon i) ++ "^fg()",
+    ppSep = "^p(10)",
     ppWsSep = "",
 
-    ppLayout = layoutCode,
+    ppLayout = layoutIcon,
     ppOrder = order,
 
     ppExtras = [return Nothing],
@@ -78,10 +90,13 @@ logPP pijp = defaultPP {
         order gek           = gek
 
 
-blokje = marge 5 . icon
+blokje = wsIcon
 
-icon ws | ws `elem` iconsFor = concat ["^i(", iconPath, ws, ".xbm", ")"]
-        | otherwise          = safe ws
+icon iPath iSet unknown i | i `elem` iSet = concat ["^i(", iPath, i, ".xbm", ")"]
+                          | otherwise     = unknown $ safe i
+wsIcon = icon wsIconPath wsIconsFor id
+layoutIcon i = concat ["^fg(#707070)", ic, "^fg()"]
+  where ic = icon lIconPath lIconsFor ('?':) $ filter (not . isSpace) i
 
 marge m txt = concat ["^p(", ms, ")", txt, "^p(", ms, ")"]
   where ms = show m
@@ -97,14 +112,6 @@ schoon' _   ('^':xs) = schoon' True xs
 schoon' _   (')':xs) = schoon' False xs
 schoon' True  (_:xs) = schoon' True xs
 schoon' False (x:xs) = x : schoon' False xs
-
-layoutCode "Grid" = "#"
-layoutCode "Tall" = "|"
-layoutCode "Mirror Tall" = "-"
-layoutCode "Tabbed Simplest" = "T"
-layoutCode "Full" = "F"
-layoutCode i      = '?' : i
-
 
 layouts = windowNavigation $
               onWorkspace "com" Grid $
