@@ -229,9 +229,11 @@ extraDzen = do
   stat <- spawnPipe $ dzenCmd ++ " -e onstart=raise -x 1080 -w 200 -ta r -bg #202020"
   forkIO $ extraLoop stat
 
+toSeconds = floor . (*1000000)
+
 extraLoop stat = do
   extraStat >>= hPutStrLn stat
-  threadDelay 1000000
+  threadDelay $ toSeconds 0.5
   extraLoop stat
 
 extraStat = do
