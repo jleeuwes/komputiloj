@@ -9,22 +9,30 @@ import XMonad.Hooks.SetWMName
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Grid
 import XMonad.Util.Run (spawnPipe)
-import XMonad.Util.Loggers
 
 import qualified XMonad.StackSet as W
 import Data.Map (union, fromList)
-import Data.List (isSuffixOf)
+import Data.List hiding (union)
 import Data.Char
 import System.IO (hPutStrLn)
 import System.IO.Unsafe
 import System.Directory (getDirectoryContents)
 
+import Control.Concurrent
+import Data.Time.LocalTime
+import Data.Time.Calendar
+import Data.Maybe
+import Text.Regex
+import Numeric (showHex)
 
-dzenCmd = "dzen2 -e '' -fg white -bg black -ta l -h 15 -x 0 -y 785 -fn " ++ datFont
+
+dzenCmd = "dzen2 -e '' -fg white -bg black -h 15 -y 785 -fn " ++ datFont
+datFont        = "-misc-fixed-bold-*-*-*-13-*-*-*-*-*-*-*"
 
 -- withUrgencyHook veroorzaakt de pidgin-crash -- NIET MEER \o/
 main = do
-  pijp <- spawnPipe dzenCmd
+  pijp <- spawnPipe $ dzenCmd ++ " -x 0 -ta l"
+  extraDzen
   xmonad $ withUrgencyHook NoUrgencyHook $ configuur pijp
 
 
@@ -34,6 +42,7 @@ main = do
 iconPath = "/home/jeroen/.xmonad/icons/"
 wsIconPath = iconPath ++ "workspaces/"
 lIconPath  = iconPath ++ "layouts/"
+extraIconPath = iconPath ++ "extra/"
 
 iconsFor idir = unsafePerformIO $ do
   dir <- getDirectoryContents idir
@@ -45,7 +54,6 @@ lIconsFor  = iconsFor lIconPath
 kBorderNormaal = "black"
 kBorderSelect  = "white"
 kBalk          = "black"
-datFont        = "-misc-fixed-bold-*-*-*-13-*-*-*-*-*-*-*"
 
 
 wextra totaal xs = xs ++ map show [l+1..l+1+n]
@@ -210,3 +218,67 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList ([
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
   )
 
+
+
+
+-- extra dzen-balk
+
+join j = concat . intersperse j
+
+extraDzen = do
+  stat <- spawnPipe $ dzenCmd ++ " -x 1000 -w 280 -ta r"
+  forkIO $ extraLoop stat
+
+extraLoop stat = do
+  extraStat >>= hPutStrLn stat
+  threadDelay 1000000
+  extraLoop stat
+
+extraStat = do
+  stats <- sequence [battery, datetime]
+  return $ join " " stats
+
+extraIcon i = concat ["^i(", extraIconPath, i, ".xbm)"]
+
+batteryColor b | b < 10    = "^fg(black)^bg(red)"
+               | otherwise = concat ["^fg(#", byteI, byteH, "00)"]
+                           where byte  = 255 * b `div` 100
+                                 byteH = showHex byte ""
+                                 byteI = showHex (255-byte) ""
+
+battery = do
+  info <- readFile "/proc/acpi/battery/BAT1/info"
+  state <- readFile "/proc/acpi/battery/BAT1/state"
+  power <- readFile "/proc/acpi/ac_adapter/ACAD/state"
+  let bat = do
+      remain <- lookup "remaining capacity" $ splitInfo state
+      total <- lookup "last full capacity" $ splitInfo info
+      return $ amp remain * 100 `div` amp total
+  let acStr = case lookup "state" $ splitInfo power of
+          Nothing         -> ""
+          Just "on-line"  -> extraIcon "adapter"
+          Just "off-line" -> extraIcon "batterij"
+          _               -> "?"
+  let batStr = maybe "" (\b -> concat [batteryColor b, acStr, show b, "%", "^fg()^bg()"]) bat
+  return batStr
+
+amp = read . takeWhile isDigit
+
+splitInfo = catMaybes . map (ltup . splitRegex (mkRegex ":\\s*")) . lines
+  where ltup [a,b] = Just (a,b)
+        ltup _     = Nothing
+
+datetime = do
+  zt <- getZonedTime
+  let lt = zonedTimeToLocalTime zt
+  let (yy,mm,dd) = toGregorian $ localDay lt
+  let time = localTimeOfDay lt
+  return $ concat [show dd, " ", maand mm, " ", show yy, " ", nul $ show $ todHour time, ":", nul $ show $ todMin time]
+
+maand = (maanden !!)
+maanden = ["jan", "feb", "maart", "april", "mei",
+  "juni", "juli", "augustus", "september", "oktober", "november", "december"]
+
+nul []  = []
+nul [x] = ['0', x]
+nul xs  = xs
