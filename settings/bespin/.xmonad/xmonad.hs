@@ -8,7 +8,7 @@ import XMonad.Hooks.UrgencyHook
 import XMonad.Hooks.SetWMName
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Grid
-import XMonad.Util.Run (spawnPipe)
+import XMonad.Util.Run
 
 import qualified XMonad.StackSet as W
 import Data.Map (union, fromList)
@@ -26,12 +26,12 @@ import Text.Regex
 import Numeric (showHex)
 
 
-dzenCmd = "dzen2 -e '' -fg white -bg black -h 15 -y 785 -fn " ++ datFont
+dzenCmd = "dzen2 -fg white -h 15 -y 785 -fn " ++ datFont
 datFont        = "-misc-fixed-bold-*-*-*-13-*-*-*-*-*-*-*"
 
 -- withUrgencyHook veroorzaakt de pidgin-crash -- NIET MEER \o/
 main = do
-  pijp <- spawnPipe $ dzenCmd ++ " -x 0 -ta l"
+  pijp <- spawnPipe $ dzenCmd ++ " -e onstart=lower -bg black -x 0 -ta l"
   extraDzen
   xmonad $ withUrgencyHook NoUrgencyHook $ configuur pijp
 
@@ -89,7 +89,7 @@ logPP pijp = defaultPP {
     ppLayout = layoutIcon,
     ppOrder = order,
 
-    ppExtras = [return Nothing],
+    ppExtras = [io nowPlaying >>= return . Just],
 
     ppOutput = hPutStrLn pijp
   }
@@ -226,7 +226,7 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList ([
 join j = concat . intersperse j
 
 extraDzen = do
-  stat <- spawnPipe $ dzenCmd ++ " -x 1000 -w 280 -ta r"
+  stat <- spawnPipe $ dzenCmd ++ " -e onstart=raise -x 1080 -w 200 -ta r -bg #202020"
   forkIO $ extraLoop stat
 
 extraLoop stat = do
@@ -235,10 +235,15 @@ extraLoop stat = do
   extraLoop stat
 
 extraStat = do
-  stats <- sequence [battery, datetime]
+  stats <- sequence [battery, datetime] --nowPlaying zit in 'normale' balk
   return $ join " " stats
 
 extraIcon i = concat ["^i(", extraIconPath, i, ".xbm)"]
+
+nowPlaying = eetError "" $ do
+  np <- runProcessWithInput "/home/jeroen/bin/np" [] ""
+  let lns = lines np
+  return $ if null lns then "" else concat ["^fg(#7070ff)", extraIcon "nowPlaying", head lns, "^fg()"]
 
 batteryColor b | b < 10    = "^fg(black)^bg(red)"
                | otherwise = concat ["^fg(#", byteI, byteH, "00)"]
@@ -246,7 +251,10 @@ batteryColor b | b < 10    = "^fg(black)^bg(red)"
                                  byteH = showHex byte ""
                                  byteI = showHex (255-byte) ""
 
-battery = do
+eetError :: a -> IO a -> IO a
+eetError def io = catch io (\e -> do putStrLn (show e) ; return def)
+
+battery = eetError "" $ do
   info <- readFile "/proc/acpi/battery/BAT1/info"
   state <- readFile "/proc/acpi/battery/BAT1/state"
   power <- readFile "/proc/acpi/ac_adapter/ACAD/state"
