@@ -70,12 +70,11 @@ configuur pijp = defaultConfig {
     }
 
 logPP pijp = defaultPP {
-    -- ppCurrent = \i -> "^fg(#ffff00)[" ++ i ++ "]^fg()",
     ppCurrent = \i -> "^fg(black)^bg(white)" ++ blokje i ++ "^fg()^bg()",
     ppVisible = \i -> "^fg(black)^bg(#ff7700)" ++ blokje i ++ "^fg()^bg()",
     ppHidden  = \i -> "^fg(#707070)^bg(#202020)" ++ blokje i ++ "^fg()^bg()",
-    ppHiddenNoWindows = \i -> "",
-    ppUrgent = \i -> "^fg(#ff00ff)" ++ blokje (schoon i) ++ "^fg()",
+    ppHiddenNoWindows = \i -> "^bg(#202020)^p(15)^bg()",
+    ppUrgent = \i -> "^fg(#00ff00)^bg(#202020)" ++ schoon i ++ "^fg()^bg()",
     ppSep = "^p(10)",
     ppWsSep = "",
 
@@ -92,11 +91,11 @@ logPP pijp = defaultPP {
 
 blokje = wsIcon
 
-icon iPath iSet unknown i | i `elem` iSet = concat ["^i(", iPath, i, ".xbm", ")"]
-                          | otherwise     = unknown $ safe i
-wsIcon = icon wsIconPath wsIconsFor id
+icon iPath iSet i = concat ["^i(", iPath, ic, ".xbm", ")"]
+  where ic = if i `elem` iSet then i else "unknown"
+wsIcon = icon wsIconPath wsIconsFor
 layoutIcon i = concat ["^fg(#707070)", ic, "^fg()"]
-  where ic = icon lIconPath lIconsFor ('?':) $ filter (not . isSpace) i
+  where ic = icon lIconPath lIconsFor $ filter (not . isSpace) i
 
 marge m txt = concat ["^p(", ms, ")", txt, "^p(", ms, ")"]
   where ms = show m
@@ -107,9 +106,10 @@ safe (x:xs)   = x : safe xs
 
 schoon = schoon' False
 schoon' _       [] = []
-schoon' _   ('^':'^':xs) = schoon' False xs
-schoon' _   ('^':xs) = schoon' True xs
-schoon' _   (')':xs) = schoon' False xs
+schoon' False ('^':'^':xs) = '^' : schoon' False xs
+schoon' False ('^':'i':xs) = '^' : 'i' : schoon' False xs
+schoon' _     ('^':xs) = schoon' True xs
+schoon' True  (')':xs) = schoon' False xs
 schoon' True  (_:xs) = schoon' True xs
 schoon' False (x:xs) = x : schoon' False xs
 
