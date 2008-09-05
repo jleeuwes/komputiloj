@@ -226,7 +226,7 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList ([
 join j = concat . intersperse j
 
 extraDzen = do
-  stat <- spawnPipe $ dzenCmd ++ " -e onstart=raise -x 1080 -w 200 -ta r -bg #202020"
+  stat <- spawnPipe $ dzenCmd ++ " -e onstart=raise -x 1060 -w 220 -ta r -bg #202020"
   forkIO $ extraLoop stat
 
 toSeconds = floor . (*1000000)
@@ -238,7 +238,7 @@ extraLoop stat = do
 
 extraStat = do
   stats <- sequence [battery, datetime] --nowPlaying zit in 'normale' balk
-  return $ join " " stats
+  return $ join " " stats ++ "^p(5)"
 
 extraIcon i = concat ["^i(", extraIconPath, i, ".xbm)"]
 
@@ -285,8 +285,8 @@ datetime = do
   let time = localTimeOfDay lt
   return $ concat [show dd, " ", maand mm, " ", show yy, " ", nul $ show $ todHour time, ":", nul $ show $ todMin time]
 
-maand = (maanden !!)
-maanden = ["jan", "feb", "maart", "april", "mei",
+maand = (maanden !!) . (flip (-) 1)
+maanden = ["januari", "februari", "maart", "april", "mei",
   "juni", "juli", "augustus", "september", "oktober", "november", "december"]
 
 nul []  = []
