@@ -229,11 +229,10 @@ extraDzen = do
   stat <- spawnPipe $ dzenCmd ++ " -e onstart=raise -x 1060 -w 220 -ta r -bg #202020"
   forkIO $ extraLoop stat
 
-toSeconds = floor . (*1000000)
-
+-- TODO: slapen onder controle krijgen. nu wordt batterij enzo pas geupdate bij een update van de normale dzen :(
 extraLoop stat = do
   extraStat >>= hPutStrLn stat
-  threadDelay $ toSeconds 0.5
+  threadDelay 100
   extraLoop stat
 
 extraStat = do
