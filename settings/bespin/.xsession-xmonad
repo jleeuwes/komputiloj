@@ -47,6 +47,8 @@ $(sleep 10 && setxkbmap) &
 
 #ssh-agent ~/bin/xmonad > $PIPE
 
+$(until pidof dzen2; do sleep 1; done ; ~/bin/extrabar) &
+
 ivman -c /etc/ivman
 ssh-agent ~/bin/xmonad
 pkill ivman #beetje bruut
