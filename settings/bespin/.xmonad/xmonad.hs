@@ -226,7 +226,7 @@ extraKeys conf@(XConfig {XMonad.modMask = modMask}) = fromList ([
 join j = concat . intersperse j
 
 extraDzen = do
-  stat <- spawnPipe $ dzenCmd ++ " -e onstart=raise -x 1060 -w 220 -ta r -bg #202020"
+  stat <- spawnPipe $ dzenCmd ++ " -e onstart=raise -x 1040 -w 240 -ta r -bg #202020"
   forkIO $ extraLoop stat
 
 -- TODO: slapen onder controle krijgen. nu wordt batterij enzo pas geupdate bij een update van de normale dzen :(
@@ -282,7 +282,9 @@ datetime = do
   let lt = zonedTimeToLocalTime zt
   let (yy,mm,dd) = toGregorian $ localDay lt
   let time = localTimeOfDay lt
-  return $ concat [show dd, " ", maand mm, " ", show yy, " ", nul $ show $ todHour time, ":", nul $ show $ todMin time]
+  return $ concat [show dd, " ", maand mm, " ", show yy, " ",
+                   nul $ show $ todHour time, ":", nul $ show $ todMin time,
+                   ":", nul $ show $ floor $ todSec time]
 
 maand = (maanden !!) . (flip (-) 1)
 maanden = ["januari", "februari", "maart", "april", "mei",
