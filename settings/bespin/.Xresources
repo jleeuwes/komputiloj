@@ -20,9 +20,10 @@ URxvt.color2: #4e9a06
 URxvt.color3: #c4a000
 URxvt.color4: #3465a4
 URxvt.color5: #75507b
-URxvt.color6: #06989a
+!URxvt.color6: #06989a
+URxvt.color6: #06209a
 URxvt.color7: #d3d7cf
-URxvt.color8: #557553
+URxvt.color8: #555753
 URxvt.color9: #ef2929
 URxvt.color10: #8ae234
 URxvt.color11: #fce94f
@@ -86,7 +87,7 @@ URxvt.cursorColor:        #ffffff
 !URxvt.imFont:             fontname
 !URxvt.title:               URxvt
 !URxvt.iconName:           string
-!URxvt.saveLines:          number
+URxvt.saveLines:           1500
 !URxvt.depth:              number
 !URxvt.transient-for:      windowid
 !URxvt.override-redirect:  boolean
