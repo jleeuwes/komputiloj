@@ -13,7 +13,7 @@ URxvt*font:        xft:Monospace:size=10
 URxvt*scrollBar:  false
 !URxvt*internalBorder: 6
 
-!Tango-kleurenschema
+!Tango-kleurenschema (oranje doet raar :()
 URxvt.color0: black
 URxvt.color1: #cc0000
 URxvt.color2: #4e9a06
