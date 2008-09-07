@@ -2,6 +2,10 @@
 
 !URxvt settings
 URxvt.urlLauncher: firefox
+URxvt.matcher.button: 1
+URxvt.perl-ext-common: matcher
+!URxvt.perl-lib: /opt/local/lib/urxvt/perl/
+
 URxvt*font:        xft:Monospace:size=10
 !URxvt*boldFont:    xft:Monospace:size=10:weight=bold
 !URxvt*italicFont: xft:segoe ui:pixelsize=9
