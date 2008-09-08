@@ -29,25 +29,24 @@ gnome-settings-daemon &
 
 ~/bin/desktop-decoratie
 
-#sleep 2
+na_inlog() {
+  echo '*' extra balkje met tijd enzo
+  ~/bin/extrabar &
 
-#zet muiscursor op achtergrond goed (verdraaid simpel achteraf):
-xsetroot -cursor_name arrow
-$(sleep 10 && unclutter -idle 1 -root) &
+  echo '*' rare brede fonts in rxvt weg!
+  xrdb -load ~/.Xresources
 
-#compose key enzo (vet!)
-$(sleep 10 && setxkbmap) &
+  echo '*' zet muiscursor op achtergrond goed #(verdraaid simpel achteraf):
+  xsetroot -cursor_name arrow
+  echo '*' geen nutteloze muiscursor
+  unclutter -idle 1 -root &
+  
+  echo '*' compose key enzo #(vet!)
+  setxkbmap &
+}
 
-#PIPE=$HOME/.xmonad-log
-
-#rm -f $PIPE
-#mkfifo $PIPE
-
-#~/bin/xmobar < $PIPE &
-
-#ssh-agent ~/bin/xmonad > $PIPE
-
-$(until pidof dzen2; do sleep 1; done ; ~/bin/extrabar) &
+#wacht op grafisch ingelogd zijn met na-inlog-dingen
+$(until pidof dzen2; do sleep 1; done ; na_inlog) &
 
 ivman -c /etc/ivman
 ssh-agent ~/bin/xmonad
