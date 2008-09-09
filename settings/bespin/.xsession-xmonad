@@ -27,9 +27,19 @@ fi
 
 gnome-settings-daemon &
 
-~/bin/desktop-decoratie
+~/bin/desktop-decoratie > /dev/null
+
+wacht_op_na_inlog() {
+  until pidof dzen2; do
+    sleep 1
+  done
+
+  na_inlog
+}
 
 na_inlog() {
+  sleep 1
+
   echo '*' extra balkje met tijd enzo
   ~/bin/extrabar &
 
@@ -46,7 +56,7 @@ na_inlog() {
 }
 
 #wacht op grafisch ingelogd zijn met na-inlog-dingen
-$(until pidof dzen2; do sleep 1; done ; na_inlog) &
+wacht_op_na_inlog &
 
 ivman -c /etc/ivman
 ssh-agent ~/bin/xmonad
