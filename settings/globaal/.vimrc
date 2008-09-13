@@ -1,3 +1,4 @@
+:set background=dark
 :syntax enable
 :set ignorecase
 :set mouse=
