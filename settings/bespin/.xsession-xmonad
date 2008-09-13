@@ -2,20 +2,20 @@
 #env DISPLAY=:0.1 gnome-terminal &
 #env DISPLAY=:0.0 wmii   #we wachten op deze om af te sluiten
 
-if xrandr --screen 1 --prop; then
-  #twee schermen zonder Xinerama
-  SCHERMEN=2
-
-  echo Meerdere schermen
-  export DISPLAY=:0.1
-  xsetroot -display :0.0 -solid black
-  #xset -display :0.0 dpms force off
-  #gnome-screensaver-command --inhibit --reason 'Screensaver crasht met meerdere schermen!' &
-else
-  SCHERMEN=1
-
-  echo Enkel scherm
-fi
+#if xrandr --screen 1 --prop; then
+#  #twee schermen zonder Xinerama
+#  SCHERMEN=2
+#
+#  echo Meerdere schermen
+#  export DISPLAY=:0.1
+#  xsetroot -display :0.0 -solid black
+#  #xset -display :0.0 dpms force off
+#  #gnome-screensaver-command --inhibit --reason 'Screensaver crasht met meerdere schermen!' &
+#else
+#  SCHERMEN=1
+#
+#  echo Enkel scherm
+#fi
 
 #start dbus (uit manpage van dbus-launch)
 ## test for an existing bus daemon, just to be safe
@@ -25,9 +25,10 @@ if test -z "$DBUS_SESSION_BUS_ADDRESS" ; then
   echo "D-Bus per-session daemon address is: $DBUS_SESSION_BUS_ADDRESS"
 fi
 
-gnome-settings-daemon &
+#~/bin/desktop-decoratie > /dev/null
 
-~/bin/desktop-decoratie > /dev/null
+gnome-settings-daemon &
+sleep 1
 
 wacht_op_na_inlog() {
   until pidof dzen2; do
@@ -49,7 +50,7 @@ na_inlog() {
   echo '*' zet muiscursor op achtergrond goed #(verdraaid simpel achteraf):
   xsetroot -cursor_name arrow
   echo '*' geen nutteloze muiscursor
-  unclutter -idle 1 -root &
+  unclutter -idle 1 -jitter 2 -root &
   
   echo '*' compose key enzo #(vet!)
   setxkbmap &
