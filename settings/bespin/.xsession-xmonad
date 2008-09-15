@@ -60,7 +60,7 @@ na_inlog() {
 wacht_op_na_inlog &
 
 ivman -c /etc/ivman
-ssh-agent ~/bin/xmonad
+ssh-agent xmonad
 pkill ivman #beetje bruut
 
 #if [ "$SCHERMEN" = "2" ]; then

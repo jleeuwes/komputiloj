@@ -1,5 +1,5 @@
 include "/etc/wyrdrc"
-include "~/settings/globaal/wyrd-theme-aes2"
+#include "~/settings/globaal/wyrd-theme-aes2"
 
 set week_starts_monday="true"
 set number_weeks="true"
