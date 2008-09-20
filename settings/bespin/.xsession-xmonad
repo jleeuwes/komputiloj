@@ -39,10 +39,7 @@ wacht_op_na_inlog() {
 }
 
 na_inlog() {
-  sleep 1
-
-  echo '*' extra balkje met tijd enzo
-  ~/bin/extrabar &
+  #sleep 1
 
   echo '*' rare brede fonts in rxvt weg!
   xrdb -load ~/.Xresources
@@ -58,6 +55,12 @@ na_inlog() {
 
 #wacht op grafisch ingelogd zijn met na-inlog-dingen
 wacht_op_na_inlog &
+
+#rm -f /home/jeroen/fiefje
+#touch /home/jeroen/fiefje
+
+echo '*' extra balkje met tijd enzo
+~/bin/extrabar &
 
 ivman -c /etc/ivman
 ssh-agent xmonad
