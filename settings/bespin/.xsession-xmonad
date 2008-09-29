@@ -28,7 +28,7 @@ fi
 #~/bin/desktop-decoratie > /dev/null
 
 gnome-settings-daemon &
-sleep 1
+sleep 2
 
 wacht_op_na_inlog() {
   until pidof dzen2; do
@@ -39,15 +39,15 @@ wacht_op_na_inlog() {
 }
 
 na_inlog() {
-  #sleep 1
+  sleep 1
 
   echo '*' rare brede fonts in rxvt weg!
   xrdb -load ~/.Xresources
 
   echo '*' zet muiscursor op achtergrond goed #(verdraaid simpel achteraf):
   xsetroot -cursor_name arrow
-  echo '*' geen nutteloze muiscursor
-  unclutter -idle 1 -jitter 2 -root &
+  #echo '*' geen nutteloze muiscursor
+  #unclutter -idle 1 -jitter 2 -root &
   
   echo '*' compose key enzo #(vet!)
   setxkbmap &
