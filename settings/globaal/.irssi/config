@@ -12,7 +12,7 @@ servers = (
     autoconnect = "yes";
   },
   {
-    address = "sterling.freenode.net";
+    address = "chat.freenode.net";
     chatnet = "freenode";
     port = "6667";
     autoconnect = "no";
@@ -35,7 +35,7 @@ servers = (
 chatnets = {
   ietsnet = { type = "IRC"; nick = "JeroenL"; };
 
-  freenode = { type = "IRC"; nick = "jleeuwes"; };
+  freenode = { type = "IRC"; nick = "loekie"; };
 
   #  IRCnet = {
   #    type = "IRC";
@@ -73,8 +73,9 @@ chatnets = {
 
 channels = (
   { name = "#comingout.nl"; chatnet = "ietsnet"; autojoin = "yes"; },
-  { name = "#rust"; chatnet = "ietsnet"; autojoin = "yes"; },
-  { name = "#tintic"; chatnet = "freenode"; autojoin = "no"; },
+  { name = "#onrust"; chatnet = "ietsnet"; autojoin = "yes"; },
+  { name = "#haskell"; chatnet = "freenode"; },
+  # { name = "#tintic"; chatnet = "freenode"; autojoin = "no"; },
   #  { name = "#irssi"; chatnet = "ircnet"; autojoin = "No"; },
   #  { name = "silc"; chatnet = "silc"; autojoin = "No"; }
 );
@@ -258,7 +259,7 @@ logs = { };
 
 
 hilights = (
-  { text = "JeroenL?"; nick = "yes"; word = "yes"; color = "%U"; },
+  { text = "Jeroen"; nick = "yes"; word = "yes"; color = "%U"; },
   { text = "jleeuwes"; nick = "yes"; word = "yes"; color = "%U"; }
 );
 ignores = ( );
