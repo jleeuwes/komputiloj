@@ -254,6 +254,8 @@ settings = {
     autolog = "yes";
   };
   "fe-text" = { actlist_sort = "refnum"; };
+  "fe-common/irc" = { show_away_once = "yes"; };
+  "perl/core/scripts" = { screen_away_message = "foetsie"; };
 };
 logs = { };
 
