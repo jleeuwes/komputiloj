@@ -28,7 +28,7 @@ fi
 #~/bin/desktop-decoratie > /dev/null
 
 gnome-settings-daemon &
-sleep 2
+#sleep 2
 
 wacht_op_na_inlog() {
   until pidof dzen2; do
