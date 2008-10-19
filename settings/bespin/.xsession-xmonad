@@ -51,6 +51,7 @@ na_inlog() {
   
   echo '*' compose key enzo #(vet!)
   setxkbmap &
+
 }
 
 #wacht op grafisch ingelogd zijn met na-inlog-dingen
@@ -60,7 +61,16 @@ wacht_op_na_inlog &
 #touch /home/jeroen/fiefje
 
 echo '*' extra balkje met tijd enzo
-~/bin/extrabar &
+#~/bin/extrabar &
+extrabar_hack() {
+  while [ `pidof dzen2 | wc -w` -ne 2 ]; do
+    pkill extrabar
+    pkill dzen2
+    ~/bin/extrabar &
+    sleep 2
+  done
+}
+extrabar_hack &
 
 ivman -c /etc/ivman
 ssh-agent xmonad
