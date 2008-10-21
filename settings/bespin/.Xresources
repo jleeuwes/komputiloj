@@ -41,9 +41,9 @@ URxvt.scrollTtyOutput:    false
 URxvt.scrollTtyKeypress:  true
 !URxvt.scrollWithBuffer:   boolean
 !URxvt.inheritPixmap:      true
-URxvt.transparent:        true
+!URxvt.transparent:        true
 !URxvt.shading:           80
-URxvt.tintColor:          #222222
+!URxvt.tintColor:          #222222
 !URxvt.fadeColor:          #444444
 URxvt.cursorColor:        #ffffff
 !URxvt.tintColor: #ffffff

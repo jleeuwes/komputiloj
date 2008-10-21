@@ -27,7 +27,7 @@ fi
 
 #~/bin/desktop-decoratie > /dev/null
 
-gnome-settings-daemon &
+#gnome-settings-daemon &
 #sleep 2
 
 wacht_op_na_inlog() {
@@ -48,9 +48,12 @@ na_inlog() {
   xsetroot -cursor_name arrow
   #echo '*' geen nutteloze muiscursor
   #unclutter -idle 1 -jitter 2 -root &
-  
+ 
   echo '*' compose key enzo #(vet!)
-  setxkbmap &
+  setxkbmap
+
+  echo '*' xmodmap
+  xmodmap ~/.Xmodmap
 
 }
 
