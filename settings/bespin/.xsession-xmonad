@@ -25,55 +25,59 @@ if test -z "$DBUS_SESSION_BUS_ADDRESS" ; then
   echo "D-Bus per-session daemon address is: $DBUS_SESSION_BUS_ADDRESS"
 fi
 
-#~/bin/desktop-decoratie > /dev/null
+~/bin/desktop-decoratie > /dev/null
 
-#gnome-settings-daemon &
-#sleep 2
+xrdb -load ~/.Xresources
+xsetroot -cursor_name arrow
+setxkbmap
+xmodmap ~/.Xmodmap
 
-wacht_op_na_inlog() {
-  until pidof dzen2; do
-    sleep 1
-  done
+gnome-screensaver
 
-  na_inlog
-}
-
-na_inlog() {
-  sleep 1
-
-  echo '*' rare brede fonts in rxvt weg!
-  xrdb -load ~/.Xresources
-
-  echo '*' zet muiscursor op achtergrond goed #(verdraaid simpel achteraf):
-  xsetroot -cursor_name arrow
-  #echo '*' geen nutteloze muiscursor
-  #unclutter -idle 1 -jitter 2 -root &
- 
-  echo '*' compose key enzo #(vet!)
-  setxkbmap
-
-  echo '*' xmodmap
-  xmodmap ~/.Xmodmap
-
-}
+#wacht_op_na_inlog() {
+#  until pidof dzen2; do
+#    sleep 1
+#  done
+#
+#  na_inlog
+#}
+#
+#na_inlog() {
+#  sleep 1
+#
+#  echo '*' rare brede fonts in rxvt weg!
+#  xrdb -load ~/.Xresources
+#
+#  echo '*' zet muiscursor op achtergrond goed #(verdraaid simpel achteraf):
+#  xsetroot -cursor_name arrow
+#  #echo '*' geen nutteloze muiscursor
+#  #unclutter -idle 1 -jitter 2 -root &
+# 
+#  echo '*' compose key enzo #(vet!)
+#  setxkbmap
+#
+#  echo '*' xmodmap
+#  xmodmap ~/.Xmodmap
+#
+#}
 
 #wacht op grafisch ingelogd zijn met na-inlog-dingen
-wacht_op_na_inlog &
+#wacht_op_na_inlog &
 
 #rm -f /home/jeroen/fiefje
 #touch /home/jeroen/fiefje
 
 echo '*' extra balkje met tijd enzo
-#~/bin/extrabar &
-extrabar_hack() {
-  while [ `pidof dzen2 | wc -w` -ne 2 ]; do
-    pkill extrabar
-    pkill dzen2
-    ~/bin/extrabar &
-    sleep 2
-  done
-}
-extrabar_hack &
+~/bin/extrabar &
+#extrabar_hack() {
+#  while [ `pidof dzen2 | wc -w` -ne 2 ]; do
+#    pkill extrabar
+#    pkill dzen2
+#    ~/bin/extrabar &
+#    sleep 2
+#  done
+#}
+#extrabar_hack &
 
 ivman -c /etc/ivman
 ssh-agent xmonad
