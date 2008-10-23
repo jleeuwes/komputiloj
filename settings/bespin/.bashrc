@@ -91,8 +91,4 @@ function iks() {
 
 # toon dingen die je niet moet vergeten!
 #~/bin/doe top 5 dead
-#if [ -s ~/vergeet-mij-niet ]; then
-#  echo !! Niet vergeten !!
-#  ~/bin/vergeet-mij-niet
-#  echo
-#fi
+~/bin/vergeet-mij-niet

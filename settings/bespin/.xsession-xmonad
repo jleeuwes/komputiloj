@@ -31,6 +31,7 @@ xrdb -load ~/.Xresources
 xsetroot -cursor_name arrow
 setxkbmap
 xmodmap ~/.Xmodmap
+xset r #keyboard repeat
 
 gnome-screensaver
 
