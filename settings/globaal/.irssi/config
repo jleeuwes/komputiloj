@@ -134,6 +134,7 @@ aliases = {
   "MANUAL-WINDOWS" = "set use_status_window off;set autocreate_windows off;set autocreate_query_level none;set autoclose_windows off;set reuse_unused_windows on;save";
   EXEMPTLIST = "mode $C +e";
   ATAG = "WINDOW SERVER";
+  id = "msg &bitlbee identify kaasfondue";
 };
 
 statusbar = {
@@ -263,7 +264,7 @@ settings = {
     # streepje na $0 doet raar, dus maar een puntje
     autolog_path = "~/irclogs/$tag/$0.%Y%m%d.log";
   };
-  "fe-text" = { actlist_sort = "refnum"; };
+  "fe-text" = { actlist_sort = "refnum"; mirc_blink_fix = "yes"; };
   "fe-common/irc" = { show_away_once = "yes"; };
   "perl/core/scripts" = { screen_away_message = "foetsie"; };
 };
@@ -272,6 +273,7 @@ logs = { };
 
 hilights = (
   { text = "Jeroen"; nick = "yes"; word = "yes"; color = "%U"; },
-  { text = "jleeuwes"; nick = "yes"; word = "yes"; color = "%U"; }
+  { text = "jleeuwes"; nick = "yes"; word = "yes"; color = "%U"; },
+  { text = "loekie"; nick = "yes"; word = "yes"; color = "%U"; }
 );
 ignores = ( );
