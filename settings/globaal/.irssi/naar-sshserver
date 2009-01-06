@@ -1,0 +1,5 @@
+#!/bin/bash
+
+scp config-sshserver sshserver:~/.irssi/config
+scp default.theme sshserver:~/.irssi/
+rsync -avL --exclude=.svn scripts/ sshserver:~/.irssi/scripts/
