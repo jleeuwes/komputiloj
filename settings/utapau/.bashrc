@@ -107,4 +107,8 @@ esac
 # niet schermwissen
 setterm -blank
 # niet piepen
-setterm -blength 0
+#setterm -blength 0
+# wel piepen, maar niet superirritant
+setterm -blength 30 -bfreq 500
+
+vergeet-mij-niet
