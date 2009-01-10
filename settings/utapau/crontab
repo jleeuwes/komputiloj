@@ -1,0 +1,6 @@
+# Vergeet niet te updaten na editen:
+#   crontab ~/crontab
+
+# m h  dom mon dow   command
+0 * * * * /home/jeroen/bin/import-irclogs
+
