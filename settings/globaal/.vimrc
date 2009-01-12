@@ -9,3 +9,8 @@
 :set shiftwidth=2
 :set background=dark
 :set hlsearch
+
+au BufRead,BufNewFile *.ag  set filetype=haskell
+au BufRead,BufNewFile *.cag set filetype=haskell
+au BufRead,BufNewFile *.il  set filetype=java    " is handig ivm commentaar
+
