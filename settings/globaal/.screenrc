@@ -76,4 +76,9 @@ bindkey -k k; title
 bindkey -k F1 prev
 bindkey -k F2 next
 
+bind '=' command -c resize
+bind -c resize '=' eval "resize ="  "command -c resize"
+bind -c resize '+' eval "resize +1" "command -c resize"
+bind -c resize '-' eval "resize -1" "command -c resize"
+
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
