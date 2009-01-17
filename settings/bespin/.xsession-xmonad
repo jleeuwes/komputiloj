@@ -69,7 +69,7 @@ gnome-screensaver
 #touch /home/jeroen/fiefje
 
 echo '*' extra balkje met tijd enzo
-~/bin/extrabar &
+extrabar &
 #extrabar_hack() {
 #  while [ `pidof dzen2 | wc -w` -ne 2 ]; do
 #    pkill extrabar
