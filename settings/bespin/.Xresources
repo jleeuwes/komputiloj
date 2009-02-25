@@ -6,6 +6,11 @@ URxvt.matcher.button: 1
 URxvt.perl-ext-common: matcher
 !URxvt.perl-lib: /opt/local/lib/urxvt/perl/
 
+! Helaas is size=10 de enige waarde waarbij het font niet horizontaal uitgerekt lijkt.
+! Nadeel is dat het font
+!  - stom gaat doen bij andere resoluties (als in: even groot probeert te blijven)
+!  - alleen op deze grootte kan (duh)
+! Ander font zoeken?
 URxvt*font:        xft:Monospace:size=10
 !URxvt*boldFont:    xft:Monospace:size=10:weight=bold
 !URxvt*italicFont: xft:segoe ui:pixelsize=9
