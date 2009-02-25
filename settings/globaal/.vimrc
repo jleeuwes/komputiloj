@@ -9,6 +9,7 @@
 :set shiftwidth=2
 :set background=dark
 :set hlsearch
+:set formatoptions=tcrq
 
 au BufRead,BufNewFile *.ag  set filetype=haskell
 au BufRead,BufNewFile *.cag set filetype=haskell
