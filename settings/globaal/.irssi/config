@@ -135,6 +135,7 @@ aliases = {
   EXEMPTLIST = "mode $C +e";
   ATAG = "WINDOW SERVER";
   id = "msg &bitlbee identify kaasfondue";
+  iba = "msg &bitlbee join_chat jabber iba@jabber.a-eskwadraat.nl &iba loekie";
   thee = "msg #comingout.nl !reminder +0:15 thee";
 };
 
