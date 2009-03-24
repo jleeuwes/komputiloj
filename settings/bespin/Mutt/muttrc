@@ -1,0 +1,5 @@
+source ~/Mutt/muttrc.mailboxes # wordt automagisch gegenereerd door offlineimap
+folder-hook As2 set from="jeroenleeuwestein@a-eskwadraat.nl"
+set mbox_type=Maildir
+set folder=$HOME/Mail
+set spoolfile=+As2/INBOX
