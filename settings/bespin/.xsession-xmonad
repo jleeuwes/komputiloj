@@ -29,6 +29,7 @@ fi
 
 xrdb -load ~/.Xresources
 xsetroot -cursor_name arrow
+#unclutter -idle 1 -root &   # nog stees focus-bugs
 setxkbmap
 xmodmap ~/.Xmodmap
 xset r #keyboard repeat
@@ -81,7 +82,8 @@ extrabar &
 #extrabar_hack &
 
 ivman -c /etc/ivman
-ssh-agent xmonad
+#ssh-agent xmonad
+xmonad
 pkill ivman #beetje bruut
 
 #if [ "$SCHERMEN" = "2" ]; then

@@ -10,6 +10,7 @@
 :set background=dark
 :set hlsearch
 :set formatoptions=tcrq
+:set textwidth=80
 
 au BufRead,BufNewFile *.ag  set filetype=haskell
 au BufRead,BufNewFile *.cag set filetype=haskell
