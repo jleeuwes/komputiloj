@@ -183,7 +183,7 @@ type = Maildir
 # to maildirs created under this path.  OfflineIMAP will create the
 # maildirs for you as needed.
 
-localfolders = ~/Mail/As2
+localfolders = ~/Mail/as2
 
 # You can specify the "path separator character" used for your Maildir
 # folders.  This is inserted in-between the components of the tree.
