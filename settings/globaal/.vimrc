@@ -1,7 +1,7 @@
 :set background=dark
 :syntax enable
 :set ignorecase
-:set mouse=
+:set mouse=a
 :set number
 :set autoindent
 :set expandtab
