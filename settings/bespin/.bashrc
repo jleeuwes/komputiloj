@@ -24,7 +24,7 @@ fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-xterm-color|rxvt*)
+linux|xterm-color|rxvt*)
     PS1='${debian_chroot:+($debian_chroot)}\u\[\e[1;32m\]@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ '
     ;;
 *)
