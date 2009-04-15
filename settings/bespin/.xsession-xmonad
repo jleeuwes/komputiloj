@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #env DISPLAY=:0.1 wmii &
 #env DISPLAY=:0.1 gnome-terminal &
 #env DISPLAY=:0.0 wmii   #we wachten op deze om af te sluiten
@@ -18,22 +20,26 @@
 #fi
 
 #start dbus (uit manpage van dbus-launch)
+# Niet nodig: zie /etc/X11/Xsession.d en /etc/X11/Xsession.options
 ## test for an existing bus daemon, just to be safe
-if test -z "$DBUS_SESSION_BUS_ADDRESS" ; then
-  ## if not found, launch a new one
-  eval `dbus-launch --sh-syntax --exit-with-session`
-  echo "D-Bus per-session daemon address is: $DBUS_SESSION_BUS_ADDRESS"
-fi
+# if test -z "$DBUS_SESSION_BUS_ADDRESS" ; then
+#   ## if not found, launch a new one
+#   eval `dbus-launch --sh-syntax --exit-with-session`
+#   echo "D-Bus per-session daemon address is: $DBUS_SESSION_BUS_ADDRESS"
+# fi
 
 ~/bin/desktop-decoratie > /dev/null
 
-xrdb -load ~/.Xresources
+# Niet nodig: zie /etc/X11/Xsession.d en /etc/X11/Xsession.options
+#xrdb -load ~/.Xresources
+
 xsetroot -cursor_name arrow
 #unclutter -idle 1 -root &   # nog stees focus-bugs
 setxkbmap
 xmodmap ~/.Xmodmap
 xset r #keyboard repeat
 
+# niet doen als we Xinerama gebruiken!
 gnome-screensaver
 
 #wacht_op_na_inlog() {
@@ -82,9 +88,20 @@ extrabar &
 #extrabar_hack &
 
 ivman -c /etc/ivman
+
+# Niet nodig: zie /etc/X11/Xsession.d en /etc/X11/Xsession.options
 #ssh-agent xmonad
-xmonad
+
+# gnome keyring is net iets fijner dan ssh-agent (geen ssh-add nodig)
+eval $(gnome-keyring-daemon)
+export GNOME_KEYRING_SOCKET SSH_AUTH_SOCK GNOME_KEYRING_PID
+
+# de /dev/null zorgt ervoor dat grafische dingen niet ten onrechte denken een
+# terminal te hebben (bijvoorbeeld ssh-add)
+xmonad < /dev/null
 pkill ivman #beetje bruut
+
+kill $GNOME_KEYRING_PID
 
 #if [ "$SCHERMEN" = "2" ]; then
   #xset -display :0.0 dpms force on
