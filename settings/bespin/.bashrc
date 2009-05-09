@@ -23,14 +23,14 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-linux|xterm-color|rxvt*)
-    PS1='${debian_chroot:+($debian_chroot)}\u\[\e[1;32m\]@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ '
-    ;;
-*)
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-    ;;
-esac
+# case "$TERM" in
+# linux|xterm-color|rxvt*)
+    PS1='${debian_chroot:+($debian_chroot)}\u\[\e[1;32m\]@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\] ⚡ '
+#    ;;
+# *)
+#    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+#    ;;
+# esac
 
 # Comment in the above and uncomment this below for a color prompt
 #PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
