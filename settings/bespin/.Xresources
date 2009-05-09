@@ -37,20 +37,21 @@ URxvt.color13: #ad7fa8
 URxvt.color14: #34e2e2
 URxvt.color15: #eeeeec
 
-URxvt.background: #010101
-URxvt.foreground:  #ffffff
-!URxvt.background: #f0f0f0
-!URxvt.foreground: #000000
+!URxvt.background: #010101
+!URxvt.foreground:  #ffffff
+URxvt.background: #ffffff
+URxvt.foreground: #000000
+
+URxvt.cursorColor:        #000000
 
 URxvt.scrollTtyOutput:    false
+URxvt.scrollWithBuffer:   true
 URxvt.scrollTtyKeypress:  true
-!URxvt.scrollWithBuffer:   boolean
 !URxvt.inheritPixmap:      true
 !URxvt.transparent:        true
 !URxvt.shading:           80
 !URxvt.tintColor:          #222222
 !URxvt.fadeColor:          #444444
-URxvt.cursorColor:        #ffffff
 !URxvt.tintColor: #ffffff
 !URxvt.fadeColor: #e0e0e0
 !URxvt.cursorColor:        #000000

@@ -7,7 +7,10 @@
 :set expandtab
 :set tabstop=2
 :set shiftwidth=2
-:set background=dark
+
+" Is niet globaal, maar dat moeten we maar later uitzoeken:
+:set background=light
+
 :set hlsearch
 :set formatoptions=tcrq
 :set textwidth=80
