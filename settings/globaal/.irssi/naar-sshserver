@@ -1,6 +1,6 @@
 #!/bin/bash
 
-scp config-sshserver sshserver:~/.irssi/config
+scp config-{sshserver,bot} sshserver:~/.irssi/config
 scp default.theme sshserver:~/.irssi/
 
 ./bot.theme.sh > bot.theme
