@@ -4,16 +4,14 @@ servers = (
     chatnet = "ietsnet";
     port = "6668";
     autoconnect = "yes";
-  },
+  }
 );
 
-chatnets = {
-  ietsnet = { type = "IRC"; nick = "JeroenL"; };
-};
+chatnets = { ietsnet = { type = "IRC"; nick = "JeroenL"; }; };
 
 channels = (
   { name = "#comingout.nl"; chatnet = "ietsnet"; autojoin = "yes"; },
-  { name = "#onrust"; chatnet = "ietsnet"; autojoin = "yes"; },
+  { name = "#onrust"; chatnet = "ietsnet"; autojoin = "yes"; }
 );
 
 aliases = {
@@ -185,6 +183,8 @@ settings = {
     hostname = "";
     #nick = "jeroen";
     awaylog_file = "~/irclogs/away.log";
+    user_name = "jeroenl";
+    nick = "jeroenl";
   };
   "fe-common/core" = {
     bell_beeps = "yes";
@@ -204,3 +204,37 @@ hilights = (
   { text = "Jeroen"; nick = "yes"; word = "yes"; color = "%U"; }
 );
 ignores = ( );
+windows = {
+  1 = { immortal = "yes"; name = "(status)"; level = "ALL"; };
+  2 = {
+    items = (
+      {
+        type = "CHANNEL";
+        chat_type = "IRC";
+        name = "#comingout.nl";
+        tag = "ietsnet";
+      }
+    );
+  };
+  3 = {
+    items = (
+      {
+        type = "CHANNEL";
+        chat_type = "IRC";
+        name = "#onrust";
+        tag = "ietsnet";
+      }
+    );
+  };
+  4 = {
+    items = (
+      {
+        type = "CHANNEL";
+        chat_type = "IRC";
+        name = "#aapjeskijken";
+        tag = "freenode";
+      }
+    );
+  };
+};
+mainwindows = { 2 = { first_line = "1"; lines = "32"; }; };
