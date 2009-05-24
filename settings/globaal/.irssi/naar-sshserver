@@ -1,9 +1,7 @@
 #!/bin/bash
 
-scp config-{sshserver,bot} sshserver:~/.irssi/config
-scp default.theme sshserver:~/.irssi/
-
+scp config-sshserver sshserver:~/.irssi/config
 ./bot.theme.sh > bot.theme
-scp bot.theme sshserver:~/.irssi/
+scp config-bot default.theme bot.theme sshserver:~/.irssi/
 
 rsync -avL --exclude=.svn scripts/ sshserver:~/.irssi/scripts/

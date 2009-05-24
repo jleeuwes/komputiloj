@@ -179,7 +179,7 @@ settings = {
   core = {
     real_name = "rybakje";
     user_name = "jeroenl";
-    nick      = "rybakje";
+    nick = "rybakje";
     hostname = "";
     awaylog_level = "None";
     awaylog_file = "/dev/null";
@@ -189,10 +189,16 @@ settings = {
     beep_msg_level = "MSGS NOTICES DCC DCCMSGS HILIGHT";
     autolog = "no";
     autolog_path = "/dev/null";
+    theme = "bot";
   };
   "fe-text" = { actlist_sort = "refnum"; mirc_blink_fix = "yes"; };
   "fe-common/irc" = { show_away_once = "yes"; };
   "perl/core/scripts" = { screen_away_message = "scherm zit los"; };
+  proxy = {
+    # irssiproxy_password = "REDACTED";
+    irssiproxy_bind = "localhost";
+    irssiproxy_ports = "ietsnet=12345";
+  };
 };
 logs = { };
 
