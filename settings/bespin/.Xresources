@@ -35,7 +35,7 @@ URxvt.color11: #fce94f
 URxvt.color12: #729fcf
 URxvt.color13: #ad7fa8
 URxvt.color14: #34e2e2
-URxvt.color15: #eeeeec
+URxvt.color15: #eeeeee
 
 !URxvt.background: #010101
 !URxvt.foreground:  #ffffff
@@ -60,4 +60,8 @@ URxvt.urgentOnBell:       true
 URxvt.mouseWheelScrollPage:   false
 URxvt.cursorBlink:         false
 URxvt.saveLines:           1500
-URxvt.borderLess:         true
+
+! borderLess *forceert* redirect-override. Dat zorgt dat de terminal nutteloos in een hoekje hangt en niet naar XMonad luistert.
+! URxvt.borderLess:         true
+! URxvt.override-redirect: false
+
