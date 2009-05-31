@@ -15,6 +15,10 @@
 :set formatoptions=tcrq
 :set textwidth=80
 
+" maak verbinding met X, want we starten op met vim -X
+" zie ook .bashrc en http://markmail.org/message/nwkwulaj4wiuuouu
+:call serverlist()
+
 au BufRead,BufNewFile *.ag  set filetype=haskell
 au BufRead,BufNewFile *.cag set filetype=haskell
 au BufRead,BufNewFile *.il  set filetype=java    " is handig ivm commentaar
