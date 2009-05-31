@@ -18,7 +18,7 @@ export HISTCONTROL=ignoredups
 #PATH="${PATH}":.
 
 #extra handigheden toevoegen aan PATH:
-PATH="${PATH}":/opt/ozone-1.2.1-beta/bin:/opt/maven-2.0.7/bin
+PATH="${PATH}":/opt/ozone-1.2.1-beta/bin:/opt/maven-2.0.7/bin:~/.cabal/bin
 
 #bedoeld om eclipse java 6 te laten gebruiken
 export JAVA_HOME="/usr/lib/jvm/java-6-sun"
@@ -61,6 +61,10 @@ alias pgrep='pgrep -l'
 alias cssh='ssh -1 -l jleeuwes -i ~/uni/key.ppk shell.students.cs.uu.nl'
 alias cscp='scp -1 -i ~/uni/key.ppk'
 #alias cscp='scp -1 -i ~/uni/key.pkk
+
+# laat vim snel opstarten in screens die hun eventuele X-sessie zijn ontsnapt
+# zie ook .vimrc http://markmail.org/message/nwkwulaj4wiuuouu
+alias vim='vim -X'
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
