@@ -2,5 +2,5 @@
 #   crontab ~/crontab
 
 # m h  dom mon dow   command
-0 * * * * /home/jeroen/bin/import-irclogs
+0 * * * * /home/jeroen/bin/import-irclogs > /dev/null
 
