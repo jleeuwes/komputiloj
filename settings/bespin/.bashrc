@@ -79,6 +79,9 @@ if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
 
+# completion voor todo:
+complete -W "\$(todo help|sed -r 's/^    ([a-z]+).*$/\1/ ; t nd; d; :nd'|xargs)" todo
+
 function iks() {
   IKS=$1
   [ -z "$IKS" ] && IKS=xmonad
