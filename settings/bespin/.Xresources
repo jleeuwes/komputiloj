@@ -11,10 +11,11 @@ URxvt.perl-ext-common: matcher
 !  - stom gaat doen bij andere resoluties (als in: even groot probeert te blijven)
 !  - alleen op deze grootte kan (duh)
 ! Ander font zoeken?
-URxvt*font:        xft:Monospace:size=10
-!URxvt*boldFont:    xft:Monospace:size=10:weight=bold
-!URxvt*italicFont: xft:segoe ui:pixelsize=9
-!URxvt*bolditalicFont: xft:Bitstream Vera Sans Mono:pixelsize=9
+! URxvt*font:        xft:Monospace:size=11
+
+! Goed. Xft wil voor geen meter. Dan terminus:
+URxvt*font: -*-terminus-*-*-*-*-16-*-*-*-*-*-*-*
+
 URxvt*scrollBar:  false
 !URxvt*internalBorder: 6
 
