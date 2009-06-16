@@ -93,15 +93,20 @@ ivman -c /etc/ivman
 #ssh-agent xmonad
 
 # gnome keyring is net iets fijner dan ssh-agent (geen ssh-add nodig)
-eval $(gnome-keyring-daemon)
-export GNOME_KEYRING_SOCKET SSH_AUTH_SOCK GNOME_KEYRING_PID
+# eval $(gnome-keyring-daemon)
+# export GNOME_KEYRING_SOCKET SSH_AUTH_SOCK GNOME_KEYRING_PID
+
+# gpg-agent is nog fijner
+eval $(gpg-agent --daemon --enable-ssh-support)
+export GPG_AGENT_PID=$(echo $GPG_AGENT_INFO|cut -d: -f2)
 
 # de /dev/null zorgt ervoor dat grafische dingen niet ten onrechte denken een
 # terminal te hebben (bijvoorbeeld ssh-add)
 xmonad < /dev/null
 pkill ivman #beetje bruut
 
-kill $GNOME_KEYRING_PID
+#kill $GNOME_KEYRING_PID
+kill $GPG_AGENT_PID
 
 #if [ "$SCHERMEN" = "2" ]; then
   #xset -display :0.0 dpms force on
