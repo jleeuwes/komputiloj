@@ -14,10 +14,18 @@ URxvt.perl-ext-common: matcher
 ! URxvt*font:        xft:Monospace:size=11
 
 ! Goed. Xft wil voor geen meter. Dan terminus:
-URxvt*font: -*-terminus-*-*-*-*-16-*-*-*-*-*-*-*
+! URxvt.font: -*-terminus-*-*-*-*-16-*-*-*-*-*-*-*
+
+! :( geen onderscheid tussen normaal en bold. boldFont wordt genegeerd, maar ik
+! kan dar niks over vinden.
+URxvt.font: -*-terminus-bold-*-*-*-16-*-*-*-*-*-*-*
+! URxvt.font: -*-terminus-medium-*-*-*-16-*-*-*-*-*-*-*
+
+! switch tussen alles bold en alleen bold bold :)
+URxvt.keysym.Control-equal: command:\033]710;-*-terminus-bold-*-*-*-16-*-*-*-*-*-*-*\007
+URxvt.keysym.Control-minus: command:\033]710;-*-terminus-medium-*-*-*-16-*-*-*-*-*-*-*\007
 
 URxvt*scrollBar:  false
-!URxvt*internalBorder: 6
 
 !Tango-kleurenschema (oranje doet raar :()
 URxvt.color0: black
@@ -65,4 +73,5 @@ URxvt.saveLines:           1500
 ! borderLess *forceert* redirect-override. Dat zorgt dat de terminal nutteloos in een hoekje hangt en niet naar XMonad luistert.
 ! URxvt.borderLess:         true
 ! URxvt.override-redirect: false
+! URxvt*internalBorder: 0
 
