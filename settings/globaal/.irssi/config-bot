@@ -1,6 +1,6 @@
 servers = (
   {
-    address = "irc.xs4all.nl";
+    address = "irc.irc6.net";
     chatnet = "ietsnet";
     port = "6668";
     autoconnect = "yes";

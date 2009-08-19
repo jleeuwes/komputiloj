@@ -80,7 +80,7 @@ chatnets = {
 
 channels = (
   { name = "#comingout.nl"; chatnet = "ietsnet"; autojoin = "yes"; },
-  { name = "#onrust"; chatnet = "ietsnet"; autojoin = "yes"; },
+  { name = "#chatmeet"; chatnet = "ietsnet"; autojoin = "yes"; },
   { name = "#haskell"; chatnet = "freenode"; },
   # { name = "#tintic"; chatnet = "freenode"; autojoin = "no"; },
   #  { name = "#irssi"; chatnet = "ircnet"; autojoin = "No"; },

@@ -11,7 +11,7 @@ chatnets = { ietsnet = { type = "IRC"; nick = "JeroenL"; }; };
 
 channels = (
   { name = "#comingout.nl"; chatnet = "ietsnet"; autojoin = "yes"; },
-  { name = "#onrust"; chatnet = "ietsnet"; autojoin = "yes"; }
+  { name = "#chatmeet"; chatnet = "ietsnet"; autojoin = "yes"; }
 );
 
 aliases = {
