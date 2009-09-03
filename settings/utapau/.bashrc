@@ -109,7 +109,7 @@ esac
 #fi
 
 # niet schermwissen
-setterm -blank
+setterm -blank > /dev/null
 # niet piepen
 #setterm -blength 0
 # wel piepen, maar niet superirritant
