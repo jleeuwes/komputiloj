@@ -2,5 +2,5 @@
 #   crontab ~/crontab
 
 # m h  dom mon dow   command
-@reboot echo "\* Doe import-irclogs" >> ~/vergeet-mij-niet
+@reboot echo '* Doe import-irclogs' >> ~/vergeet-mij-niet
 
