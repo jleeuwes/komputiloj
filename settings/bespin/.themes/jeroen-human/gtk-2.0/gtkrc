@@ -13,6 +13,8 @@ gtk_color_scheme =
 gtk-icon-sizes = "panel-menu=24,24"
 gtk_icon_theme_name="Tango"
 
+gtk-cursor-blink = 0
+
 style "murrine-default"
 {
 	########
