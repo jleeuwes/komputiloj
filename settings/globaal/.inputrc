@@ -1,1 +1,5 @@
 set match-hidden-files off
+
+# control-links en -rechts in urxvt
+"\eOd": backward-word
+"\eOc": forward-word

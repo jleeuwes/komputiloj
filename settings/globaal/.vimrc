@@ -23,3 +23,16 @@ au BufRead,BufNewFile *.ag  set filetype=haskell
 au BufRead,BufNewFile *.cag set filetype=haskell
 au BufRead,BufNewFile *.il  set filetype=java    " is handig ivm commentaar
 
+" laat tab-switchen werken in urxvt
+:nmap <ESC>[6^ <C-PageDown>
+:nmap <ESC>[5^ <C-PageUp>
+" control-pijltjes in alle modi
+:map! <ESC>Od  <C-Left>
+:map  <ESC>Od  <C-Left>
+:map! <ESC>Oc  <C-Right>
+:map  <ESC>Oc  <C-Right>
+:map! <ESC>Oa  <C-Up>
+:map  <ESC>Oa  <C-Up>
+:map! <ESC>Ob  <C-Down>
+:map  <ESC>Ob  <C-Down>
+
