@@ -30,6 +30,7 @@ fi
     # maf exitcode-afhankelijk teken:
     TEKEN='$(if [ "$?" -eq 0 ]; then echo ✔; else echo ✘; fi)'
     PS1='${debian_chroot:+($debian_chroot)}\[\e[7m\]\u\[\e[1;32m\]@\h\[\e[34m\]:\w\[\e[0m\]'" $TEKEN "
+    unset TEKEN
 #    ;;
 # *)
 #    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
