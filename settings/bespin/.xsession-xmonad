@@ -36,7 +36,8 @@
 xsetroot -cursor_name arrow
 #unclutter -idle 1 -root &   # nog stees focus-bugs
 setxkbmap
-xmodmap ~/.Xmodmap
+# xmodmap ~/.Xmodmap # zou nu in /etc/default/console-setup moeten worden
+# geregeld
 xset r #keyboard repeat
 
 # niet doen als we Xinerama gebruiken!

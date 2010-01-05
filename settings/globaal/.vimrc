@@ -8,6 +8,8 @@
 :set tabstop=2
 :set shiftwidth=2
 
+au BufReadPost set nobomb
+
 " Is niet globaal, maar dat moeten we maar later uitzoeken:
 :set background=light
 
