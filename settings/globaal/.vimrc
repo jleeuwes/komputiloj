@@ -11,7 +11,7 @@
 au BufReadPost set nobomb
 
 " Is niet globaal, maar dat moeten we maar later uitzoeken:
-:set background=light
+" :set background=light
 
 :set hlsearch
 :set formatoptions=tcrq
