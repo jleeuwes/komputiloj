@@ -11,5 +11,5 @@ Config { font = "-*-terminus-*-*-*-*-12-*-*-*-*-*-*-*"
           ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%StdinReader% }{ <fc=#7070EE>%playing%</fc> | %battery% | %date%"
+       , template = " %StdinReader% }{ <fc=#7070EE>%playing%</fc> | %battery% | %date%"
        }
