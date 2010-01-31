@@ -29,7 +29,7 @@ fi
     #TEKEN='⚡'
     # maf exitcode-afhankelijk teken:
     TEKEN='$(st="$?"; if [ "$st" -eq 0 ]; then echo ✔; else if [ "$st" -gt 127 ]; then echo ✚; else echo ✘; fi; fi)'
-    PS1='${debian_chroot:+($debian_chroot)}\[\e[7m\]\u\[\e[1;32m\]@\h\[\e[0m\]:\w\n'"$TEKEN "
+    PS1='${debian_chroot:+($debian_chroot)}\u\[\e[1;32m\]@\h\[\e[0m\]:\w\n'"$TEKEN "
     unset TEKEN
 #    ;;
 # *)
@@ -85,7 +85,7 @@ if [ -f /etc/bash_completion ]; then
 fi
 
 # completion voor todo:
-complete -W "\$(todo help|sed -r 's/^    ([a-z]+).*$/\1/ ; t nd; d; :nd'|xargs)" todo
+# complete -W "\$(todo help|sed -r 's/^    ([a-z]+).*$/\1/ ; t nd; d; :nd'|xargs)" todo
 
 function iks() {
   IKS=$1
