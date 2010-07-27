@@ -4,12 +4,13 @@ Config { font = "-*-terminus-*-*-*-*-12-*-*-*-*-*-*-*"
        , position = Bottom
        , lowerOnStart = True
        , commands =
-          [ Run Com "date" ["+\"%a w%V %e %B %Y %H:%M\""] "date" 10
+          [ Run Com "date" ["+\"%a %-e %B [%V] %Y %H:%M\""] "date" 10
           , Run Battery ["-L","10","-H","50","--low","#f00000", "--normal","#f0a000","--high","#00f000", "--template", "<left>"] 10
-          , Run Com "bash" ["-c", "\"rhythmbox-client --no-start --print-playing|xargs -0 echo\""] "playing" 10
+          , Run Com "bash" ["-c", "\"rhythmbox-client --no-start --print-playing|xargs -0 echo|cut -c 1-45\""] "playing" 10
+          , Run Com "bash" ["-c", "\"xsel -o|cut -c 1-30\""] "xsel" 10
           , Run StdinReader
           ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " %StdinReader% }{ <fc=#7070EE>%playing%</fc> | %battery% | %date%"
+       , template = " %StdinReader% }{ <fc=#404040>%xsel%</fc> <fc=#7070EE>%playing%</fc> %battery% %date%"
        }
