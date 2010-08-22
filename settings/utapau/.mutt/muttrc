@@ -1,0 +1,45 @@
+set imap_user = "jeroenleeuwestein@gmail.com"
+source ~/.mutt/muttrc_password
+
+set ssl_force_tls = yes
+
+# set smtp_url = "smtp://jeroenleeuwestein@smtp.gmail.com:587/"
+# set smtp_pass = "password"
+set from = "jeroenleeuwestein@gmail.com"
+set realname = "Jeroen Leeuwestein"
+
+set folder = "imaps://imap.gmail.com:993"
+set spoolfile = "+INBOX"
+set mbox = "+Gelezen"
+set move = no
+set postponed = "+Drafts"
+save-hook . "+Gelezen"
+
+set header_cache=~/.mutt/cache/headers
+set message_cachedir=~/.mutt/cache/bodies
+set certificate_file=~/.mutt/certificates
+
+# achtergrond transparant
+color normal default default
+
+set delete = yes
+set fast_reply = yes
+set metoo = yes
+set edit_headers = yes
+set include = yes # neem mail over bij reply
+
+# meuk!!!
+set pgp_use_gpg_agent = yes
+source ~/.mutt/gpg.rc
+
+# vaker dan elke 600 seconde mail checken
+set timeout = 15
+
+set sort = threads
+set sort_aux = last-date
+
+# adressen
+set alias_file = ~/.mutt/aliases
+source $alias_file
+set sort_alias = alias
+set reverse_alias = yes
