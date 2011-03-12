@@ -46,6 +46,11 @@ alias ll='ls -lh'
 #alias la='ls -A'
 #alias l='ls -CF'
 
+#pdf-viewer (evince) zonder gezeur
+function pdf() {
+  evince "$@" > /dev/null 2>&1
+}
+
 #handig: directory/file size
 alias duh='du -h'
 alias dus='du -hs'
@@ -57,10 +62,6 @@ alias nautilus='nautilus --no-desktop'
 
 #pgrep met naam
 alias pgrep='pgrep -l'
-
-alias cssh='ssh -1 -l jleeuwes -i ~/uni/key.ppk shell.students.cs.uu.nl'
-alias cscp='scp -1 -i ~/uni/key.ppk'
-#alias cscp='scp -1 -i ~/uni/key.pkk
 
 # laat vim snel opstarten in screens die hun eventuele X-sessie zijn ontsnapt
 # zie ook .vimrc http://markmail.org/message/nwkwulaj4wiuuouu
@@ -107,6 +108,8 @@ esac
 #if [ -f /etc/bash_completion ]; then
 #    . /etc/bash_completion
 #fi
+
+complete -C 'wachtwoord complete' wachtwoord
 
 # niet schermwissen
 setterm -blank > /dev/null
