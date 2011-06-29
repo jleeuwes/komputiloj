@@ -32,6 +32,9 @@ set include = yes # neem mail over bij reply
 set pgp_use_gpg_agent = yes
 source ~/.mutt/gpg.rc
 
+# html
+auto_view text/html
+
 # vaker dan elke 600 seconde mail checken
 set timeout = 15
 
