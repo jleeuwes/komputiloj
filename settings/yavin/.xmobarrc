@@ -1,0 +1,21 @@
+Config { font = "xft:Monospace-7"
+       , bgColor = "black"
+       , fgColor = "white"
+       , position = Top
+       , commands =
+          [ Run Date "%a %-e %B [%V] %Y %H:%M<fc=#404040>:%S</fc>" "date" 10
+          , Run Battery ["-L","10","-H","49",
+            "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
+            "-t","<fc=#a0a0a0><timeleft></fc><fc=white><acstatus></fc><left>",
+            "--", "-f","ACAD/online", "-O", "⚉", "-o","⚇"
+            ] 10
+          , Run Wireless "wlan0" [
+              "-L","49","-H","89",
+              "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
+              "-t", "≈<quality>"] 10
+          , Run StdinReader
+          ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = " %StdinReader% }{ %wlan0wi% %battery% %date%"
+       }
