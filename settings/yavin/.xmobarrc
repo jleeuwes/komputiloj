@@ -13,9 +13,10 @@ Config { font = "xft:Monospace-7"
               "-L","49","-H","89",
               "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
               "-t", "≈<quality>"] 10
+          , Run Com "cat" ["/home/jeroen/.xmobar-apt-updates"] "apt" 100
           , Run StdinReader
           ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " %StdinReader% }{ %wlan0wi% %battery% %date%"
+       , template = " %StdinReader% }{ %apt% %wlan0wi% %battery% %date%"
        }

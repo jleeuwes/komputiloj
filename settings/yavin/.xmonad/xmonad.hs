@@ -36,14 +36,15 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch a terminal
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
     , ((modm .|. shiftMask, xK_KP_Enter), spawn $ XMonad.terminal conf)
-
+    
+    -- super+p heeft ruzie met dat rare touchpadmediaknopje op mijn HP
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn ("exe=`dmenu_path | " ++ dmenu ++
+    , ((modm .|. shiftMask, xK_p     ), spawn ("exe=`dmenu_path | " ++ dmenu ++
                                                "` && eval \"exec $exe\""))
 
     -- launch gmrun
     -- , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
-    , ((modm .|. shiftMask, xK_p     ), shellPrompt xpConfig)
+    , ((modm .|. shiftMask .|. controlMask, xK_p     ), shellPrompt xpConfig)
     , ((modm .|. shiftMask, xK_x     ), windowPromptGoto xpConfig)
 
     -- close focused window
@@ -241,7 +242,7 @@ main = statusBar "xmobar" myPP toggleStrutsKey defaults
   where toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
 
 dmenu :: String
-dmenu = "dmenu -nb black -nf \\#404040 -sb black -sf white"
+dmenu = "jdmenu"
 
 myPP :: PP
 myPP = defaultPP
