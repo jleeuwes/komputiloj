@@ -1,14 +1,31 @@
-gnome-settings-daemon
-gnome-power-manager &
+function daemons() {
+  gnome-settings-daemon &
+  
+  sleep 2
 
-eval $(gnome-keyring-daemon)
-export GNOME-KEYRING-SOCKET
-export GNOME-KEYRING-PID
+  late_settings
+}
 
-numlockx on
+function late_settings() {
+  xrdb -load $HOME/.Xresources
+  numlockx on
+}
 
-xrdb -load $HOME/.Xresources
+daemons &
+
+# gnome-keyring-daemon is al door PAM gestart (waardoor de login-keyring al
+# ontgrendeld is). Nu geven we door dat we hem ook voor gpg willen gebruiken:
+eval $(gnome-keyring-daemon --start --components=secrets,ssh,gpg)
+export GNOME_KEYRING_CONTROL
+export SSH_AUTH_SOCK
+export GPG_AGENT_INFO
+export GNOME_KEYRING_PID
+
+
+late_settings
+
+desktop-decoratie
 
 xmonad
 
-kill $GNOME-KEYRING-PID
+# kill $GNOME_KEYRING_PID
