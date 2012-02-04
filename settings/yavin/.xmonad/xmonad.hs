@@ -18,9 +18,13 @@ import XMonad.Prompt (defaultXPConfig,autoComplete)
 import XMonad.Hooks.UrgencyHook
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers
 
 import XMonad.Layout.NoBorders (smartBorders)
 import XMonad.Layout.LayoutHints
+import XMonad.Layout.MultiToggle
+import XMonad.Layout.Reflect
+import XMonad.Layout.IM
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -45,7 +49,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch gmrun
     -- , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
     , ((modm .|. shiftMask .|. controlMask, xK_p     ), shellPrompt xpConfig)
-    , ((modm .|. shiftMask, xK_x     ), windowPromptGoto xpConfig)
+    -- , ((modm .|. shiftMask, xK_x     ), windowPromptGoto xpConfig)
 
     -- close focused window
     , ((modm .|. shiftMask, xK_c     ), kill)
@@ -99,6 +103,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- Deincrement the number of windows in the master area
     , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
+    
+    -- Dingen omdraaien
+    , ((modm              , xK_x), sendMessage $ Toggle REFLECTX)
+    , ((modm              , xK_y), sendMessage $ Toggle REFLECTY)
 
     -- Jump to urgent window
     , ((modm              , xK_BackSpace), focusUrgent)
@@ -152,6 +160,9 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
                                        >> windows W.shiftMaster))
 
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
+    , ((modm, button4), const $ sendMessage Expand)
+    , ((modm, button5), const $ sendMessage Shrink)
+
     ]
 
 ------------------------------------------------------------------------
@@ -165,19 +176,60 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = layoutHintsToCenter $ smartBorders $ avoidStruts (tiled ||| Mirror tiled ||| Full)
+myLayout = layoutHintsToCenter $ smartBorders $ avoidStruts $
+           mkToggle (single REFLECTX) $ mkToggle (single REFLECTY) $
+           gimpMod $ imMod
+           (wide ||| tall ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
-     tiled   = Tall nmaster delta ratio
+     tall    = Tall 1 delta (3/5)
+     wide    = Mirror $ Tall 1 delta (4/5+delta)
 
      -- The default number of windows in the master pane
      nmaster = 1
 
-     -- Default proportion of screen occupied by master pane
-     ratio   = 3/5
-
      -- Percent of screen to increment by when resizing panes
      delta   = 3/100
+
+-- Omring standaard layout met ruimte voor gimp-balkjes, indien van toepassing
+-- (http://nathanhowell.net/2009/03/08/xmonad-and-the-gimp/)
+gimpMod
+  = withIM (barSz) (Role "gimp-toolbox")
+  . reflectHoriz
+  . withIM (barSz / (1-barSz)) (Role "gimp-dock")
+  . reflectHoriz
+  where barSz = 0.15
+
+imMod
+  = reflectHoriz . withIM (0.1335) (Role "contact_list" `Or` Role "buddy_list") . reflectHoriz
+
+layoutNm = layoutNm' False False False . words
+--variant met ascii-reflects
+-- layoutNm' rx ry ln = case ln of
+--   ("IM":xs)         -> layoutNm' rx ry xs
+--   ["Tall"]          | rx        -> "=|"
+--                     | otherwise -> "|="
+--   ["Mirror","Tall"] | ry        -> "--"
+--                     | otherwise -> "__"
+--   ["Full"]          -> "[]"
+--   ("ReflectX":xs)   -> layoutNm' (not rx) ry xs
+--   ("ReflectY":xs)   -> layoutNm' rx (not ry) xs
+--   (x:xs)            -> x ++ " " ++ layoutNm' rx ry xs
+--   []                -> ""
+
+layoutNm' rx ry m ln = case ln of
+  ("IM":xs)         -> layoutNm' rx ry m xs
+  ("Mirror":xs)     -> layoutNm' rx ry (not m) xs
+  ("ReflectX":xs)   -> layoutNm' (not rx) ry m xs
+  ("ReflectY":xs)   -> layoutNm' rx (not ry) m xs
+  [x]               -> ref (atom x)
+  (x:xs)            -> x ++ " " ++ layoutNm' rx ry m xs
+  []                -> ""
+  where ref = refC rx 'ˣ' . refC ry 'ʸ' . refC m '↻'
+        refC True  c  = (c:)
+        refC False _  = (' ':)
+        atom "Tall"   = "T"
+        atom "Full"   = "F"
 
 ------------------------------------------------------------------------
 -- Window rules:
@@ -194,13 +246,20 @@ myLayout = layoutHintsToCenter $ smartBorders $ avoidStruts (tiled ||| Mirror ti
 -- To match on the WM_NAME, you can use 'title' in the same way that
 -- 'className' and 'resource' are used below.
 --
-myManageHook = composeAll
-    [ className =? "MPlayer"        --> doFloat
-    , className =? "Gimp"           --> doFloat
+myManageHook =
+    (fmap not isDialog --> doF avoidMaster) <+>
+    composeAll [ className =? "MPlayer"        --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
+    , className =? "Pidgin" <||> className =? "pidgin"  --> doShift "com"
     , manageDocks
     ]
+
+-- Avoid changing master on new window creation (https://bbs.archlinux.org/viewtopic.php?id=94969)
+avoidMaster :: W.StackSet i l a s sd -> W.StackSet i l a s sd
+avoidMaster = W.modify' $ \c -> case c of
+    W.Stack t [] (r:rs) -> W.Stack t [r] rs
+    otherwise           -> c
 
 ------------------------------------------------------------------------
 -- Event handling
@@ -254,7 +313,7 @@ myPP = defaultPP
   , ppSep             = " " -- xmobarColor "#404040" "" " / "
   , ppWsSep           = " "
   , ppTitle           = xmobarColor "#6666ff" "" . shorten 80
-  , ppLayout          = xmobarColor "#f0e040" ""
+  , ppLayout          = xmobarColor "#f0e040" "" . layoutNm
   , ppOrder           = id
   -- , ppOutput          = putStrLn
   -- , ppSort            = getSortByIndex
