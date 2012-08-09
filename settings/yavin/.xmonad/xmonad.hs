@@ -248,7 +248,7 @@ layoutNm' rx ry m ln = case ln of
 -- 'className' and 'resource' are used below.
 --
 myManageHook =
-    (fmap not isDialog --> doF avoidMaster) <+>
+    -- (fmap not isDialog --> doF avoidMaster) <+>
     composeAll [ className =? "MPlayer"        --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
