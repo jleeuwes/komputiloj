@@ -11,6 +11,8 @@ import XMonad
 import Data.Monoid
 import System.Exit
 
+import XMonad.Actions.CycleWS (toggleWS)
+
 import XMonad.Prompt.Window (windowPromptGoto)
 import XMonad.Prompt.Shell (shellPrompt)
 import XMonad.Prompt (defaultXPConfig,autoComplete)
@@ -111,6 +113,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- Jump to urgent window
     , ((modm              , xK_BackSpace), focusUrgent)
+    
+    -- Switchen tussen twee workspaces
+    , ((modm              , xK_grave), toggleWS)
 
     -- Toggle the status bar gap
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
