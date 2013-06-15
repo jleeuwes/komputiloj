@@ -28,6 +28,8 @@ import XMonad.Layout.MultiToggle
 import XMonad.Layout.Reflect
 import XMonad.Layout.IM
 
+import XMonad.Util.Run (safeSpawn)
+
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 
@@ -40,9 +42,12 @@ xpConfig = defaultXPConfig
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- launch a terminal
-    [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
-    , ((modm .|. shiftMask, xK_KP_Enter), spawn $ XMonad.terminal conf)
-    
+    [ ((modm .|. shiftMask, xK_Return),   terminalOveral conf)
+    , ((modm .|. shiftMask, xK_KP_Enter), terminalOveral conf)
+
+    , ((modm .|. shiftMask .|. controlMask, xK_Return), spawn $ XMonad.terminal conf)
+    , ((modm .|. shiftMask .|. controlMask, xK_KP_Enter), spawn $ XMonad.terminal conf)
+
     -- super+p heeft ruzie met dat rare touchpadmediaknopje op mijn HP
     -- launch dmenu
     , ((modm .|. shiftMask, xK_p     ), spawn ("exe=`dmenu_path | " ++ dmenu ++
@@ -128,6 +133,14 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- Restart xmonad
     , ((modm              , xK_q     ), spawn "xmonad --recompile; xmonad --restart")
+    
+    -- Multimedia keys (zie /usr/include/X11/XF86keysym.h voor codes)
+    , ((0, 0x1008FF14), spawn "media playpause")
+    , ((0, 0x1008FF16), spawn "media prev")
+    , ((0, 0x1008FF17), spawn "media next")
+    , ((0, 0x1008FF11), spawn "media vol-")
+    , ((0, 0x1008FF12), spawn "media mute")
+    , ((0, 0x1008FF13), spawn "media vol+")
     ]
     ++
 
@@ -148,6 +161,16 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     --     | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
     --     , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
+
+terminalOveral conf
+  = do
+    st <- gets $ W.stack . W.workspace . W.current . windowset
+    case st of
+      Nothing
+       -> spawn $ XMonad.terminal conf
+      Just (W.Stack { W.focus = w })
+       -> runQuery title w >>=
+          safeSpawn "terminal-overal" . (XMonad.terminal conf :) . (:[])
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
