@@ -324,7 +324,7 @@ myStartupHook = return ()
 
 -- Run xmonad with the settings you specify. No need to modify this.
 --
-main = statusBar "xmobar" myPP toggleStrutsKey defaults
+main = statusBar "xmobar" myPP toggleStrutsKey myConfig
       >>= return . withUrgencyHook NoUrgencyHook
       >>= xmonad
   where toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
@@ -355,7 +355,7 @@ myPP = defaultPP
 --
 -- No need to modify this.
 --
-defaults = defaultConfig {
+myConfig = defaultConfig {
       -- simple stuff
         terminal           = "urxvt",
         focusFollowsMouse  = True,
