@@ -15,11 +15,10 @@ Config { font = "xft:Monospace-8"
               "-t", "≈<quality>"] 10
           , Run Com "fancy-volume" ["4", "♪"] "vol" 2
           , Run Com "cut" ["-d", "' '", "-f1-3", "/proc/loadavg"] "load" 10
-          , Run Com "cat" ["/home/jeroen/.xmobar-apt-updates"] "apt" 100
           , Run Com "/home/jeroen/bin/xsel-clipped" ["60"] "xsel" 10
           , Run StdinReader
           ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " %StdinReader% }{ <fc=#a0a0a0>%xsel%</fc> %apt% %wlan0wi% <fc=#a0e0f0>⚒%load%</fc> %vol% %battery% %date%"
+       , template = " %StdinReader% }{ <fc=#a0a0a0>%xsel%</fc> %wlan0wi% <fc=#a0e0f0>⚒%load%</fc> %vol% %battery% %date%"
        }
