@@ -1,0 +1,24 @@
+Config { font = "xft:inconsolata:size=14"
+       , bgColor = "black"
+       , fgColor = "white"
+       , position = Top
+       , commands =
+          [ Run Date "%a %-e %B [%V] %Y %H:%M<fc=#404040>:%S</fc>" "date" 10
+          , Run Battery ["-L","10","-H","49",
+            "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
+            "-t","<fc=#a0a0a0><timeleft></fc><fc=white><acstatus></fc><left>",
+            "--", "-f","ACAD/online", "-O", "⚉", "-o","⚇"
+            ] 10
+          , Run Wireless "wlan0" [
+              "-L","49","-H","89",
+              "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
+              "-t", "≈<quality>"] 10
+          , Run Com "fancy-volume" ["4", "♪"] "vol" 2
+          , Run Com "cut" ["-d", "' '", "-f1-3", "/proc/loadavg"] "load" 10
+          , Run Com "/home/jeroen/bin/xsel-clipped" ["60"] "xsel" 10
+          , Run StdinReader
+          ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = " %StdinReader% }{ <fc=#a0a0a0>%xsel%</fc> %wlan0wi% <fc=#a0e0f0>⚒%load%</fc> %vol% %battery% %date%"
+       }
