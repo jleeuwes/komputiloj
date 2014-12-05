@@ -1,6 +1,7 @@
 !moeite waard: http://www.haskell.org/haskellwiki/Xmonad/Frequently_asked_questions (compositing)
 !ook handig: http://www.saltycrane.com/blog/2009/11/how-make-urxvt-look-gnome-terminal/
 
+URxvt.termName: rxvt
 !URxvt settings
 URxvt.urlLauncher: chromium-browser
 URxvt.matcher.button: 1

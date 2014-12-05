@@ -1,0 +1,7 @@
+xrdb -load ~/.Xresources
+setxkbmap -option 'compose:ralt'
+
+if [ ! -d ~/.cache ]; then
+  CACHE_DIR=$(mktemp --tmpdir=/tmp -d jeroen.cache.XXXXXXXXX)
+  ln -sf "$CACHE_DIR" ~/.cache
+fi

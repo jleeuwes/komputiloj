@@ -42,7 +42,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- super+p heeft ruzie met dat rare touchpadmediaknopje op mijn HP
     -- launch dmenu
     , ((modm, xK_p),                      dmenu_run)
-    , ((modm, xK_w),                      safeSpawn "wachtwoord-balk" [])
+    , ((modm, xK_w),                      dmenu_ww)
     
     -- close focused window
     , ((modm .|. shiftMask, xK_c     ), kill)
@@ -321,9 +321,11 @@ myPP = defaultPP
   , ppExtras          = []
   }
 
-dmenu_run = safeSpawn "dmenu_run"
+dmenu_run = safeSpawn "dmenu_run" dmenu_opts
+dmenu_ww  = safeSpawn "wachtwoord-balk" dmenu_opts
+dmenu_opts =
   ["-nb", "#000", "-nf", "#fff", "-sb", "#fff", "-sf", "#000", "-fn",
-  "xft:inconsolata:size=14"]
+  "inconsolata:size=14"]
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
