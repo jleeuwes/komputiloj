@@ -255,6 +255,7 @@ myManageHook =
     composeAll -- [ className =? "MPlayer"        --> doFloat
     [ resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
+    , isDialog                      --> doFloat
     -- , className =? "Pidgin" <||> className =? "pidgin"  --> doShift "com"
     , manageDocks
     ]

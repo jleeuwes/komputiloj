@@ -2,11 +2,9 @@
 !ook handig: http://www.saltycrane.com/blog/2009/11/how-make-urxvt-look-gnome-terminal/
 
 URxvt.termName: rxvt
-!URxvt settings
-URxvt.urlLauncher: chromium-browser
-URxvt.matcher.button: 1
-URxvt.perl-ext-common: matcher
-!URxvt.perl-lib: /opt/local/lib/urxvt/perl/
+URxvt.perl-ext: default,matcher
+URxvt.url-launcher: firefox
+URxvt.matcher.button: 3
 
 URxvt*font:        xft:inconsolata:size=14
 ! URxvt*boldFont:    xft:Monospace:size=11

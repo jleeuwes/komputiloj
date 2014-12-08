@@ -5,3 +5,5 @@ if [ ! -d ~/.cache ]; then
   CACHE_DIR=$(mktemp --tmpdir=/tmp -d jeroen.cache.XXXXXXXXX)
   ln -sf "$CACHE_DIR" ~/.cache
 fi
+
+export EDITOR=vim
