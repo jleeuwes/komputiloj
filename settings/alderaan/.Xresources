@@ -6,7 +6,7 @@ URxvt.perl-ext: default,matcher
 URxvt.url-launcher: firefox
 URxvt.matcher.button: 3
 
-URxvt*font:        xft:inconsolata:size=14
+URxvt*font:        xft:inconsolata:size=15
 ! URxvt*boldFont:    xft:Monospace:size=11
 
 ! als Xft.rgba verderop op '1' of 'rgb' staat, moet dit -2 zijn. Anders -1. Bizar.

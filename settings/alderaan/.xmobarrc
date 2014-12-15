@@ -1,4 +1,4 @@
-Config { font = "xft:inconsolata:size=14"
+Config { font = "xft:UbuntuMono:size=14"
        , bgColor = "black"
        , fgColor = "white"
        , position = Top
