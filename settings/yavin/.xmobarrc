@@ -12,9 +12,9 @@ Config { font = "xft:Monospace-8"
           , Run Wireless "wlan0" [
               "-L","49","-H","89",
               "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
-              "-t", "≈<quality>"] 10
+              "-t", "<essid>≈<quality>"] 10
           , Run Com "fancy-volume" ["4", "♪"] "vol" 2
-          , Run Com "cut" ["-d", "' '", "-f1-3", "/proc/loadavg"] "load" 10
+          , Run Com "cut" ["-d", "' '", "-f1", "/proc/loadavg"] "load" 10
           , Run Com "/home/jeroen/bin/xsel-clipped" ["60"] "xsel" 10
           , Run StdinReader
           ]

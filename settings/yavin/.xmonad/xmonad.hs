@@ -27,6 +27,7 @@ import XMonad.Layout.LayoutHints
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.Reflect
 import XMonad.Layout.IM
+import XMonad.Layout.ThreeColumns
 
 import XMonad.Util.Run (safeSpawn)
 
@@ -206,9 +207,9 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- which denotes layout choice.
 --
 myLayout = layoutHintsToCenter $ smartBorders $ avoidStruts $
-           mkToggle (single REFLECTX) $ mkToggle (single REFLECTY) $
-           gimpMod $ imMod
-           (wide ||| tall ||| Full)
+           -- mkToggle (single REFLECTX) $ mkToggle (single REFLECTY) $
+           -- gimpMod $ imMod
+           (wide ||| tall ||| gimpLayout ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tall    = Tall 1 delta (3/5)
@@ -222,6 +223,8 @@ myLayout = layoutHintsToCenter $ smartBorders $ avoidStruts $
 
 -- Omring standaard layout met ruimte voor gimp-balkjes, indien van toepassing
 -- (http://nathanhowell.net/2009/03/08/xmonad-and-the-gimp/)
+-- BROKEN
+{-
 gimpMod
   = withIM (barSz) (Role "gimp-toolbox")
   . reflectHoriz
@@ -231,6 +234,10 @@ gimpMod
 
 imMod
   = reflectHoriz . withIM (0.1335) (Role "contact_list" `Or` Role "buddy_list") . reflectHoriz
+-}
+
+-- from https://github.com/davidbrewer/xmonad-ubuntu-conf/blob/master/xmonad.hs
+gimpLayout = {- smartBorders $ avoidStruts $ -} ThreeColMid 1 (3/100) (3/4)
 
 layoutNm = layoutNm' False False False . words
 --variant met ascii-reflects
@@ -247,18 +254,19 @@ layoutNm = layoutNm' False False False . words
 --   []                -> ""
 
 layoutNm' rx ry m ln = case ln of
-  ("IM":xs)         -> layoutNm' rx ry m xs
-  ("Mirror":xs)     -> layoutNm' rx ry (not m) xs
-  ("ReflectX":xs)   -> layoutNm' (not rx) ry m xs
-  ("ReflectY":xs)   -> layoutNm' rx (not ry) m xs
-  [x]               -> ref (atom x)
-  (x:xs)            -> x ++ " " ++ layoutNm' rx ry m xs
-  []                -> ""
+  ("IM":xs)          -> layoutNm' rx ry m xs
+  ("Mirror":xs)      -> layoutNm' rx ry (not m) xs
+  ("ReflectX":xs)    -> layoutNm' (not rx) ry m xs
+  ("ReflectY":xs)    -> layoutNm' rx (not ry) m xs
+  [x]                -> ref (atom x)
+  (x:xs)             -> x ++ " " ++ layoutNm' rx ry m xs
+  []                 -> ""
   where ref = refC rx 'ˣ' . refC ry 'ʸ' . refC m '↻'
-        refC True  c  = (c:)
-        refC False _  = (' ':)
-        atom "Tall"   = "T"
-        atom "Full"   = "F"
+        refC True  c    = (c:)
+        refC False _    = (' ':)
+        atom "Tall"     = "T"
+        atom "Full"     = "F"
+        atom "ThreeCol" = "3"
 
 ------------------------------------------------------------------------
 -- Window rules:
