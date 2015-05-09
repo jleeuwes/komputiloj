@@ -2,6 +2,9 @@
 
 let
   nixpkgs = import <nixpkgs> {};
+  rereDsl = import "/home/jeroen/code/rere/rere-dsl" {};
+  haskellEnv = haskellPackages: with haskellPackages; [ hint alsaPcm
+  vector hinotify stm async uuid caseInsensitive parsec ]; # rereDsl ];
 in {
   dmenu = nixpkgs.dmenu.override { enableXft = true; };
   
@@ -13,4 +16,6 @@ in {
       sha256 = "1l5y4k830jyw7n1nnhssci3qahq091fj5cxcr77znk20nclz851s";
     };
   });
+
+  ghc = nixpkgs.haskellPackages.ghcWithPackages haskellEnv;
 }
