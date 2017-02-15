@@ -18,7 +18,8 @@
   boot.tmpOnTmpfs = true;
 
   networking.hostName = "scarif";
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  # Netwerken staan in /etc/wpa_supplicant.conf vanwege passphrases
 
   # Select internationalisation properties.
   i18n = {
