@@ -55,6 +55,18 @@
   services.xserver.windowManager.xmonad.enableContribAndExtras = true;
   # en xfce voor de goodies
   services.xserver.desktopManager.xfce.enable = true;
+  
+  # touchpad
+  services.xserver.synaptics = {
+    enable = true;
+    horizEdgeScroll = false;
+    horizTwoFingerScroll = true;
+    vertEdgeScroll = false;
+    vertTwoFingerScroll = true;
+    tapButtons = false;
+    maxSpeed = "2";
+    accelFactor = "0.04";
+  };
 
   # Enable the KDE Desktop Environment.
   # services.xserver.displayManager.kdm.enable = true;
