@@ -102,12 +102,16 @@
   # services.xserver.displayManager.kdm.enable = true;
   # services.xserver.desktopManager.kde4.enable = true;
 
+  # For 32-bit games:
+  hardware.opengl.driSupport32Bit = true;
+  hardware.opengl.driSupport = true; # is actually the default
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.extraUsers.jeroen = {
     uid = 1000;
     isNormalUser = true;
     description = "Jeroen Leeuwestein";
-    extraGroups = [ "wheel" "network-manager" ];
+    extraGroups = [ "wheel" "network-manager" "dialout" ];
   };
 
   # The NixOS release to be compatible with for stateful data such as databases.
