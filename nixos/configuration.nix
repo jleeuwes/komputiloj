@@ -46,6 +46,13 @@
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
+  # Screen locker
+  services.physlock = {
+    enable = true;
+    # nog niet beschikbaar (eens updaten!)
+    # allowAnyUser = true; # of moeten we rechten via systemd regelen?
+  };
+
   # Enable the X11 windowing system.
   services.xserver.enable = true;
   services.xserver.layout = "us";
