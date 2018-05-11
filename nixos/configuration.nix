@@ -39,6 +39,10 @@
   ];
 
   # List services that you want to enable:
+  
+  # I suspect UPower hard-shutdowns my laptop if one battery is empty,
+  # so let's try with it disabled:
+  services.upower.enable = false;
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
@@ -62,7 +66,9 @@
   services.xserver.windowManager.xmonad.enable = true;
   services.xserver.windowManager.xmonad.enableContribAndExtras = true;
   # en xfce voor de goodies
-  services.xserver.desktopManager.xfce.enable = true;
+  # services.xserver.desktopManager.xfce.enable = true;
+  # (TODO die vereist upower, dus staat nu uit;
+  # als ik dingen mis moet ik de losse programma's maar installeren)
   
   # touchpad
   services.xserver.synaptics = {
