@@ -35,8 +35,16 @@
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
-    git vim file
+    git vim file subversionClient pciutils pmount parted
+    # xfce stuff:
+    xfce.terminal xfce.thunar xfce.ristretto
   ];
+
+  # Generate setuid wrappers for pmount:
+  security.wrappers = {
+    pmount.source  = "${pkgs.pmount}/bin/pmount";
+    pumount.source = "${pkgs.pmount}/bin/pumount";
+  };
 
   # List services that you want to enable:
   
