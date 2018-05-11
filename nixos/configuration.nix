@@ -20,6 +20,7 @@
   networking.hostName = "scarif";
   networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   # Netwerken staan in /etc/wpa_supplicant.conf vanwege passphrases
+  networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
   # Select internationalisation properties.
   i18n = {
