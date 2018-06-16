@@ -5,6 +5,16 @@
 { config, pkgs, ... }:
 
 {
+  nixpkgs.config = {
+    # allowUnfree = true;
+    packageOverrides = pkgs: {
+      # You need to first add the nixos-unstable channel as 'unstable' using nix-channel
+      unstable = import <unstable> {
+        config = config.nixpkgs.config;
+      };
+    };
+  };
+
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
@@ -97,6 +107,10 @@
     ACTION=="add", SUBSYSTEM=="input", KERNEL=="mouse[0-9]*", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="/home/jeroen/.Xauthority", RUN+="${pkgs.xorg.xf86inputsynaptics}/bin/synclient TouchpadOff=1"
     ACTION=="remove", SUBSYSTEM=="input", KERNEL=="mouse[0-9]*", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="/home/jeroen/.Xauthority", RUN+="${pkgs.xorg.xf86inputsynaptics}/bin/synclient TouchpadOff=0"
   '';
+  # Enable adb group and udev rules and such:
+  programs.adb.enable = true;
+  # Use newer rules for OnePlus 5T support:
+  services.udev.packages = [ pkgs.unstable.android-udev-rules ];
 
   # Enable the KDE Desktop Environment.
   # services.xserver.displayManager.kdm.enable = true;
@@ -111,7 +125,7 @@
     uid = 1000;
     isNormalUser = true;
     description = "Jeroen Leeuwestein";
-    extraGroups = [ "wheel" "network-manager" "dialout" ];
+    extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" ];
   };
 
   # The NixOS release to be compatible with for stateful data such as databases.
