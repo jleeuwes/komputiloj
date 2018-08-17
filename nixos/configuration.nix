@@ -45,9 +45,25 @@
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
+    # prettiness ( more inspiration at https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 and https://stackoverflow.com/questions/38576616/how-to-install-gtk-themes-under-nixos-without-hacky-scripts )
+    # gtk-engine-murrine arc-theme arc-icon-theme elementary-icon-theme
+    # gtk
+    hicolor_icon_theme xfce.xfce4icontheme
+    # usefull programs:
     git vim file subversionClient pciutils pmount parted
+    firefox thunderbird
+    geany
+    zathura # pdf viewer
+    # gnome stuff (won't work because dconf is missing):
+    # gnome3.gedit
     # xfce stuff:
+    # support stuff (needed for generating thumbnails for instance - maar het werkt voor geen zak)
+    xfce.exo xfce.xfconf # xfce.xfce4settings
+    shared_mime_info xfce.tumbler # <- these two in particular seemed to do the trick!
+    # actual programs:
     xfce.terminal xfce.thunar xfce.ristretto
+    # Belgian eID (it looks in /run/current-system/sw/ by default for some things so it's easier to have it installed system-wide):
+    unstable.eid-mw
   ];
 
   # Generate setuid wrappers for pmount:
@@ -76,29 +92,45 @@
   };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
-  services.xserver.layout = "us";
-  services.xserver.xkbOptions = "eurosign:e";
+  services.xserver = {
+    enable = true;
+    layout = "us";
+    xkbOptions = "compose:ralt eurosign:e";
 
-  # Xmonad :)
-  services.xserver.windowManager.xmonad.enable = true;
-  services.xserver.windowManager.xmonad.enableContribAndExtras = true;
+    displayManager.sessionCommands = ''
+      # # ( adapted from https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 )
+      # # (lijkt allemaal voor geen flikker te werken)
+      # # This allows GTK to load SVG icons.
+      # export GDK_PIXBUF_MODULE_FILE=$(echo ${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/*/loaders.cache)
+      # # Set GTK_PATH so that GTK+ can find the Xfce theme engine.
+      # export GTK_PATH=${pkgs.gtk-engine-murrine}/lib/gtk-2.0
+      # # Set GTK_DATA_PREFIX so that GTK+ can find the Xfce themes.
+      # export GTK_DATA_PREFIX=${config.system.path}
+      # # Launch xfce settings daemon.
+      # ${pkgs.xfce.xfce4settings}/bin/xfsettingsd &
+    '';
+
+    windowManager.xmonad.enable = true;
+    windowManager.xmonad.enableContribAndExtras = true;
+  
+    # touchpad
+    synaptics = {
+      enable = true;
+      horizEdgeScroll = false;
+      horizTwoFingerScroll = true;
+      vertEdgeScroll = false;
+      vertTwoFingerScroll = true;
+      tapButtons = false;
+      maxSpeed = "2";
+      accelFactor = "0.04";
+    };
+  };
+
   # en xfce voor de goodies
   # services.xserver.desktopManager.xfce.enable = true;
   # (TODO die vereist upower, dus staat nu uit;
   # als ik dingen mis moet ik de losse programma's maar installeren)
   
-  # touchpad
-  services.xserver.synaptics = {
-    enable = true;
-    horizEdgeScroll = false;
-    horizTwoFingerScroll = true;
-    vertEdgeScroll = false;
-    vertTwoFingerScroll = true;
-    tapButtons = false;
-    maxSpeed = "2";
-    accelFactor = "0.04";
-  };
 
   services.udev.extraRules = ''
     # https://wiki.archlinux.org/index.php/Touchpad_Synaptics#Disable_touchpad_on_mouse_detection
