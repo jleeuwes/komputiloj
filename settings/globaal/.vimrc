@@ -4,9 +4,23 @@
 :set mouse=a
 :set number
 :set autoindent
-:set expandtab
-:set tabstop=2
-:set shiftwidth=2
+
+" http://tedlogan.com/techblog3.html
+:set noexpandtab
+:set tabstop=4
+:set shiftwidth=4
+:set softtabstop=4
+
+" Haskell wants spaces and I want less indentation:
+autocmd FileType haskell setlocal expandtab tabstop=2 shiftwidth=2 softtabstop=2
+autocmd FileType cabal setlocal expandtab tabstop=2 shiftwidth=2 softtabstop=2
+
+" visualize tabs and trailing spaces:
+:set list
+:set listchars=trail:␣,tab:▸\ 
+
+" Don't enable modelines! They should not be executed
+" on untrusted files.
 
 au BufReadPost set nobomb
 
