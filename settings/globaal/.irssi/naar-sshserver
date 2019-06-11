@@ -1,0 +1,11 @@
+#!/bin/bash
+
+scp config-sshserver sshserver:~/.irssi/config
+
+./bar.theme.sh %0%w > sshserver.theme
+scp sshserver.theme sshserver:~/.irssi/default.theme
+
+./bar.theme.sh %1%w > bot.theme
+scp config-bot bot.theme sshserver:~/.irssi/
+
+rsync -avL --exclude=.svn scripts/ sshserver:~/.irssi/scripts/

@@ -1,0 +1,2 @@
+VMARGS="-Xms40m -Xmx512m -XX:PermSize=128M -XX:MaxPermSize=256M"  #meer geheugen reserveren
+JAVA_HOME=/usr/lib/jvm/java-1.5.0-sun   #willekeurige crashes van Java 6 uitschakelen

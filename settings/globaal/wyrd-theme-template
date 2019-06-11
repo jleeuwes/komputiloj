@@ -1,0 +1,59 @@
+# the help bar at the top of the screen
+color help default default
+
+# an empty timeslot in the day-schedule window
+color timed_default default default
+
+# the current time in the day-schedule window (if it is visible)
+color timed_current default default
+ 
+# a nonempty timeslot in the day-schedule window, indented to level 1
+color timed_reminder1 default default
+
+# a nonempty timeslot in the day-schedule window, indented to level 2
+color timed_reminder2 default default
+
+# a nonempty timeslot in the day-schedule window, indented to level 3
+color timed_reminder3 default default
+
+# a nonempty timeslot in the day-schedule window, indented to level 4
+color timed_reminder4 default default
+
+# an entry in the untimed reminders window
+color untimed_reminder default default
+
+# the vertical date strip at the left side of the screen
+color timed_date default default
+
+# the line providing date/time for the current selection
+color selection_info default default
+
+# the reminder description window
+color description default default
+
+# the bottom bar providing current date and time
+color status default default
+
+# the month and weekday labels in the calendar window
+color calendar_labels default default
+
+
+# calendar days with low activity
+color calendar_level1 default default
+
+# calendar days with medium activity
+color calendar_level2 default default
+
+# calendar days with hight activity
+color calendar_level3 default default
+
+# the current day in the calendar window (if it is visible)
+color calendar_today default default
+
+# the vertical line to the left of the timed reminders window
+color left_divider default default
+
+
+# the vertical and horizontal lines to the right of the timed reminders window
+color right_divider default default
+

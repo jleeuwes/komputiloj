@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=jeroen-minder-donker
+Type=X-GNOME-Metatheme
+Comment=
+
+[X-GNOME-Metatheme]
+GtkTheme=Glossy
+MetacityTheme=Human
+IconTheme=Human
+GtkColorScheme=fg_color:#191919191919,bg_color:#821082108210,text_color:#ffffffffffff,base_color:#18c618c618c6,selected_fg_color:#ffffffffffff,selected_bg_color:#3ed800006b8a,tooltip_fg_color:#ffffffffffff,tooltip_bg_color:#000000000000
+CursorTheme=Human
+CursorSize=18

@@ -1,0 +1,56 @@
+# the help bar at the top of the screen
+color help default yellow
+
+# an empty timeslot in the day-schedule window
+color timed_default default default
+
+# the current time in the day-schedule window (if it is visible)
+color timed_current white red
+ 
+# a nonempty timeslot in the day-schedule window, indented to level x
+color timed_reminder1 white red
+color timed_reminder2 white yellow
+color timed_reminder3 white green
+color timed_reminder4 white magenta
+
+# an entry in the untimed reminders window
+color untimed_reminder default default
+
+# the vertical date strip at the left side of the screen
+color timed_date default yellow
+
+# the line providing date/time for the current selection
+color selection_info default yellow
+
+# the reminder description window
+color description default default
+
+# the bottom bar providing current date and time
+color status default yellow
+
+# the month and weekday labels in the calendar window
+color calendar_labels default default
+
+
+# calendar days with low activity
+color calendar_level1 default default
+
+# calendar days with medium activity
+color calendar_level2 black white
+
+# calendar days with hight activity
+color calendar_level3 black yellow
+
+# the current day in the calendar window (if it is visible)
+color calendar_today white red
+
+# ongedocumenteerd: de geselecteerde dag in de kalender
+color calendar_selection white black
+
+# the vertical line to the left of the timed reminders window
+color left_divider default yellow
+
+
+# the vertical and horizontal lines to the right of the timed reminders window
+color right_divider default yellow
+

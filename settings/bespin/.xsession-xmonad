@@ -1,0 +1,44 @@
+#!/bin/bash
+
+echo '** Welkom bij deze X-sessie'
+
+echo '* Gezellig achtergrondplaatje'
+~/bin/desktop-decoratie > /dev/null
+
+echo '* Wat X-instellinkjes (muis, xkbmap, keyboard repeat)'
+xsetroot -cursor_name arrow
+#unclutter -idle 1 -root &   # nog stees focus-bugs
+setxkbmap
+# xmodmap ~/.Xmodmap # zou nu in /etc/default/console-setup moeten worden geregeld
+xset r #keyboard repeat
+
+echo '* Screensaver'
+# niet doen als we Xinerama gebruiken!
+gnome-screensaver
+
+
+#rm -f /home/jeroen/fiefje
+#touch /home/jeroen/fiefje
+
+echo '* xmobar-statusbalk'
+xmobar < ~/fiefje &
+
+echo '* ivman hotplugding'
+ivman -c /etc/ivman
+
+echo '* GPG-agent'
+eval $(gpg-agent --daemon --enable-ssh-support)
+export GPG_AGENT_PID="$(echo "$GPG_AGENT_INFO"|cut -d: -f2)"
+
+echo '* XMonad! Daar gaan we!'
+# de /dev/null zorgt ervoor dat grafische dingen niet ten onrechte denken een
+# terminal te hebben (bijvoorbeeld ssh-add)
+xmonad < /dev/null
+
+echo '* ivman afschieten'
+pkill ivman #beetje bruut
+
+echo '* GPG-agent afschieten'
+kill "$GPG_AGENT_PID"
+
+echo '** Bedankt voor uw aandacht en tot ziens.'

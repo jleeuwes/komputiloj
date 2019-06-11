@@ -1,0 +1,30 @@
+include "/etc/wyrdrc"
+#include "~/settings/globaal/wyrd-theme-aes2"
+
+set week_starts_monday="true"
+set number_weeks="true"
+
+set schedule_12_hour="false"
+set selection_12_hour="false"
+set status_12_hour="false"
+set description_12_hour="false"
+
+set busy_level1="0"   # level1 color
+set busy_level2="1"   # level2 color
+set busy_level3="2"   # level2 color, bold
+set busy_level4="3"   # level3 color
+# (everything else is level3 color, bold)
+
+# templates for creating new appointments
+set timed_template="REM %mday% %monname% %year% AT %hour%:%min% DURATION 1:00 MSG "
+set untimed_template="REM %mday% %monname% %year% MSG "
+
+# weekly recurrence
+set template0="REM %wdayname% AT %hour%:%min% DURATION 1:00 MSG "
+set template1="REM %wdayname% MSG "
+
+# monthly recurrence
+set template2="REM %mday% AT %hour%:%min% DURATION 1:00 MSG "
+set template3="REM %mday% MSG "
+
+bind "q" quit

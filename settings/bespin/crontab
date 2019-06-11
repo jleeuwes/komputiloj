@@ -1,0 +1,8 @@
+# Vergeet niet te updaten na editen:
+#   crontab ~/crontab
+
+# 0 * * * * /home/jeroen/bin/zegtijd
+# 15 * * * * /home/jeroen/bin/zegtijd
+# 30 * * * * /home/jeroen/bin/zegtijd
+# 45 * * * * /home/jeroen/bin/zegtijd
+

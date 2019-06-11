@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "$0")"
+
+ICONS=xmonad-icons.png
+SIZE=20
+TMP=tmp
+
+mkdir "$TMP"
+
+convert "$ICONS" -crop ${SIZE}x${SIZE} -set filename:tile \
+  "%[fx:page.x/20+1]-%[fx:page.y/20+1]" +repage +adjoin \
+  "$TMP/icon-%[filename:tile].png"
+
+URGENT="$TMP/icon-10-2.png"
+
+for i in `seq 1 10`; do
+  convert "$TMP/icon-$i-1.png" "icon-$i-empty.xpm"
+  convert "$TMP/icon-$i-2.png" "icon-$i-hidden.xpm"
+  convert "$TMP/icon-$i-3.png" "icon-$i-current.xpm"
+  composite "$URGENT" "$TMP/icon-$i-2.png" "icon-$i-urgent.xpm"
+done
+
+rm -rf "$TMP"

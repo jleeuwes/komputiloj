@@ -1,0 +1,2 @@
+HISTCONTROL=ignoredups
+HISTSIZE=10000
