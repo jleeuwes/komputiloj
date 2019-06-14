@@ -50,7 +50,7 @@
     # gtk
     hicolor_icon_theme xfce.xfce4icontheme
     # usefull programs:
-    git vim file subversionClient pciutils pmount parted
+    gitFull vim file subversionClient pciutils pmount parted
     firefox thunderbird
     geany
     zathura # pdf viewer
