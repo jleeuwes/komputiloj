@@ -60,6 +60,10 @@
     # support stuff (needed for generating thumbnails for instance - maar het werkt voor geen zak)
     xfce.exo xfce.xfconf # xfce.xfce4settings
     shared_mime_info xfce.tumbler # <- these two in particular seemed to do the trick!
+    
+    hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way:
+    unclutter-xfixes # hides the mouse if unused
+    
     # actual programs:
     xfce.terminal xfce.thunar xfce.ristretto
     # Belgian eID (it looks in /run/current-system/sw/ by default for some things so it's easier to have it installed system-wide):

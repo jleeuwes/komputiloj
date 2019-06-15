@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 --
 -- xmonad example config file.
 --
@@ -14,6 +15,7 @@ import System.Exit
 import Numeric
 
 import XMonad.Actions.CycleWS (toggleWS)
+import XMonad.Actions.UpdatePointer (updatePointer)
 
 import XMonad.Hooks.UrgencyHook
 import XMonad.Hooks.DynamicLog
@@ -21,6 +23,7 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
 
 import XMonad.Layout.NoBorders (smartBorders)
+import XMonad.Layout.Spacing (smartSpacing)
 import XMonad.Layout.LayoutHints
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.Reflect
@@ -99,7 +102,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Deincrement the number of windows in the master area
     , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
     
-    -- Dingen omdraaien
+    -- Dingen omdraaien (gebruik ik niet echt)
     , ((modm              , xK_x), sendMessage $ Toggle REFLECTX)
     , ((modm              , xK_y), sendMessage $ Toggle REFLECTY)
 
@@ -182,14 +185,14 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = layoutHintsToCenter $ smartBorders $ avoidStruts $
+myLayout = layoutHintsToCenter $ smartSpacing 2 $ smartBorders $ avoidStruts $
            -- mkToggle (single REFLECTX) $ mkToggle (single REFLECTY) $
            -- gimpMod $ imMod
            (wide ||| tall ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tall    = Tall 1 delta (3/5)
-     wide    = Mirror $ Tall 1 delta (4/5+delta)
+     wide    = Mirror $ Tall 1 delta {- <- requires some tweaking to reduce wasted space when resizing -} (7/10)
 
      -- The default number of windows in the master pane
      nmaster = 1
@@ -285,18 +288,23 @@ myEventHook = mempty
 -- Perform an arbitrary action on each internal state change or X event.
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
-myLogHook = do
-    disp <- asks display
-    root <- asks theRoot
+updateBackgroundHook = do
     workspace <- gets (W.tag . W.workspace . W.current . windowset)
-    let hexcolor = withIndex workspaceColor workspace
-    let px = fromHex hexcolor
-    liftIO $ do
-        setWindowBackground disp root px
-        clearWindow disp root
-    return ()
+    setBgH $ withIndex workspaceColor workspace
 
   where
+    -- Set background using hsetroot because that is compatible with
+    -- xfce-terminal (launching a process on each change is not ideal but hey)
+    setBgH hexcolor = liftIO $ safeSpawn "/run/current-system/sw/bin/hsetroot" ["-solid", hexcolor]
+
+    -- Set background by painting on the root window (not compatible with
+    -- xfce-temrinal transparency)
+    setBgX hexcolor = do
+        disp <- asks display
+        root <- asks theRoot
+        liftIO $ do
+            setWindowBackground disp root $ fromHex hexcolor
+            clearWindow disp root
     fromHex = head0 . map fst . filter (null . snd) . readHex . tail
     head0 [] = 0
     head0 (x:_) = x
@@ -324,13 +332,13 @@ main = statusBar "xmobar" myPP toggleStrutsKey myConfig
 -- Leuke vormpjes:
 -- https://en.wikipedia.org/wiki/Geometric_Shapes
 -- ...
--- ▪ ↓ ⋅ ▼ ◆
+-- ▪ ↓ ⋅ ▼ ◆ ● ◉ ○ ◌ ◎
 myPP :: PP
 myPP = defaultPP
   { ppCurrent         = withIndex $ \i -> xmobarColor "#000000" (workspaceColor i) " ● " -- (workspaceText Hi i)
   , ppVisible         = withIndex $ \i -> xmobarColor "#000000" (workspaceColor i) " ◉ " -- whatever, we don't use xinerama
   , ppHidden          = withIndex $ \i -> xmobarColor "#000000" (workspaceColor i) " ○ "
-  , ppHiddenNoWindows = withIndex $ \i -> xmobarColor "#000000" (workspaceColor i) " ◌ "
+  , ppHiddenNoWindows = withIndex $ \i -> xmobarColor "#000000" (workspaceColor i) " ◠ "
   , ppUrgent          = withIndex $ \i -> xmobarColor "#000000" (workspaceColor i) " ◎ " -- . xmobarStrip
   , ppSep             = " " -- xmobarColor "#404040" "" " / "
   , ppWsSep           = ""
@@ -392,12 +400,12 @@ myConfig = defaultConfig {
       -- simple stuff
         terminal           = "xfce4-terminal",
         focusFollowsMouse  = True,
-        borderWidth        = 1,
+        borderWidth        = 2,
         modMask            = mod4Mask,
         -- numlockMask        = myNumlockMask,
         workspaces         = map show [1..9], -- ¹²³⁴⁵⁶⁷⁸⁹₁₂₃₄₅₆₇₈₉
-        normalBorderColor  = "#000000",
-        focusedBorderColor = "#a0a0a0",
+        normalBorderColor  = "#a0a0a0",
+        focusedBorderColor = "#000000",
 
       -- key bindings
         keys               = myKeys,
@@ -407,7 +415,8 @@ myConfig = defaultConfig {
         layoutHook         = myLayout,
         manageHook         = myManageHook,
         handleEventHook    = myEventHook,
-        logHook            = myLogHook,
+        logHook            = updateBackgroundHook
+                           >> updatePointer (0.5, 0.5) (0.0, 0.0),
         startupHook        = myStartupHook
     }
 
