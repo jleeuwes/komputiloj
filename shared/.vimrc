@@ -1,5 +1,11 @@
-:set background=dark
-:syntax enable
+" :set background is unnecessary because vim should detect this
+syntax enable
+" For some reason the background seems a tint too dark
+" and some keywords get a lighter background.
+" It looks odd and not like in the screenshots, so
+" TODO I thing I should investigate
+colorscheme solarized
+
 :set ignorecase
 :set mouse=a
 :set number
