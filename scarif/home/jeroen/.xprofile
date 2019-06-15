@@ -1,9 +1,42 @@
-xrdb -load ~/.Xresources
-setxkbmap -option 'compose:ralt'
 
+# Make sure our .cache-dir is not on SSD but in-memory
+# So for instance Firefox doesn't trash our SSD
+# (Assuming /tmp is in-memory)
 if [ ! -d ~/.cache ]; then
   CACHE_DIR=$(mktemp --tmpdir=/tmp -d jeroen.cache.XXXXXXXXX)
-  ln -sf "$CACHE_DIR" ~/.cache
+  ln -sfT "$CACHE_DIR" ~/.cache
+fi
+# Also put tumbler/thunar thumbnails there:
+if [ ! -d ~/.thumbnails ]; then
+	if [ ! -d ~/.cache/thumbnails ]; then
+		mkdir ~/.cache/thumbnails
+	fi
+	ln -sfT ~/.cache/thumbnails ~/.thumbnails
 fi
 
+# Cache for surf browser, if .surf dir is present
+if [ -d ~/.surf -a ! -d ~/.cache/surf ]; then
+  mkdir -p ~/.cache/surf
+  ln -sf ~/.cache/surf ~/.surf/cache
+fi
+
+# Use sane editor
 export EDITOR=vim
+
+# Use gpg-agent instead of ssh-agent
+unset SSH_AGENT_PID
+export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+gpg-agent --daemon
+
+# Set compose key
+setxkbmap -option compose:ralt
+
+# Remove ugly X root cursor
+xsetroot -cursor_name left_ptr
+
+# Make Java applications work
+export _JAVA_AWT_WM_NONREPARENTING=1
+
+# Hide the mouse when inactive:
+unclutter --timeout 2 &
+
