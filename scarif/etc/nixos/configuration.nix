@@ -42,6 +42,28 @@
   # Set your time zone.
   time.timeZone = "Europe/Amsterdam";
 
+  fonts = {
+	enableDefaultFonts = true; # <- dit lijkt niet echt iets uit te maken t.o.v.  weglaten
+	fonts = [
+		# nerdfonts is HUGE and nixos-rebuild hangs without progress information
+		# (withFont does not help)
+		# (also it is a useless font for emoji - it has nice icons but only
+		# custom ones, not stuff actually defined in unicode)
+		# (pkgs.nerdfonts.override { withFont = "SpaceMono"; })
+		# noto is veelbelovend maar sommige emoji zijn kleur (niet zo erg) en ENORM (wel erg)
+		# pkgs.noto-fonts-emoji
+		# pkgs.noto-fonts
+		# We weten nu trouwens zeker dat er een of ander fallback-systeem aan
+		# het werk is, want ook als je andere fonts kiest en noto-fonts-emoji is
+		# aanwezig krijg je emoji.
+
+		# WE HEBBEN EEN WINNAAR!
+		# symbola heeft mooie zwartwit-emoji op normale grootte.
+		# woooooooot \o/
+		pkgs.symbola
+	];
+  };
+
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
