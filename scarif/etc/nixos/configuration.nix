@@ -66,13 +66,22 @@
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = let
+    # this incomprehensible magic incantation was conjured by TheMsDosNerd at https://www.reddit.com/r/NixOS/comments/8cq4ic/problem_installing_python_package/
+    myPythonPackages = pythonPackages: with pythonPackages; [
+        flask
+        flask-api
+    ]; in with pkgs; [
     # prettiness ( more inspiration at https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 and https://stackoverflow.com/questions/38576616/how-to-install-gtk-themes-under-nixos-without-hacky-scripts )
     # gtk-engine-murrine arc-theme arc-icon-theme elementary-icon-theme
     # gtk
     hicolor_icon_theme xfce.xfce4icontheme
     # usefull programs:
     gitFull vim file subversionClient pciutils pmount parted
+    
+    # programming:
+    (python3.withPackages myPythonPackages)
+
     firefox thunderbird
     geany
     zathura # pdf viewer
