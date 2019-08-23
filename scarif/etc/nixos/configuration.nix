@@ -78,6 +78,7 @@
     hicolor_icon_theme xfce.xfce4icontheme
     # usefull programs:
     gitFull vim file subversionClient pciutils pmount parted
+    sshpass
     
     # programming:
     (python3.withPackages myPythonPackages)
