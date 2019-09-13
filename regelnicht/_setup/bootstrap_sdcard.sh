@@ -155,5 +155,9 @@ preconfigure_system
 echo
 echo "We're done!"
 echo "Go ahead and put the SD card in the raspberry and boot it up!"
+echo "Let it do its business of installing itself."
+echo "When http://192.168.1.40:8123/ gives a welcome screen,"
+echo "Run first_contact.sh and follow the instructions."
+
 echo "And then there will be some further steps but TODO YOLO"
 

@@ -1,0 +1,8 @@
+proc            /proc           proc    defaults          0       0
+PARTUUID=a6537e69-01  /boot           vfat    defaults          0       2
+PARTUUID=a6537e69-02  /               ext4    defaults,noatime  0       1
+PARTUUID=a6537e69-03  /mnt/data  ext4  defaults,noatime  0  2
+# a swapfile is not a swap partition, no line here
+#   use  dphys-swapfile swap[on|off]  for that
+# (TODO disable swap?)
+

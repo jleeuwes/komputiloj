@@ -19,34 +19,22 @@ trust_host_key() { # tijdelijk even uitgezet
 	ssh -o StrictHostKeyChecking=accept-new pi@"$REGELNICHT_IP" echo "First contact!"
 }
 
-perform_upgrades() {
-	echo "Updating the machine..."
-	ssh pi@"$REGELNICHT_IP" sudo apt-get update --allow-releaseinfo-change
-	ssh pi@"$REGELNICHT_IP" sudo apt-get upgrade -y
-}
-
-# TODO tune sshd_config (but maybe just pull that from git)
-
-# TODO set up overlayfs against corruption?
-
 set_up_komputiloj() {
-	# idee: script in komputiloj zetten, als eerste git clonen en dan het script uitvoeren,
-	# in plaats van steeds stukjes via ssh doen
-	
+	echo "Checking out kompituloj on regelnicht..."
 	ssh pi@"$REGELNICHT_IP" /usr/bin/bash <<EOF
 		set -Eeu
 		set -o pipefail
-		git clone https://github.com/jleeuwes/komputiloj.git
-		sudo -u homeassistant mv ~homeassistant/.homeassistant{,.old}
-		sudo -u homeassistant ln -s ~pi/komputiloj/regelnicht/home/homeassistant/.homeassistant ~homeassistant
+		sudo git clone https://github.com/jleeuwes/komputiloj.git /etc/komputiloj
 EOF
-
-	# TODO scripten of via /etc-beheer regelen
-	# Over dat laatste: best met een schone install beginnen, dat inchecken, dan tweaken
-	# sudo ln -sf /usr/share/zoneinfo/Europe/Brussels /etc/localtime
 }
 
 trust_host_key
-# perform_upgrades
-# set_up_komputiloj
+set_up_komputiloj
+
+echo "Things are set up on regelnicht."
+echo "Please log in on regelnicht and run:"
+echo "    sudo apt-get install screen"
+echo "    sudo screen"
+echo "    /etc/komputiloj/regelnicht/_setup/first_steps.sh"
+echo "(The last command being inside the screen session)"
 
