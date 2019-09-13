@@ -74,7 +74,7 @@ check_sdcard_device_available() {
 	done
 }
 
-flash_and_repartition_sdcard() {
+flash_sdcard() {
 	echo "SUDO Asking root to give you ownership over $SDCARD_DEVICE..."
 	echo "(This will stick until you remove the SD card)"
 	# Note: we tried chowning partition devices as well later in the script,
@@ -87,7 +87,9 @@ flash_and_repartition_sdcard() {
 	await_confirmation
 	echo "Please wait while I write the image..."
 	unzip -p -- "$IMAGE_DOWNLOAD_FILENAME" > "$SDCARD_DEVICE"
-	
+}
+
+repartition_sdcard() {
 	echo "SUDO Partition time! I will:"
 	echo "  - expand the primary partition to $SDCARD_PRIMARY_PARTITION_SIZE to accomodate later OS updates"
 	echo "  - fill the rest of the SD card with a data partition"
@@ -107,18 +109,51 @@ flash_and_repartition_sdcard() {
 	sudo e2fsck -f "${SDCARD_DEVICE}p2"
 	sudo resize2fs "${SDCARD_DEVICE}p2"
 	# Apparently the filesystem can survive all the above, so first destroy it to prevent nagging by mkfs:
-	sudo dd if=/dev/zero of=/dev/mmcblk0p3 count=10
+	sudo dd if=/dev/zero of="${SDCARD_DEVICE}p3" count=10
 	# (Alternatively, maybe it's a good idea to keep the data fs intact?)
 	sudo mkfs.ext4 "${SDCARD_DEVICE}p3"
 }
 
+preconfigure_system() {
+	local MEDIA_DIR
+
+	# echo "Mounting the SD card boot partition..."
+	# pmount -- "${SDCARD_DEVICE}p1"
+	# MEDIA_DIR=/media/$(basename -- "${SDCARD_DEVICE}p1")
+	# echo "TODO remove init=/usr/lib/raspi-config/init_resize.sh from cmdline.txt to prevent first-time-boot modal dialog complaining about not being able to resize fs (due to our custom partitioning"
+	# echo "Umounting the SD card boot partition..."
+	# pumount -- "${SDCARD_DEVICE}p1"
+
+	echo "Mounting the SD card primary partition..."
+	pmount -- "${SDCARD_DEVICE}p2"
+	MEDIA_DIR=/media/$(basename -- "${SDCARD_DEVICE}p2")
+	echo "SUDO Disabling pi user password..."
+	# It's important to do this before booting the raspberry,
+	# because otherwise it will be accessible with the default password,
+	# which is NOT GOOD if this is a reinstall and the router is configured to
+	# forward SSH from the internet to the raspberry.
+	sudo sed -Ei 's/^pi:[^:]+:/pi:*:/' "$MEDIA_DIR"/etc/shadow
+	echo "Putting your SSH key in place..."
+	# This is a hack relying on the coincidence that we have the same UID as the pi user.
+	# The nice thing is: we don't have to check this, because if this would happen to not be true,
+	# the next commands would simply fail with a permission error.
+	mkdir "$MEDIA_DIR"/home/pi/.ssh
+	cat ~/.ssh/id_rsa.pub > "$MEDIA_DIR"/home/pi/.ssh/authorized_keys
+	echo "Unmounting the SD card primary partition..."
+	pumount -- "${SDCARD_DEVICE}p2"
+}
+
 check_download
 check_sdcard_device_available
-flash_and_repartition_sdcard
+flash_sdcard
+repartition_sdcard
+preconfigure_system
 
-# TODO give ourselves SSH access and disable password (better than doing that
-# online because of possible router forwarding)
-# TODO prepare overlayfs
+# TODO prepare overlayfs like https://github.com/JasperE84/root-ro but with a real partition instead of tmpfs,
+# for persistence with easy reset (just nuke the data partition)
 
-echo "We're done! Go ahead and put the SD card in the raspberry and boot it up!"
+echo
+echo "We're done!"
+echo "Go ahead and put the SD card in the raspberry and boot it up!"
+echo "And then there will be some further steps but TODO YOLO"
 
