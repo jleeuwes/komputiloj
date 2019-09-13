@@ -1,0 +1,4 @@
+# Definitely don't want private key checked in:
+/*/home/jeroen/.ssh/id_rsa
+# Not so sure about this one:
+/*/home/jeroen/.ssh/known_hosts
