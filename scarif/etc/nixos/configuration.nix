@@ -77,7 +77,8 @@
     # gtk
     hicolor_icon_theme xfce.xfce4icontheme
     # usefull programs:
-    gitFull vim file subversionClient pciutils pmount parted
+    gitFull vim file subversionClient pciutils pmount parted squashfsTools
+    unstable.gitAndTools.git-annex
     sshpass
     
     # programming:

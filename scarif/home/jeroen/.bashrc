@@ -15,3 +15,8 @@ sz() {
 		sed -Ei 's/^(FontName=.*) [0-9]+$/\1 '"$size"'/' ~/.config/xfce4/terminal/terminalrc
 	fi
 }
+
+# Alias for git add that bypasses git-annex
+# (only relevant in v7 mode which is becoming the default)
+alias ga="git -c annex.largefiles=nothing add"
+
