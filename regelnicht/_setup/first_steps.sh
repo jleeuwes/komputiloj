@@ -59,7 +59,7 @@ hassbian-config upgrade homeassistant
 ##### Finalization
 
 echo "Starting home assistant..."
-systemctl stop home-assistant@homeassistant.service
+systemctl start home-assistant@homeassistant.service
 
 echo "That's it, I'm done!"
 echo "The latest configuration from komputiloj is activated."
