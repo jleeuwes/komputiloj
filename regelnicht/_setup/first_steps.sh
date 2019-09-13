@@ -25,7 +25,8 @@ if test ! -d komputiloj; then
 fi
 
 echo "Setting up mounts..."
-cp -a fstab fstab.bak
+rm -f fstab.bak
+cp -a --dereference fstab fstab.bak
 ln -sf komputiloj/regelnicht/etc/fstab
 mkdir /mnt/data
 mount -a # mount the new config
