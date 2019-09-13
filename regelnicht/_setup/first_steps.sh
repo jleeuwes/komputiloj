@@ -42,10 +42,10 @@ ln -s /mnt/data/home /home
 echo "Moving homeassistant config from komputiloj in place..."
 cd ~homeassistant
 mv .homeassistant{,.bak}
-ln -s /etc/komputiloj/home/homeassistant/.homeassistant
+ln -s /etc/komputiloj/regelnicht/home/homeassistant/.homeassistant
 chown homeassistant:homeassistant -R .homeassistant
 # Move non-config over from the fresh install
-mv .homeassistant.bak/{home-assistant.log,home-assistant_v2.db} .homeassistant
+mv .homeassistant.bak/{home-assistant.log,home-assistant_v2.db,.cloud,.storage} .homeassistant
 
 ##### Upgrades
 
