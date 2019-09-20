@@ -42,11 +42,11 @@ ln -s /mnt/data/home /home
 
 echo "Moving homeassistant config from komputiloj in place..."
 cd ~homeassistant
-mv .homeassistant{,.bak}
-ln -s /etc/komputiloj/regelnicht/home/homeassistant/.homeassistant
-chown homeassistant:homeassistant -R .homeassistant/
-# Move non-config over from the fresh install
-mv .homeassistant.bak/{home-assistant.log,home-assistant_v2.db,.cloud,.storage} .homeassistant
+cp -a .homeassistant{,.bak}
+cd .homeassistant
+# Make shallow symlinks to everything in komputiloj
+# (Note: hidden files won't be linked; directories will be symlinked as a whole)
+ln -sf /etc/komputiloj/regelnicht/home/homeassistant/.homeassistant/* .
 
 ##### Upgrades
 
