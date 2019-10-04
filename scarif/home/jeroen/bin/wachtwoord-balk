@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-wn=$(wachtwoord ls | dmenu "$@")
+set -Eeu
+set -o pipefail
 
-ww=$(wachtwoord cat "$wn")
-wachtwoord cat "$wn" | tr --delete '\n' | timeout 10 xsel -in
+wn=$(ls ~/passwords | dmenu "$@")
+
+wachtwoord cat ~/passwords/"$wn" | tr --delete '\n' | timeout 10 xsel -in
 

@@ -1,77 +1,85 @@
 #!/usr/bin/env bash
 
-# We gaan ervanuit dat de gebruiker zichzelf als default recipient heeft gezet.
+set -Eeu
+set -o pipefail
 
-gpg=gpg2
+set -o noclobber
 
-if ! type -P $gpg > /dev/null; then
-  echo "Ja, hallo, ik kan gpg niet vinden." 1>&2
+CMD_GPG=gpg2
+
+# Identity to sign with and to always encrypt for:
+ME=jeroen@lwstn.eu
+
+if ! type -P "$CMD_GPG" > /dev/null; then
+	echo "Ja, hallo, ik kan $CMD_GPG niet vinden." >&2
+	exit 1
 fi
 
-case "$1" in
-  (mount)
-    exit
-  ;;
-  (umount)
-    exit
-  ;;
-  (ls)
-    ls ~/passwords
-  ;;
-  (show|cat)
-    shift
-    for i in $@; do
-      # esc=$(echo "$i" | sed '[^a-zA-Z0-9_-+=#      #blabla, TODO whitelisten
-      esc=${i//@/\\@}
-      esc=${esc//./\\.}
-      file=~/passwords/"$i"
-      if [ -f "$file" ]; then
-        [ $# -gt 1 ] && echo -en "\e[32m$i:\e[m "
-        $gpg --use-agent --batch -d "$file" 2>/dev/null
-      else
-        [ $# -gt 1 ] && echo -en "\e[31m$i:\e[m " 1>&2
-        echo "niet gevonden"  1>&2
-      fi
-    done
-  ;;
-  (add|new)
-    shift
-    naam=$1
-    [ -z "$naam" ] && exit 2
+main() {
+	local command
+	if test $# = 0; then
+		command=""
+	else
+		command="$1"
+		shift
+	fi
 
-    file=~/passwords/"$naam"
-    if [ -e "$file" ]; then
-      echo "Wachtwoord voor $naam bestaat al."
-      exit 1
-    fi
-    
-    stty -echo
-    pass=""
-    read -r -p "Wachtwoord voor $naam: " pass
-    stty echo
-    echo
-    [ -z "$pass" ] && exit 2
-    echo "$pass" | $gpg --use-agent --armor --encrypt --sign > "$file" || exit 1
-    echo "Wachtwoord voor $naam opgeslagen."
-  ;;
-  (rm)
-    shift
-    "$0" cat "$1" || exit 1
-    rm ~/passwords/"$1"
-    echo "Wachtwoord voor $1 verwijderd."
-  ;;
-  (complete)
-    cmd=$2
-    word=$3
-    prev=$4
-    if [ "$prev" = "$cmd" ]; then
-      compgen -W "cat ls new rm" "$word"
-    elif [ "$prev" = cat -o "$prev" = rm ]; then
-      compgen -W "$($0 ls)" "$word"
-    fi
-  ;;
-  (*)
-    echo "Onbekend commando '$1'. Tot ziens!"
-  ;;
-esac
+	case "$command" in
+	show|cat)
+		local success=0
+		local prefix=""
+		local content
+		if [ $# = 0 ]; then
+			echo "Reading from stdin..." >&2
+			set -- -
+		fi
+		for file in "$@"; do
+			if [ $# -gt 1 ]; then
+				prefix="$file: "
+			fi
+			# We let gpg produce any errors for us and use && to make sure we continue with the other files in case of an error
+			content=$($CMD_GPG --use-agent --batch --decrypt "$file") && {
+				printf "%s%s\n" "$prefix" "$content"
+				let ++success # ++ first because of weird exit code if expression is 0
+			}
+		done
+		if [ $success -lt $# ]; then
+			exit 1
+		fi
+	;;
+	add|new)
+		file="$1"
+		shift
+		if [ -e "$file" ]; then
+		  echo "Wachtwoord $file bestaat al." >&2
+		  exit 1
+		fi
+		
+		local recipients=(--recipient "$ME")
+		for recipient in "$@"; do
+			echo "Wachtwoord zal ook leesbaar zijn voor $recipient" >&2
+			recipients+=(--recipient "$recipient")
+		done
 
+		tty -s && stty -echo
+		local pass=""
+		read -r -p "Wachtwoord: " pass
+		tty -s && stty echo
+		if [ -z "$pass" ]; then
+			echo "Geen wachtwoord gegeven." >&2
+			exit 1
+		fi
+		local content
+		# We don't redirect the command to $file directly so no empty file will be created on error
+		content=$(printf "%s" "$pass" | $CMD_GPG --batch --use-agent --armor --encrypt --sign --local-user "$ME" "${recipients[@]}")
+		printf "%s" "$content" > "$file"
+		echo "Wachtwoord $file opgeslagen." >&2
+	;;
+	*)
+		echo "Onbekend commando '$command'. Tot ziens!" >&2
+		exit 1
+	;;
+	esac
+}
+
+main "$@"
