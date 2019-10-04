@@ -60,11 +60,17 @@ main() {
 			echo "Wachtwoord zal ook leesbaar zijn voor $recipient" >&2
 			recipients+=(--recipient "$recipient")
 		done
-
-		tty -s && stty -echo
+		
 		local pass=""
-		read -r -p "Wachtwoord: " pass
-		tty -s && stty echo
+		if tty -s; then
+			# If terminal; ask for a one line password
+			stty -echo
+			read -r -p "Wachtwoord: " pass
+			stty echo
+		else
+			# Otherwise, read full input
+			pass=$(cat)
+		fi
 		if [ -z "$pass" ]; then
 			echo "Geen wachtwoord gegeven." >&2
 			exit 1
