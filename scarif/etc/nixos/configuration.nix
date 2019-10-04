@@ -80,6 +80,7 @@
     gitFull vim file subversionClient pciutils pmount parted squashfsTools
     unstable.gitAndTools.git-annex
     sshpass
+    gnupg
     
     # programming:
     (python3.withPackages myPythonPackages)
@@ -96,6 +97,7 @@
     
     hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way:
     unclutter-xfixes # hides the mouse if unused
+    dmenu2 xsel # some helpers for menus
     
     # actual programs:
     xfce.terminal xfce.thunar xfce.ristretto

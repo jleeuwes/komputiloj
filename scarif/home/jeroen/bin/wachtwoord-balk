@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+wn=$(wachtwoord ls | dmenu "$@")
+
+ww=$(wachtwoord cat "$wn")
+wachtwoord cat "$wn" | tr --delete '\n' | timeout 10 xsel -in
+
