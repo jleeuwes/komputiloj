@@ -80,7 +80,7 @@
     gitFull vim file subversionClient pciutils pmount parted squashfsTools
     unstable.gitAndTools.git-annex
     sshpass
-    gnupg
+    gnupg paperkey qrencode zbar
     
     # programming:
     (python3.withPackages myPythonPackages)
