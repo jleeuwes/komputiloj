@@ -23,7 +23,7 @@ My public keys:
 
 - Must be stored on at least two easily accessible devices [TODO]
 - Must be stored in a publicly accessible place on the web
-	- My new key is in this repo: <jeroen@lwstn.eu.pub.asc>
+	- My new key is [here in this repo](jeroen@lwstn.eu.pub.asc)
 	- My old keys (which should be phased out) are already floating around [on
 	  keyservers](https://keyserver.ubuntu.com/pks/lookup?search=jeroenleeuwestein&fingerprint=on&op=index)
 
