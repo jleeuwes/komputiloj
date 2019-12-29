@@ -16,7 +16,7 @@ mkdir -p ~/backup/incoming
 
 cd ~/backup
 
-snapshot_slug=$(ssh root@$REGELNICHT_HOST hassio snapshots new --name "Automatic backup initiated from radstand" --raw-json | jq --raw-output '.data.slug')
+snapshot_slug=$(ssh root@$REGELNICHT_HOST hassio snapshots new --name "\"Automatic backup initiated from radstand\"" --raw-json | jq --raw-output '.data.slug')
 snapshot_file=incoming/"$snapshot_slug".tar
 
 scp -q root@$REGELNICHT_HOST:/backup/"$snapshot_slug".tar "$snapshot_file"
