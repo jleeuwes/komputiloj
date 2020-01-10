@@ -5,6 +5,8 @@
 # assuming they belong to the annex that is found in the .git directory in your
 # working directory or in one of its parent directories.
 #
+# Currently fixes files in the current directory only, non-recursively.
+#
 # git annex fix says it does this, but it only complains about unlocked files,
 # which doesn't have much to do with this functionality.
 
@@ -36,11 +38,12 @@ if test "$#" -gt 0; then
 fi
 
 THE_GIT_DIR=$(find_git_dir)
-find -type l -lname '*/.git/annex/objects/*' -print0 | while IFS= read -r -d '' file; do
+find -maxdepth 1 -mindepth 1 -type l -lname '*/.git/annex/objects/*' -print0 | while IFS= read -r -d '' file; do
 	target=$(readlink -- "$file")
 	# Assumption: there are only .. parts in the path before /.git/
 	# Assumption: there is only ony .git part in the path
 	target="$THE_GIT_DIR/${target#*/.git/}"
+	printf "Rewriting symlink %q to point to %q\n" "$file" "$target" >&2
 	ln -sf -- "$target" "$file"
 done
 
