@@ -77,10 +77,11 @@
     # gtk
     hicolor_icon_theme xfce.xfce4icontheme tango-icon-theme
     # usefull programs:
-    gitFull vim file subversionClient pciutils pmount parted squashfsTools
+    gitFull vim file subversionClient pciutils pmount parted squashfsTools wget
     unstable.gitAndTools.git-annex
     sshpass
     gnupg paperkey qrencode zbar
+    telnet # for ftp for the nas
     
     # programming:
     (python3.withPackages myPythonPackages)
@@ -95,7 +96,8 @@
     xfce.exo xfce.xfconf # xfce.xfce4settings
     shared_mime_info xfce.tumbler # <- these two in particular seemed to do the trick!
     
-    hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way:
+    hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way
+    xorg.xbacklight
     unclutter-xfixes # hides the mouse if unused
     dmenu2 xsel # some helpers for menus
     
