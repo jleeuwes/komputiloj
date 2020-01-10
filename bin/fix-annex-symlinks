@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# Fixes symlinks to annexed content after moving them to a directory
+# on a higher or lower level,
+# assuming they belong to the annex that is found in the .git directory in your
+# working directory or in one of its parent directories.
+#
+# git annex fix says it does this, but it only complains about unlocked files,
+# which doesn't have much to do with this functionality.
+
+set -Eeu
+set -o pipefail
+
+find_git_dir_rec() {
+	if test -d .git; then
+		echo -n .git
+		return 0
+	fi
+	if test "$PWD" = /; then
+		echo "Reached root dir without finding .git dir" >&2
+		return 1
+	fi
+	cd ..
+	echo -n ../
+	find_git_dir_rec
+}
+
+find_git_dir() {(
+	find_git_dir_rec
+)}
+
+if test "$#" -gt 0; then
+	echo "You gave arguments. You probably want me to fix symlinks in some
+	specific directory. That is not yet implemented." >&2
+	exit 1
+fi
+
+THE_GIT_DIR=$(find_git_dir)
+find -type l -lname '*/.git/annex/objects/*' -print0 | while IFS= read -r -d '' file; do
+	target=$(readlink -- "$file")
+	# Assumption: there are only .. parts in the path before /.git/
+	# Assumption: there is only ony .git part in the path
+	target="$THE_GIT_DIR/${target#*/.git/}"
+	ln -sf -- "$target" "$file"
+done
+
