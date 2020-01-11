@@ -16,7 +16,8 @@ mkdir -p ~/backup/incoming
 
 cd ~/backup
 
-snapshot_slug=$(ssh root@$REGELNICHT_HOST hassio snapshots new --name "\"Automatic backup initiated from radstand\"" --raw-json | jq --raw-output '.data.slug')
+# The source command is because of https://github.com/hassio-addons/addon-ssh/issues/115
+snapshot_slug=$(ssh root@$REGELNICHT_HOST source /etc/profile.d/hassio.sh ';' hassio snapshots new --name "\"Automatic backup initiated from radstand\"" --raw-json | jq --raw-output '.data.slug')
 snapshot_file=incoming/"$snapshot_slug".tar
 
 scp -q root@$REGELNICHT_HOST:/backup/"$snapshot_slug".tar "$snapshot_file"
