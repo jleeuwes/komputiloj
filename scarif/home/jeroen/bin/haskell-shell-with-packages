@@ -1,0 +1,22 @@
+#! /usr/bin/env bash
+
+pakjes=
+while [ "$#" -gt 0 ]; do
+	arg="$1"
+	shift
+	if [ "$arg" = -- ]; then
+		break
+	fi
+	pakjes="$pakjes $arg"
+done
+
+# De escaping is ruk!
+p_option="haskellPackages.ghcWithPackages (pkgs: with pkgs; [$pakjes])"
+
+if [ "$#" -eq 0 ]; then
+	exec nix-shell -p "$p_option"
+else
+	c_option=$(printf "%q " "$@")
+	exec nix-shell --run "$c_option" -p "$p_option"
+fi
+

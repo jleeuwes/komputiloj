@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+echo "Overbodig. Gebruik:" >&2
+echo "  haskell-shell-with-packages pkg1 pkg2 -- ghci arg1 arg2" >&2
+exit 1
+
