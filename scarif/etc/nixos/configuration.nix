@@ -86,6 +86,11 @@
     # programming:
     (python3.withPackages myPythonPackages)
 
+    # LaTeX:
+    # (Not sure if rubber uses the chosen texlive distribution)
+    texlive.combined.scheme-medium
+    rubber
+
     firefox thunderbird
     geany
     zathura # pdf viewer
