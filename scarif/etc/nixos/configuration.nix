@@ -6,10 +6,13 @@
 
 {
   nixpkgs.config = {
-    # allowUnfree = true;
     packageOverrides = pkgs: {
       # You need to first add the nixos-unstable channel as 'unstable' using nix-channel
       unstable = import <unstable> {
+        config = config.nixpkgs.config;
+      };
+      # You need to first add a nixos-18.09 channel called nixos_18_09 using nix-channel
+      nixos_18_09 = import <nixos_18_09> {
         config = config.nixpkgs.config;
       };
     };
@@ -60,7 +63,8 @@
 		# WE HEBBEN EEN WINNAAR!
 		# symbola heeft mooie zwartwit-emoji op normale grootte.
 		# woooooooot \o/
-		pkgs.symbola
+		# (is unfree tegenwoordig dus we gebruiken een oudere versie)
+		pkgs.nixos_18_09.symbola
 	];
   };
 
@@ -104,12 +108,12 @@
     hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way
     xorg.xbacklight
     unclutter-xfixes # hides the mouse if unused
-    dmenu2 xsel # some helpers for menus
+    dmenu xsel # some helpers for menus
     
     # actual programs:
     xfce.terminal xfce.thunar xfce.ristretto
     # Belgian eID (it looks in /run/current-system/sw/ by default for some things so it's easier to have it installed system-wide):
-    unstable.eid-mw
+    eid-mw
   ];
 
   # Generate setuid wrappers for pmount:
@@ -190,8 +194,6 @@
   # '';
   # Enable adb group and udev rules and such:
   programs.adb.enable = true;
-  # Use newer rules for OnePlus 5T support:
-  services.udev.packages = [ pkgs.unstable.android-udev-rules ];
 
   # Enable the KDE Desktop Environment.
   # services.xserver.displayManager.kdm.enable = true;
