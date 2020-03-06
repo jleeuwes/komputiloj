@@ -22,6 +22,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
+  hardware.pulseaudio.enable = true;
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
