@@ -108,6 +108,7 @@
     rubber
 
     firefox thunderbird
+    dejsonlz4 # for reading firefox jsonlz4 files
     geany
     zathura # pdf viewer
     # gnome stuff (won't work because dconf is missing):
