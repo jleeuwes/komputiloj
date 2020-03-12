@@ -1,4 +1,6 @@
 # Definitely don't want private key checked in:
 /*/home/jeroen/.ssh/id_rsa
-# Not so sure about this one:
+# This should be managed in *some* way
+# but it's probably best to not make it public as-is.
+# Maybe put it in datumoj? Or encrypt+sign it? And/or hash hosts?
 /*/home/jeroen/.ssh/known_hosts
