@@ -5,7 +5,7 @@ Config { font = "xft:Monospace:size=11"
        , alpha = 255
        , textOffset = 16
        , commands =
-          [ Run DateZone "%a %-e %B [%V] %Y %H:%M<fc=#404040>:%S</fc>" "nl_NL.UTF8" "" "date" 10
+          [ Run DateZone "%a %-e %B [%V] %Y %H:%M<fc=#404040>:%S</fc>" "nl_NL.UTF8" "" "date" 1
           , Run BatteryN ["BAT0"] ["-L","10","-H","49",
             "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
             "-t","<fc=#a0a0a0><timeleft></fc><fc=white><acstatus></fc><left>",
@@ -20,11 +20,10 @@ Config { font = "xft:Monospace:size=11"
               "-L","49","-H","89",
               "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
               "-t", "<fc=#a0e0f0><essid></fc>≈<quality>"] 10
-          , Run Com "/run/current-system/sw/bin/cut" ["-d", " ", "-f1-3", "/proc/loadavg"] "load" 10
           , Run Com "/home/jeroen/bin/xsel-clipped" ["40"] "xsel" 10
           , Run StdinReader
           ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " %StdinReader% }{ <fc=#a0a0a0>%xsel%</fc> %wlp4s0wi% <fc=#a0e0f0>⚒%load%</fc> %BAT1% %BAT0% %date%"
+       , template = " %StdinReader% }{ <fc=#a0a0a0>%xsel%</fc> %wlp4s0wi% <fc=#a0e0f0>⚒-</fc> %BAT1% %BAT0% %date%"
        }

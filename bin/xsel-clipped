@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+function isnum() {
+  [[ "$1" =~ ^[0-9]+ ]]
+}
+
+len=0
+if isnum "$1" ; then
+  len="$1"
+else
+  echo "Geen (geldige) lengte opgegeven." >&2
+  exit 1
+fi
+
+suf=0
+if isnum "$2" ; then
+  suf="$2"
+fi
+if [[ $suf -gt $len ]]; then
+  suf=$len
+fi
+
+let pre=len-suf
+
+if [[ "$pre" -gt 0 ]]; then
+  let pre--
+  voor="(.{$pre})."
+else
+  voor="()"
+fi
+
+if [[ "$suf" -gt 0 ]]; then
+  na=".{$suf}"
+else
+  na=""
+fi
+
+timeout -k 0.01 0.1 xsel -t 50 | tr -s '\n' ' ' | sed -E 's/^'$voor'.+('$na')$/\1…\2/'
