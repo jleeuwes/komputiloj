@@ -23,6 +23,17 @@
       ./hardware-configuration.nix
     ];
   hardware.pulseaudio.enable = true;
+  hardware.acpilight.enable = true; # doesn't work
+  hardware.brightnessctl.enable = true;
+
+  # also doesn't work:
+  environment.etc."X11/xorg.conf.d/05-backlight.conf".text = ''
+    Section "Device"
+      Identifier "Intel Graphics"
+      Driver "intel"
+      Option "Backlight" "intel_backlight"
+    EndSection
+  '';
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -107,7 +118,7 @@
     shared_mime_info xfce.tumbler # <- these two in particular seemed to do the trick!
     
     hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way
-    xorg.xbacklight
+    # xorg.xbacklight # doesn't work anymore - https://github.com/NixOS/nixpkgs/issues/55520#issuecomment-470501591
     unclutter-xfixes # hides the mouse if unused
     dmenu xsel # some helpers for menus
     
@@ -209,7 +220,7 @@
     uid = 1000;
     isNormalUser = true;
     description = "Jeroen Leeuwestein";
-    extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" ];
+    extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video" ];
   };
 
   # The NixOS release to be compatible with for stateful data such as databases.
