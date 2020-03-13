@@ -52,7 +52,7 @@ encrypted using the `wachtwoord` program in this repository.
 
 The encrypted secrets are stored in the datumoj repository if they are for
 personal use, or in the komputiloj repository if they must be available for
-unattened use by some device configured in komputiloj.
+unattended use by some device configured in komputiloj.
 
 Komputiloj being public and datumoj being duplicated/synchronizated between
 multiple devices will make sure these secrets are backed up.

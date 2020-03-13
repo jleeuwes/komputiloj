@@ -4,14 +4,7 @@ Have a unified persistent configuration and a way to rebuild it easily.
 I'm making it public so I can't loose it,
 and maybe someone might find something useful in there for their own config.
 
-## The plan
-
-1. Switch over my scarif NixOS config to this repo.
-2. Switch over my scarif home config from my `home-overal` SVN crap to this repo.
-3. Switch over my scarif content to some git-annex.
-4. Roll this out to my other machines.
-
-## How to use this
+## How to use this (on scarif)
 
 1. Clone this repository into `~/komputiloj`.
 2. Make some symlinks:
@@ -19,12 +12,24 @@ and maybe someone might find something useful in there for their own config.
     mkdir -p /etc/nixos
     sudo ln -s ~/komputiloj/scarif/etc/nixos/* /etc/nixos/
     ```
-3. (Re)build the NixOS configuration. TODO
+3. (Re)build the NixOS configuration with `nixos-rebuild --switch`
+4. Add a bunch of symlinks from `~` to files/dirs in `~/komputiloj/scarif/home/jeroen`
+   (use `ls -A ~/komputiloj/scarif/home/jeroen` to see all the dotfiles).
 
-Alternative: set `NIXOS_CONFIG` environment variable instead of symlinking
+(Unexplored alternative: set `NIXOS_CONFIG` environment variable instead of symlinking
 stuff. See <https://github.com/argumatronic/home-nixos> and
 <https://www.reddit.com/r/NixOS/comments/6zn5tv/manage_nixos_config_from_git_without_having_to/>
-for some good (and bad) ideas.
+for some good (and bad) ideas.)
+
+## Private/non-config data
+
+Private and non-config data is stored in [datumoj](file:///home/jeroen/datumoj).
+See <file:///home/jeroen/datumoj/README.md>.
+
+TODO describe setting up datumoj from scratch,
+including access to special remotes.
+
+Also important: [secrets management](secrets-management.md).
 
 ## Useful inspiration
 

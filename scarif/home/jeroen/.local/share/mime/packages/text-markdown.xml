@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+  <!--
+  This XML (after calling update-mime-database ~/.local/share/mime)
+  makes Firefox not offer file://*.md files for download,
+  but instead displays them.
+  In combination with https://github.com/painyeph/GitLabMarkdownViewer this lets
+  you read local file:// markdown files.
+  https://superuser.com/questions/696361/how-to-get-the-markdown-viewer-addon-of-firefox-to-work-on-linux/1175837#1175837
+  -->
+  <mime-type type="text/plain">
+    <glob pattern="*.md"/>
+    <glob pattern="*.mkd"/>
+    <glob pattern="*.markdown"/>
+  </mime-type>
+</mime-info>
