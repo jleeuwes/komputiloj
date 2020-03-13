@@ -101,6 +101,9 @@
     
     # programming:
     (python3.withPackages myPythonPackages)
+    dejsonlz4 # for reading firefox jsonlz4 files
+    remarshal # for yaml2json etc
+    jq # json manipulation
 
     # LaTeX:
     # (Not sure if rubber uses the chosen texlive distribution)
@@ -108,7 +111,6 @@
     rubber
 
     firefox thunderbird
-    dejsonlz4 # for reading firefox jsonlz4 files
     geany
     zathura # pdf viewer
     # gnome stuff (won't work because dconf is missing):
