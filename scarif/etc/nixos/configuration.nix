@@ -111,6 +111,7 @@
     rubber
 
     firefox thunderbird
+    chromium
     geany
     zathura # pdf viewer
     # gnome stuff (won't work because dconf is missing):
@@ -142,6 +143,12 @@
   # I suspect UPower hard-shutdowns my laptop if one battery is empty,
   # so let's try with it disabled:
   services.upower.enable = false;
+
+  # Needed for ChromeCast to work in chromium,
+  # in combination with enabling
+  # chrome://flags/#load-media-router-component-extension and
+  # chrome://flags/#cast-media-route-provider
+  services.avahi.enable = true;
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
