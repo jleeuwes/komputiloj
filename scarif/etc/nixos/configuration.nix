@@ -104,6 +104,8 @@
     dejsonlz4 # for reading firefox jsonlz4 files
     remarshal # for yaml2json etc
     jq # json manipulation
+    unstable.android-studio
+    # jetbrains.idea-community
 
     # LaTeX:
     # (Not sure if rubber uses the chosen texlive distribution)
