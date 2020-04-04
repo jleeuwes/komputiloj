@@ -132,6 +132,9 @@
     xfce.terminal xfce.thunar xfce.ristretto
     # Belgian eID (it looks in /run/current-system/sw/ by default for some things so it's easier to have it installed system-wide):
     eid-mw
+
+    # other package managers (to be used for non-reproducable things only):
+    nodejs #npm
   ];
 
   # Generate setuid wrappers for pmount:
