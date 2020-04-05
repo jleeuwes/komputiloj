@@ -1,4 +1,4 @@
-# Servilo
+# Serviloj
 
 Work in progress to set up a more
 [cattle-like](https://medium.com/@Joachim8675309/devops-concepts-pets-vs-cattle-2380b5aab313)
