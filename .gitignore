@@ -4,3 +4,5 @@
 # but it's probably best to not make it public as-is.
 # Maybe put it in datumoj? Or encrypt+sign it? And/or hash hosts?
 /*/home/jeroen/.ssh/known_hosts
+
+/serviloj/state.nixops
