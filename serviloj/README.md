@@ -48,10 +48,19 @@ So verify the host like this:
 6. If the hostkey ascii art matches, trust is established.
    If not, you have been MITMed and you should destroy the VPS.
 
-## To be continued
+## NixOps
 
-Now apply some Nixops magic.
-That's why we did this in the first place.
+We use immutable users in our deployment configuration,
+and we don't want to put our password in that configuration,
+so we configure the root password to be read from `/root/password`.
+To make this work, the hashed password needs to be put there:
+
+	ssh root@$VPS bash <<EOF
+	sed -E 's/^root:([^:]+):.*$/\1/;t;d' /etc/shadow > /root/password
+	chmod go-r /root/password
+	EOF
+
+Now update your NixOps deployment and deploy!
 
 ## Stuff maybe useful for further automization
 
