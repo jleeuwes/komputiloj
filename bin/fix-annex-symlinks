@@ -22,7 +22,7 @@ find_git_dir_rec() {
 		echo "Reached root dir without finding .git dir" >&2
 		return 1
 	fi
-	cd ..
+	cd -P ..
 	echo -n ../
 	find_git_dir_rec
 }
