@@ -91,6 +91,8 @@
 		nixops
 		mkpasswd
 
+		ocrad
+
 		# prettiness ( more inspiration at https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 and https://stackoverflow.com/questions/38576616/how-to-install-gtk-themes-under-nixos-without-hacky-scripts )
 		# gtk-engine-murrine arc-theme arc-icon-theme elementary-icon-theme
 		# gtk
