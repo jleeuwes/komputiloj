@@ -107,7 +107,7 @@
 		dejsonlz4 # for reading firefox jsonlz4 files
 		remarshal # for yaml2json etc
 		jq # json manipulation
-		unstable.android-studio
+		# unstable.android-studio # nonfree
 		# jetbrains.idea-community
 
 		# LaTeX:
