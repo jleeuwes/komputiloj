@@ -166,6 +166,13 @@
 	# Enable CUPS to print documents.
 	# services.printing.enable = true;
 	
+	# enable gvfs to have ftp support etcetera in thunar
+	# (doesn't work; maybe use
+	# https://github.com/NixOS/nixpkgs/blob/release-19.09/nixos/modules/services/x11/desktop-managers/xfce.nix
+	# ?)
+	# services.gvfs.enable = true;
+	# services.gvfs.package = pkgs.xfce.gvfs;
+	
 	# Enable sound.
 	sound.enable = true;
 
