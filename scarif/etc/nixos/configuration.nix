@@ -1,6 +1,6 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+
+# TODO https://github.com/NixOS/nixpkgs/issues/62832
+# and/or use our own fork of nixpkgs
 
 { config, pkgs, ... }:
 
@@ -88,6 +88,9 @@
 				flask
 				flask-api
 		]; in with pkgs; [
+		nixops
+		mkpasswd
+
 		# prettiness ( more inspiration at https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 and https://stackoverflow.com/questions/38576616/how-to-install-gtk-themes-under-nixos-without-hacky-scripts )
 		# gtk-engine-murrine arc-theme arc-icon-theme elementary-icon-theme
 		# gtk
