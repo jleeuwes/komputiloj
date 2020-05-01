@@ -40,11 +40,10 @@ import qualified Data.Map        as M
 --
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
-    -- launch a terminal
+    -- launch a terminal (TODO updatePointer doesn't work here; add it to the hook for new windows?)
     [ ((modm .|. shiftMask, xK_Return),   safeSpawn (XMonad.terminal conf) [])
     , ((modm .|. shiftMask, xK_KP_Enter), safeSpawn (XMonad.terminal conf) [])
 
-    -- super+p heeft ruzie met dat rare touchpadmediaknopje op mijn HP
     -- launch dmenu
     , ((modm, xK_p),                      dmenu_run)
     , ((modm, xK_w),                      dmenu_ww)
@@ -62,55 +61,55 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm,               xK_n     ), refresh)
 
     -- Move focus to the next window
-    , ((modm,               xK_Tab   ), windows W.focusDown)
+    , ((modm,               xK_Tab   ), windows W.focusDown >> doUpdatePointer)
     
     -- Vang alt-tab af (want ga ik vaak nog proberen), maar doe niks, om het af
     -- te leren
     , ((mod1Mask,           xK_Tab   ), return ())
 
     -- Move focus to the next window
-    , ((modm,               xK_j     ), windows W.focusDown)
+    , ((modm,               xK_j     ), windows W.focusDown >> doUpdatePointer)
 
     -- Move focus to the previous window
-    , ((modm,               xK_k     ), windows W.focusUp  )
+    , ((modm,               xK_k     ), windows W.focusUp >> doUpdatePointer)
 
     -- Move focus to the master window
-    , ((modm,               xK_m     ), windows W.focusMaster  )
+    , ((modm,               xK_m     ), windows W.focusMaster >> doUpdatePointer)
 
     -- Swap the focused window and the master window
-    , ((modm,               xK_Return), windows W.swapMaster)
-    , ((modm,               xK_KP_Enter), windows W.swapMaster)
+    , ((modm,               xK_Return), windows W.swapMaster >> doUpdatePointer)
+    , ((modm,               xK_KP_Enter), windows W.swapMaster >> doUpdatePointer)
 
     -- Swap the focused window with the next window
-    , ((modm .|. shiftMask, xK_j     ), windows W.swapDown  )
+    , ((modm .|. shiftMask, xK_j     ), windows W.swapDown >> doUpdatePointer)
 
     -- Swap the focused window with the previous window
-    , ((modm .|. shiftMask, xK_k     ), windows W.swapUp    )
+    , ((modm .|. shiftMask, xK_k     ), windows W.swapUp >> doUpdatePointer)
 
     -- Shrink the master area
-    , ((modm,               xK_h     ), sendMessage Shrink)
+    , ((modm,               xK_h     ), sendMessage Shrink >> doUpdatePointer)
 
     -- Expand the master area
-    , ((modm,               xK_l     ), sendMessage Expand)
+    , ((modm,               xK_l     ), sendMessage Expand >> doUpdatePointer)
 
     -- Push window back into tiling
-    , ((modm,               xK_t     ), withFocused $ windows . W.sink)
+    , ((modm,               xK_t     ), withFocused (windows . W.sink) >> doUpdatePointer)
 
     -- Increment the number of windows in the master area
-    , ((modm              , xK_comma ), sendMessage (IncMasterN 1))
+    , ((modm              , xK_comma ), sendMessage (IncMasterN 1) >> doUpdatePointer)
 
     -- Deincrement the number of windows in the master area
-    , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
+    , ((modm              , xK_period), sendMessage (IncMasterN (-1)) >> doUpdatePointer)
     
     -- Dingen omdraaien (gebruik ik niet echt)
-    , ((modm              , xK_x), sendMessage $ Toggle REFLECTX)
-    , ((modm              , xK_y), sendMessage $ Toggle REFLECTY)
+    -- , ((modm              , xK_x), sendMessage $ Toggle REFLECTX)
+    -- , ((modm              , xK_y), sendMessage $ Toggle REFLECTY)
 
     -- Jump to urgent window
-    , ((modm              , xK_BackSpace), focusUrgent)
+    , ((modm              , xK_BackSpace), focusUrgent >> doUpdatePointer)
     
     -- Switchen tussen twee workspaces
-    , ((modm              , xK_grave), toggleWS)
+    , ((modm              , xK_grave), toggleWS >> doUpdatePointer)
 
     -- Toggle the status bar gap
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
@@ -138,7 +137,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- mod-[1..9], Switch to workspace N
     -- mod-shift-[1..9], Move client to workspace N
     --
-    [((m .|. modm, k), windows $ f i)
+    [((m .|. modm, k), windows (f i) >> doUpdatePointer)
         | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
     -- ++
@@ -309,6 +308,8 @@ updateBackgroundHook = do
     head0 [] = 0
     head0 (x:_) = x
 
+doUpdatePointer = updatePointer (0.5, 0.5) (0.0, 0.0)
+
 ------------------------------------------------------------------------
 -- Startup hook
 
@@ -415,8 +416,10 @@ myConfig = defaultConfig {
         layoutHook         = myLayout,
         manageHook         = myManageHook,
         handleEventHook    = myEventHook,
-        logHook            = updateBackgroundHook
-                           >> updatePointer (0.5, 0.5) (0.0, 0.0),
+        logHook            = updateBackgroundHook,
+                           -- Don't use updatePointer here, because it messes with drag-and-drop
+                           -- and makes the pointer jump around when going over the root window;
+                           -- instead we added doUpdatePointer to most window-related keyboard shortcuts
         startupHook        = myStartupHook
     }
 
