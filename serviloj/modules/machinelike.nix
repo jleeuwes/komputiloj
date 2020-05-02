@@ -4,5 +4,6 @@
 	config = {
 		users.mutableUsers = false;
 		boot.cleanTmpDir = true;
+		networking.usePredictableInterfaceNames = true;
 	};
 }
