@@ -34,6 +34,9 @@
 		EndSection
 	'';
 
+	# Make sure ~/bin is added to PATH:
+	environment.homeBinInPath = true;
+
 	# Use the systemd-boot EFI boot loader.
 	boot.loader.systemd-boot.enable = true;
 	boot.loader.efi.canTouchEfiVariables = true;
@@ -47,9 +50,11 @@
 	networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
 	# Select internationalisation properties.
+	console = {
+		font = "Lat2-Terminus16";
+		keyMap = "us";
+	};
 	i18n = {
-		consoleFont = "Lat2-Terminus16";
-		consoleKeyMap = "us";
 		defaultLocale = "nl_NL.UTF-8";
 	};
 
@@ -141,6 +146,12 @@
 		# other package managers (to be used for non-reproducable things only):
 		nodejs #npm
 	];
+
+	programs.gnupg.agent = {
+		enable = true;
+		enableSSHSupport = true;
+		pinentryFlavor = "gtk2";
+	};
 
 	# Generate setuid wrappers for pmount:
 	security.wrappers = {
