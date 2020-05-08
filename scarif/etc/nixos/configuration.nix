@@ -24,7 +24,6 @@
 		];
 	hardware.pulseaudio.enable = true;
 	hardware.acpilight.enable = true; # doesn't work
-	hardware.brightnessctl.enable = true;
 
 	# also doesn't work:
 	environment.etc."X11/xorg.conf.d/05-backlight.conf".text = ''
@@ -130,6 +129,7 @@
 		
 		hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way
 		# xorg.xbacklight # doesn't work anymore - https://github.com/NixOS/nixpkgs/issues/55520#issuecomment-470501591
+		brightnessctl
 		unclutter-xfixes # hides the mouse if unused
 		dmenu xsel # some helpers for menus
 		
