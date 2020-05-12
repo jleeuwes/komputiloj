@@ -80,7 +80,7 @@
 				"volgendewolk.radstand.nl" = {
 					forceSSL = true;
 					enableACME = true;
-					locations."/".proxyPass = "http://${config.containers.nextcloud.localAddress}";
+					locations."/".proxyPass = "http://${config.containers.wolk.localAddress}";
 				};
 			};
 		};
@@ -112,14 +112,15 @@
 				};
 			};
 
-			nextcloud = {
+			wolk = {
 				autoStart = true;
 				privateNetwork = true;
 				localAddress = "10.0.0.2";
 				hostAddress  = "10.0.1.2";
 				bindMounts = {
-					"/var/lib/nextcloud" = {
-						hostPath = "/var/local/nextcloud";
+					"/var/local/stokado/radstand/wolk" = {
+						# hostPath: customer/app/service
+						hostPath = "/var/local/stokado/radstand/wolk";
 						isReadOnly = false;
 					};
 				};
@@ -143,7 +144,7 @@
 						# This attribute exists in a newer NixOS version
 						# package = pkgs.nextcloud18;
 
-						home = "/var/lib/nextcloud";
+						home = "/var/local/stokado/radstand/wolk/nextcloud";
 
 						autoUpdateApps = {
 							enable = true;
