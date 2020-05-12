@@ -13,7 +13,7 @@
 			"radstand.wolk.admin" = {
 				destDir = "/run/ujoslosiloj/radstand/wolk";
 				keyFile = ./secrets.temp/radstand.wolk.admin;
-				user = "nextcloud";
+				user = "nextcloud-radstand";
 			};
 		};
 		
@@ -30,21 +30,28 @@
 			};
 
 			# Make sure users created in the different containers
-			# also exist on the machine, with the same uid.
-			# That way files and processes look good both within and outside the container.
-			# Don't forget to set the uids of users in the containers to these uids!
-			redmine = {
-				uid = config.ids.uids.redmine;
+			# also exist on the machine (actually, in our whole deployment), with a fixed uid.
+			# That way files and processes look good both within and outside the container;
+			# most importantly files in stokado will have recognizable and consistent owners.
+			# Note that the username outside the container is more precise than inside the containers;
+			# this way we can differentiate different customers outside the container,
+			# while default service usernames can still be used inside containers.
+			# TODO also fix groups
+			# Warning: changing uids here after a user has been created has no effect!
+			# You have to destroy and rebuild the container,
+			# or go inside the container, rm /var/lib/nixos/uid-map and userdel the user,
+			# then fiddle to reactivate the container
+			nextcloud-radstand = {
+				uid = 70000;
 			};
-			mysql = {
-				uid = config.ids.uids.mysql;
+			redmine-radstand = {
+				uid = 70001;
 			};
-			nextcloud = {
-				# nextcloud is assigned a free uid if this is not specified;
-				# we don't want that because the machine will most probably assign a different uid
-				# than the container.
-				# Warning: changing this after the user has been created has no effect
-				uid = 459;
+			mysql-radstand = {
+				uid = 70002;
+			};
+			nginx-radstand = {
+				uid = 70003;
 			};
 		};
 
@@ -108,8 +115,8 @@
 				config = { pkgs, ... }: {
 					imports = [ ./modules/container.nix ];
 
-					users.users.redmine.uid = nodes.servilo-1.config.users.users.redmine.uid;
-					users.users.mysql.uid = nodes.servilo-1.config.users.users.mysql.uid;
+					users.users.redmine.uid = lib.mkForce nodes.servilo-1.config.users.users.redmine-radstand.uid;
+					users.users.mysql.uid = lib.mkForce nodes.servilo-1.config.users.users.mysql-radstand.uid;
 
 					networking.firewall = {
 						allowPing = true;
@@ -140,7 +147,8 @@
 				config = { pkgs, ...}: {
 					imports = [ ./modules/container.nix ];
 					
-					users.users.nextcloud.uid = nodes.servilo-1.config.users.users.nextcloud.uid;
+					users.users.nextcloud.uid = nodes.servilo-1.config.users.users.nextcloud-radstand.uid;
+					users.users.nginx.uid = lib.mkForce nodes.servilo-1.config.users.users.nginx-radstand.uid;
 
 					networking.firewall = {
 						allowPing = true;
