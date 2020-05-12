@@ -83,7 +83,7 @@
 				"roodmijn.radstand.nl" = {
 					forceSSL = true;
 					enableACME = true;
-					locations."/".proxyPass = "http://${config.containers.redmine.localAddress}:3000";
+					locations."/".proxyPass = "http://${config.containers.roodmijn.localAddress}:3000";
 				};
 				"volgendewolk.radstand.nl" = {
 					forceSSL = true;
@@ -99,7 +99,7 @@
 		# then chattr -i /var/lib/containers/$containername/var/empty
 		# and then rm -rf /var/lib/containers/$containername
 		containers = {
-			redmine = {
+			roodmijn = {
 				autoStart = true;
 				privateNetwork = true;
 				localAddress = "10.0.0.1";
