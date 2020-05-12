@@ -9,6 +9,14 @@
 
 		deployment.targetHost = "servilo-1.tilaa.cloud";
 		
+		deployment.keys = {
+			"radstand.wolk.admin" = {
+				destDir = "/run/ujoslosiloj/radstand/wolk";
+				keyFile = ./secrets.temp/radstand.wolk.admin;
+				user = "nextcloud";
+			};
+		};
+		
 		# The rest is a configuration just like nixos/configuration.nix
 		# TODO put database(s) on the machine itself and share them between containers
 		
@@ -123,6 +131,10 @@
 						hostPath = "/var/local/stokado/radstand/wolk";
 						isReadOnly = false;
 					};
+					"/run/ujoslosiloj/radstand/wolk" = {
+						hostPath = "/run/ujoslosiloj/radstand/wolk";
+						isReadOnly = true;
+					};
 				};
 
 				config = { pkgs, ...}: {
@@ -165,9 +177,8 @@
 						nginx.enable = true;
 
 						config = {
-							adminuser = "TODO";
-							# adminpassFile = ""; # TODO
-							adminpass = "superveilig"; # TODO
+							adminuser = "admin";
+							adminpassFile = "/run/ujoslosiloj/radstand/wolk/radstand.wolk.admin";
 							
 							dbtype = "sqlite"; # let's start simple
 							
