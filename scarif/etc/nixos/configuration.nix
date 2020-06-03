@@ -2,7 +2,7 @@
 # TODO https://github.com/NixOS/nixpkgs/issues/62832
 # and/or use our own fork of nixpkgs
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
 	nixpkgs.config = {
@@ -16,6 +16,12 @@
 				config = config.nixpkgs.config;
 			};
 		};
+
+		# Selectively allow some unfree packages
+		# - https://nixos.org/nixpkgs/manual/#sec-allow-unfree
+		allowUnfreePredicate = pkg:
+			builtins.match "android-studio-.*" (lib.getName pkg) != null
+		;
 	};
 
 	imports =
@@ -113,7 +119,7 @@
 		dejsonlz4 # for reading firefox jsonlz4 files
 		remarshal # for yaml2json etc
 		jq # json manipulation
-		# unstable.android-studio # nonfree
+		unstable.android-studio
 		# jetbrains.idea-community
 
 		# LaTeX:
