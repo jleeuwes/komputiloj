@@ -5,6 +5,13 @@
 { config, pkgs, lib, ... }:
 
 {
+	# # Add the --option extra-builtins-file to nix
+	# # using a magic spell from https://elvishjerricco.github.io/2018/06/24/secure-declarative-key-management.html
+	# (Doesn't work: warning: ignoring the user-specified setting 'extra-builtins-file', because it is a restricted setting and you are not a trusted user)
+	# nix.extraOptions = ''
+	# 	plugin-files = ${pkgs.nix-plugins.override { nix = config.nix.package; }}/lib/nix/plugins/libnix-extra-builtins.so
+	# '';
+
 	nixpkgs.config = {
 		packageOverrides = pkgs: {
 			# You need to first add the nixos-unstable channel as 'unstable' using nix-channel
@@ -49,6 +56,16 @@
 
 	# Make /tmp in-memory:
 	boot.tmpOnTmpfs = true;
+
+	# Here I was looking into creating a ramfs mount with /tmp properties
+	# (i.e. anyone can write) for temporarily decripted keys.
+	# However, this is discouraged as size limits are not enforced?
+	# Anyway, we don't have swap on this system so we just use /tmp.
+	# boot.specialFileSystems = {
+	# 	"/run/stuff" = {
+	# 		fsType = "ramfs";
+	# 		options = [ "nosuid" "nodev" "mode=01777" "size=100M" ];/swap
+	# };
 
 	networking.hostName = "scarif";
 	networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -113,6 +130,7 @@
 		sshpass
 		gnupg paperkey qrencode zbar
 		telnet # for ftp for the nas
+		# TODO rclone (is now installed locally)
 		
 		# programming:
 		(python3.withPackages myPythonPackages)
