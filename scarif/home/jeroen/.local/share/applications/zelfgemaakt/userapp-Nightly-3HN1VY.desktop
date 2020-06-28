@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+NoDisplay=true
+Exec=/nix/store/mp0vdk5g4vhhcjh14jsif0ypfkr4w5j1-firefox-unwrapped-51.0.1/lib/firefox-51.0.1/firefox %u
+Name=Nightly
+Comment=Zelfgemaakte definitie voor Nightly
