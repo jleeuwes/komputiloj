@@ -198,8 +198,17 @@
 	# Enable the OpenSSH daemon.
 	# services.openssh.enable = true;
 
-	# Enable CUPS to print documents.
-	# services.printing.enable = true;
+	# Enable CUPS and printing.
+	# Add the Canon TR7500 printer using:
+	#   lpadmin -p kantoor -v ipp://192.168.1.44:631/ipp/print -E -m everywhere
+	# (Don't forget to make the IP fixed in the router config!)
+	# Then further configure it at http://localhost:631/printers/kantoor
+	# 
+	# I used https://wiki.debian.org/CUPSDriverlessPrinting to get this stuff
+	# working; I had to use the IP address in the URI instead of using the
+	# dnssd://... detected by the CUPS web interface or the name-based ipp://...
+	# detected by ippfind
+	services.printing.enable = true;
 	
 	# enable gvfs to have ftp support etcetera in thunar
 	# (doesn't work; maybe use
