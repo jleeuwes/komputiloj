@@ -132,6 +132,14 @@
 		telnet # for ftp for the nas
 		# TODO rclone (is now installed locally)
 		
+		# Install scanimage (saneBackends) and scanadf (saneFrontends),
+		# among other scanning tools.
+		# I can't get ADF scanning to work. 'Best' command line is:
+		#     scanimage -d pixma:04A91824_214FE1 --batch=scan%02d.png --format tiff --batch-start 1 --batch-double --batch-count 3 --source "Automatic Document Feeder"
+		# But it gives "scanimage: sane_read: Operation was cancelled"
+		# - this is probably related to https://gitlab.com/sane-project/backends/-/merge_requests/213
+		saneBackends saneFrontends
+		
 		# programming:
 		(python3.withPackages myPythonPackages)
 		dejsonlz4 # for reading firefox jsonlz4 files
@@ -291,7 +299,9 @@
 		uid = 1000;
 		isNormalUser = true;
 		description = "Jeroen Leeuwestein";
-		extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video" ];
+		extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video"
+			"lp" # for scanning with Canon
+		];
 	};
 
 	# The NixOS release to be compatible with for stateful data such as databases.
