@@ -1,4 +1,13 @@
 
+homeassistant:
+  latitude: !secret latitude
+  longitude: !secret longitude
+  elevation: !secret elevation
+  name: "Thuis"
+  time_zone: "Europe/Brussels"
+  unit_system: "metric"
+
+
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 

@@ -4,6 +4,8 @@
 # to be run on the raspberry pi once after a (re-)install.
 # Run it as root.
 # Use first_contact.sh from another machine to get this script on regelnicht.
+#
+# TODO replace all this adhoc stuff with a nice NixOS configuration, ideally
 
 set -Eeu
 set -o pipefail
@@ -46,7 +48,7 @@ cp -a .homeassistant{,.bak}
 cd .homeassistant
 # Make shallow symlinks to everything in komputiloj
 # (Note: hidden files won't be linked; directories will be symlinked as a whole)
-ln -sf /etc/komputiloj/regelnicht/home/homeassistant/.homeassistant/* .
+ln -sf -t . /etc/komputiloj/regelnicht/home/homeassistant/.homeassistant/*
 
 ##### Upgrades
 
@@ -56,6 +58,17 @@ apt-get upgrade -y
 
 echo "Upgrading home assistant..."
 hassbian-config upgrade homeassistant
+
+echo "Installing requirements for FR!TZBox presence detection..."
+# Install some stuff needed for fritzbox presence detection - https://www.home-assistant.io/components/fritz/
+apt-get install -y python3-lxml libxslt-dev libxml2-dev zlib1g-dev
+
+echo "Setting up duckdns+letsencrypt..."
+sudo -u homeassistant /bin/bash <<EOF
+	cd ~homeassistant
+	git clone https://github.com/lukas2511/dehydrated.git
+	ln -s -t dehydrated /etc/komputiloj/regelnicht/home/homeassistant/dehydrated/*
+EOF
 
 ##### Finalization
 
