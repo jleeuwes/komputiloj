@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<!-- © 1998 - 2020 DPG Online Services B.V. -->
+<html class="js" lang="EN"><head>
+        
+                            <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+                                                <meta name="referrer" content="origin-when-cross-origin">
+                            
+                    <title>Reading out TP-Link HS110 on Linux/Raspberry Pi - Atomstar's blog - Tweakblogs - Tweakers</title>
+        <link rel="navigator" title="Spring voorbij navigatie" href="https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi#contentArea">
+
+                                            <link rel="shortcut icon" href="https://tweakers.net/favicon.ico" type="image/x-icon">
+                            <link rel="alternate" title="Tweakblogs mixed Rss feed" type="application/rss+xml" href="https://atomstar.tweakblogs.net/blog/feed/">
+                            <link rel="alternate" title="Atomstar's blog - Comments" type="application/rss+xml" href="https://atomstar.tweakblogs.net/feed/comments">
+                            <link rel="alternate" title="Atomstar's blog" type="application/rss+xml" href="https://atomstar.tweakblogs.net/feed/">
+            
+        <script type="text/javascript" async="" src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/recaptcha__en.js"></script><script async="" src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/15r48.js"></script><script>
+                var relaxedDomain  = 'tweakers.net',
+                    tweakersConfig = {"BaseURL":"https:\/\/atomstar.tweakblogs.net\/","TnetBaseURL":"https:\/\/tweakers.net\/","ForumBaseURL":"https:\/\/gathering.tweakers.net\/","ImgURL":"https:\/\/tweakers.net\/","sidName":"__Secure-TnetID","UserID":0,"requestId":"Twk-eun-web3_186.6.4_29299_5f101b9e5e0ad0.32768800","loginJs":"https:\/\/tweakers.net\/x\/scripts\/min\/login.js?1589440930","loginCss":"https:\/\/tweakers.net\/x\/styles\/profiles\/login.css?1583238942","clickToLoad":false};
+
+                try
+                {
+                    document.domain = relaxedDomain;
+                }
+                catch (e)
+                {
+                    relaxedDomain = '';
+                }
+                document.documentElement.className = 'js';
+            </script>
+        <link rel="stylesheet" href="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/weblogs.css" type="text/css">
+                                                    <style type="text/css">div.article h4 {
+	font-size: 20px;
+	font-weight: bold;
+	font-style: normal;
+	text-decoration: none;
+}
+div.article h5 {
+	font-size: 16px;
+	font-weight: bold;
+	font-style: normal;
+	text-decoration: none;
+}
+div.article h6 {
+	font-size: 14px;
+	font-weight: bold;
+	font-style: normal;
+	text-decoration: none;
+}
+.content h2 {
+	font-size: 26px;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: none;
+}
+#reacties .ownreply {
+	background-color: #ddffdd;
+	padding: 3px;
+}
+
+                        </style>
+                            <script src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/runtime.js"></script><script src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/0.js"></script><script src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/app.js"></script>                <script src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/general.js"></script>
+            <script src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/weblogs.js"></script>
+            <script src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/rml_toolbar.js"></script>
+                    <script>
+            var _wtq=[['_init',{"randomId":"742954390554423","trackId":"318816705845986","trackDomain":"tweakers.net","domain":"tweakers.net;gathering.tweakers.net","cookie":"1","mediaCode":"wt_mc","contentId":"blog\/16983\/reading-out-tp-link-hs110-on-linux-raspberry-pi","contentGroup":{"1":"tweakers.net","2":"Tweakblogs","3":"Beeld en geluid"},"executePluginFunction":"wt_urlCampaignMapper;wt_stats_plugin","requestObfuscation":true,"customParameter":{"1":"LG"}}],['_trackPage']];
+			loadJS('https://tweakers.net/x/scripts/min/15r48.js',AbStats.wtCallBack);
+
+        </script>
+        </head>
+    <body>
+        <div id="container">    <div id="tweakblogsNav">
+        <div class="logo"><a href="https://tweakblogs.net/"><img src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/tweakblogs.png" alt="Tweakblogs" width="131" height="20"></a></div>
+        <ul>
+            <li><a href="https://tweakblogs.net/">Tweakblogs Home</a></li>
+            <li><a href="https://tweakers.net/">Tweakers</a></li>
+                            <li>
+                    <a href="https://tweakers.net/nieuws/">Nieuws</a>
+                </li>
+                            <li>
+                    <a href="https://tweakers.net/reviews/">Reviews</a>
+                </li>
+                            <li>
+                    <a href="https://tweakers.net/pricewatch/">Pricewatch</a>
+                </li>
+                            <li>
+                    <a href="https://tweakers.net/aanbod/">Vraag &amp; Aanbod</a>
+                </li>
+                            <li>
+                    <a href="https://gathering.tweakers.net/">Forum</a>
+                </li>
+                            <li>
+                    <a href="https://tweakers.net/carriere/">Carrière</a>
+                </li>
+                            <li>
+                    <a href="#">Meer</a>
+                </li>
+                    </ul>
+    </div>    <div id="banner">
+    
+        
+    <h1><a href="https://atomstar.tweakblogs.net/">Atomstar's blog</a></h1>
+            <span class="subtitle"></span>
+    </div>
+            <p class="breadCrumb">
+                <a href="https://atomstar.tweakblogs.net/feed/" title="Atomstar's blog" rel="nofollow">
+            <img src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/rss_small.png" alt="[RSS]" width="12" height="12">
+        </a>
+                                <a href="https://atomstar.tweakblogs.net/">            Home            </a>
+                                    <span>»</span>
+                        <a href="https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi">            Reading out TP-Link HS110 on Linux/Raspberry Pi            </a>
+            </p>
+<div id="pagebody">
+                <div class="columnwrapper normal">    <div class="content">
+			<div class="blogpost">
+				<h2>Reading out TP-Link HS110 on Linux/Raspberry Pi</h2>
+				<p class="author">
+					By <a href="https://tweakers.net/gallery/59952/" rel="nofollow">Atomstar</a> on Sunday 25 November 2018 13:47 - <a href="https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi#reacties">Comments (4)</a><br>Categories: <a href="https://atomstar.tweakblogs.net/blog/cat/4005">Linux</a>, <a href="https://atomstar.tweakblogs.net/blog/cat/4003">Smarthome</a>, Views: 6.369
+				</p>
+				<div class="article">I bought a <a href="https://tweakers.net/pricewatch/488835" rel="external noopener" target="_blank">TP-Link HS110</a>
+ version 3.0 smart wi-fi plug for 30 EUR to read out power usage of some
+ appliances. I have a Raspberry Pi 3B+ to connect this to running 
+domoticz and influxdb/grafana to visualise the data.<br>
+<br><a name="more"></a><br>
+The device identifies itself as:<br>
+<div class="pre"><pre>{
+  "system": {
+    "get_sysinfo": {
+      "sw_ver": "1.4.3 Build 171009 Rel.104144",
+      "hw_ver": "2.0",
+      "type": "IOT.SMARTPLUGSWITCH",
+      "model": "HS110(EU)",
+      "mac": "ab:cd:ef:gh:ij:kl",
+      "dev_name": "Smart Wi-Fi Plug With Energy Monitoring",
+      "alias": "TP-LINK_Smart Plug_IJKL",
+      "relay_state": 1,
+      "on_time": 336,
+      "active_mode": "none",
+      "feature": "TIM:ENE",
+      "updating": 0,
+      "icon_hash": "",
+      "rssi": 33,
+      "led_off": 0,
+      "longitude_i": 0,
+      "latitude_i": 0,
+      "hwId": "044A516EE63C875F9458DA25C2CCC5A0",
+      "fwId": "00000000000000000000000000000000",
+      "deviceId": "8006FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+      "oemId": "1998A14DAA86E4E001FD7CAF42868B5E",
+      "err_code": 0
+    }
+  }
+}
+</pre></div> where <span class="mono">mac</span>, the last 4 digits of <span class="mono">alias</span>, and the last 36 digits of <span class="mono">deviceId</span> have been masked.<h4 class="rml" id="part_1">Device setup</h4>Here
+ we connect the HS110 to our existing WiFi network without using the 
+TP-link Kasa app and without it ever connecting to the TP-link cloud 
+server.<ol><li>Plug into wall socket, the wifi symbol will blink green-amber.</li><li>Get python clients <a href="https://github.com/softScheck/tplink-smartplug" rel="external nofollow noopener" target="_blank">https://github.com/softScheck/tplink-smartplug</a></li><li>Connect to HS110 access point <span class="mono">TP-LINK_Smart Plug_XXXX</span>.<ol><li>Get initial information: <div class="pre"><pre>./tplink_smartplug.py -t 192.168.0.1 -c info</pre></div></li></ol></li><li>Disable cloud access:<ol><li>Set <span class="mono">devs.tplinkcloud.com</span> to resolve to <span class="mono">127.0.0.1</span> (or similar)</li><li>Set cloud server to new dummy value of trusted party: using<br>
+<div class="pre"><pre>./tplink_smartplug.py -t 192.168.0.1 -j '{"cnCloud":{"set_server_url":{"server":"xs4all.nl"}}}'</pre></div> N.B. <span class="mono">err_code:0</span> means no error</li></ol></li><li>Bind to existing WiFi network:<br>
+<div class="pre"><pre>./tplink_smartplug.py -t 192.168.0.1 -j '{"netif":{"set_stainfo":{"ssid":"WiFi","password":"123","key_type":3}}}'</pre></div> N.B. This <a href="https://www.softscheck.com/en/reverse-engineering-tp-link-hs110/#TP-Link%20Smart%20Home%20Protocol" rel="external nofollow noopener" target="_blank">command is not encrypted</a> so it will leak your SSID and network. There is no way around it as the official Kasa app uses the same protocol.</li><li>Recommend to give it a fixed IP</li></ol>N.B. I wasn't able to switch to a different network. Instead, I reset the HS110 and repeated the steps above.<h4 class="rml" id="part_2">Device read out</h4>Now the device is connected to our WiFi network and we can use it as a measurement device<ol><li>Find out new IP<ol><li>On your router, look at connected devices, write down IP</li><li>Ping broadcast address to find IP of all connected devices responding to ping: e.g. <span class="mono">ping 192.168.0.255</span>, the TP-link HS110 will respond</li></ol></li><li>Read out device: <div class="pre"><pre>./tplink_smartplug.py -t 192.168.0.134 -c energy</pre></div></li></ol><h4 class="rml" id="part_3">Implementing in Domoticz/Influxdb</h4>Here I automate measurement data collection on my Rpi:<h5 class="rml" id="part_4">Influxdb</h5><ol><li>Get updated script from <a href="https://github.com/tvwerkhoven/tplink-smartplug" rel="external nofollow noopener" target="_blank">https://github.com/tvwerkhoven/tplink-smartplug</a>, store somewhere <div class="pre"><pre>git clone https://github.com/tvwerkhoven/tplink-smartplug.git</pre></div></li><li>Install as crontab, e.g. <div class="pre"><pre>*/1 * * * * /home/pi/workers/hs110_reader/tplink_smartplug.py -t 172.16.0.204 -c energy --influxdb http://172.16.0.133:8086 smarthome --influxdb_energy "energy,type=elec,device=hs110" --influxdb_power "power,type=elec,device=hs110"</pre></div></li></ol><h5 class="rml" id="part_5">Domoticz</h5>Todo, probably: create virtual sensor/meter, update script to push to domoticz, adapt cron, done.<h4 class="rml" id="part_6">Accuracy</h4>Accuracy is comparable to <a href="https://www.brennenstuhl.com/en-DE/products/adapter-plugs/primera-line-wattage-and-current-meter-pm-231-e" rel="external nofollow noopener" target="_blank">Brennenstuhl PM 231E</a> offline power meter, which has a <a href="https://www.manualslib.com/manual/1254777/Brennenstuhl-Pm-231-E.html" rel="external nofollow noopener" target="_blank">reported accuracy of 1% or 0.2W</a>.<h5 class="rml" id="part_7">15W incandescent bulb</h5><ul><li>Reference measurement: 15.0±0.2W (average-by-eye)</li><li>TP-Link measurement: 15.03±0.09W (average of 10 measurements)</li></ul><h5 class="rml" id="part_8">1300W heating iron</h5><ul><li>Reference measurement: 1340±5W (average-by-eye)</li><li>TP-link measurement: 1342W±5W (average of 14 measurements)</li></ul>N.B. the heating iron's load drops 20W over the timeframe of a minute, such that these uncertainties are upper limits.<h4 class="rml" id="part_9">Power usage</h4>The TP-link HS110 itself uses 1.8±0.1 Watt (as measured by Brennenstuhl PM 231E)<h4 class="rml" id="part_10">Speed</h4>The plug starts up in ±8 seconds, and then takes ±3 seconds to join the WiFi network.<h4 class="rml" id="part_11">Alternatives</h4><ol><li><a href="https://www.evehome.com/en/eve-energy" rel="external nofollow noopener" target="_blank">Elgato Eve Energy</a> works with Bluetooth (vs WiFi), compatible with Homekit. Could work on Linux using <a href="https://homebridge.io/" rel="external nofollow noopener" target="_blank">Homebridge</a>, but this sounded like more trouble than reading out over Wi-Fi/HTTP</li><li><a href="https://www.fibaro.com/en/products/wall-plug/" rel="external nofollow noopener" target="_blank">Fibaro Wall Plug</a>
+ works with Z-wave (vs WiFi), requires additional Z-wave dongle, which I
+ don't have. It's also more expensive than the TP-link. After that it 
+could work on Linux, e.g. via <a href="https://community.openhab.org/t/how-to-read-power-consumption-with-fibaro-fgwp102-wall-plug/40625" rel="external nofollow noopener" target="_blank">this OpenHab post</a> or this <a href="https://www.youtube.com/watch?v=ajklDCaOGwY" rel="external nofollow noopener" target="_blank">Youtube Tutorial</a></li></ol><h4 class="rml" id="part_12">Sources</h4><ul><li><a href="https://www.softscheck.com/en/reverse-engineering-tp-link-hs110/" rel="external nofollow noopener" target="_blank">Reverse Engineering the TP-Link HS110</a>, by Lubomir Stroetmann, Consultant and Tobias Esser, Consultant</li><li><a href="https://github.com/softScheck/tplink-smartplug/" rel="external nofollow noopener" target="_blank">TP-Link WiFi SmartPlug Client and Wireshark Dissector</a></li><li><a href="https://github.com/GadgetReactor/pyHS100" rel="external nofollow noopener" target="_blank">Python Library to control TPLink Switch (HS100 / HS110)</a></li></ul></div><p class="nextPrevious"><img src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/arrow_up.gif" alt="Volgende: Smarthome data logging with RPi/domoticz/influxdb/grafana" width="9" height="9"> 12-'18 <a href="https://atomstar.tweakblogs.net/blog/17019/smarthome-data-logging-with-rpi-domoticz-influxdb-grafana">Smarthome data logging with RPi/domoticz/influxdb/grafana</a></p>
+				<div id="reacties">
+					<h4>Comments</h4>
+						<hr><div class="reactie" id="r_236559">
+							<p class="author"><img class="quoteImg" src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/quotecomment.png" title="Quote reactie" width="16" height="16">
+								By 
+							<img src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/user_small.png" alt="Tweakers user" title="Tweakers Username" width="11" height="11">
+							<a href="https://tweakers.net/gallery/55461/" rel="nofollow">spone</a>,
+								<a href="https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi#r_236559" rel="nofollow">Sunday 25 November 2018 22:47</a></p>
+							<div class="reactieContent"><blockquote><div class="quote">The TP-link HS110 itself uses 4.3±0.2 Watt</div></blockquote>Weet je zeker dat dit klopt? Lijkt me tamelijk hoog voor een mini bordje met wifi en een relais.</div>
+						</div>
+						<hr><div class="reactie ownreply" id="r_236663">
+							<p class="author"><img class="quoteImg" src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/quotecomment.png" title="Quote reactie" width="16" height="16">
+								By 
+							<img src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/user_small.png" alt="Tweakers user" title="Tweakers Username" width="11" height="11">
+							<a href="https://tweakers.net/gallery/59952/" rel="nofollow">Atomstar</a>,
+								<a href="https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi#r_236663" rel="nofollow">Monday 26 November 2018 20:19</a></p>
+							<div class="reactieContent"><blockquote><div class="quote"><a href="https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi#r_236559">spone wrote on Sunday 25 November 2018 @ 22:47:</a><br>
+[...]<br>
+<br>
+Weet je zeker dat dit klopt? Lijkt me tamelijk hoog voor een mini bordje met wifi en een relais.</div></blockquote><span style="text-decoration:line-through">4.3W
+ is similar to a Raspberry Pi. After all, remember this is a mini Linux 
+server including Wifi radio. It's a bit high, but not unreasonably so.</span><br>
+<br>
+Turned out to be a fluke, power usage is ±1.8W. Apologies!<p class="edit">[Comment edited on Saturday 17 August 2019 14:18]</p></div>
+						</div>
+						<hr><div class="reactie" id="r_250684">
+							<p class="author"><img class="quoteImg" src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/quotecomment.png" title="Quote reactie" width="16" height="16">
+								By idic,
+								<a href="https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi#r_250684" rel="nofollow">Tuesday 29 October 2019 22:33</a></p>
+							<div class="reactieContent">just wanted to say thanks for posting this.  Used it to get me started.   Great job</div>
+						</div>
+						<hr><div class="reactie" id="r_252778">
+							<p class="author"><img class="quoteImg" src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/quotecomment.png" title="Quote reactie" width="16" height="16">
+								By Francisco,
+								<a href="https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi#r_252778" rel="nofollow">Friday 17 January 2020 13:07</a></p>
+							<div class="reactieContent">Hi,<br>
+Getting this error :<br>
+tplink_smartplug.py: error: unrecognized arguments: --influxdb_energy 
+energy,type=elec,device=hs110 --influxdb_power 
+power,type=elec,device=hs110<br>
+<br>
+Something related with influxdb query, I not an expert, so could you please help me ?<br>
+<br>
+Tks in advance</div>
+						</div><hr>
+			<form id="reactieForm" action="https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi#reactieForm" method="POST">
+				<fieldset>
+					<legend>Comment form</legend>
+					<input type="hidden" name="action" id="action" value="addReaction">
+				<table id="reactieTable">
+					<tbody><tr>
+						<td class="label"><label for="reactieName" id="reactieNameLabel">Name:</label></td>
+						<td>
+							<input type="text" id="reactieName" name="reactieName" size="40" class="inputText" tabindex="1">
+							<span class="pageIndex">(required)</span></td>
+					</tr>
+					<tr>
+						<td class="label"><label for="reactieEmail" id="reactieEmailLabel">Email:</label></td>
+						<td>
+							<input type="text" id="reactieEmail" name="reactieEmail" size="40" class="inputText" tabindex="2">
+							<span class="pageIndex">(required, but will not be displayed)</span>
+						</td>
+					</tr>
+					<tr>
+						<td class="label"><label for="reactieWebsite" id="reactieWebisteLabel">Website:</label></td>
+						<td>
+							<input type="text" id="reactieWebsite" name="reactieWebsite" size="40" class="inputText" tabindex="3">
+							<span class="pageIndex">(optional)</span></td>
+					</tr>
+				</tbody></table><input type="hidden" name="tweakers_token" value="BugcJ0DiXxA3vuBNf6f3Yqz9BtQxBQcv1yPMMtKC">
+                <div class="g-recaptcha" data-sitekey="6LdmygsTAAAAAFsWwUPID0iAjPCM_rQAYPSU8D1G"><div style="width: 304px; height: 78px;"><div><iframe src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/anchor." role="presentation" name="a-1wl09u36yqb6" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" width="304" height="78" frameborder="0"></iframe></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div>
+                <script src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/api.js"></script>
+					<label for="reactieFormContent" id="reactieFormContentLabel">Comment:</label>
+					<div class="rmlToolbarWrapper vertical"><div class="rmlToolbar"><div class="buttons"><span class="smilies" title="Smilies"></span><span class="bold" title="Tekst vet maken (CTRL+B)"></span><span class="italic" title="Tekst schuin zetten (CTRL+I)"></span><span class="strike" title="Tekst doorstrepen (CTRL+S)"></span><span class="link" title="Link maken (CTRL+K)"></span><span class="list_bullet" title="Ongesorteerde lijst maken"></span></div></div><textarea name="reactieFormContent" id="reactieFormContent" cols="100" rows="14" tabindex="4"></textarea></div>
+					<div class="submit">
+						<a href="https://tweakers.net/info/faq/redactie/#ubb" rel="external noopener" class="underline" tabindex="6" target="_blank">UBB faq</a>
+						<input type="submit" class="ctaButton" id="reactionFormSubmit" value="Submit" accesskey="s" tabindex="5">
+					</div>
+				</fieldset>
+			</form>
+				</div>
+					<script>
+						new WeblogReactionForm();
+					</script>
+			</div></div><div class="sidebar">
+        <div id="loginFrame">
+            <h2 class="top">Inloggen</h2>
+            <p>Login door in te loggen op <a href="https://tweakers.net/my.tnet/login/?location=https://atomstar.tweakblogs.net/blog/16983/reading-out-tp-link-hs110-on-linux-raspberry-pi">Tweakers</a>.</p>
+        </div>
+		<div class="recentPosts">
+			<h4>Recent posts</h4><ul class="ellipsis"><li><a href="https://atomstar.tweakblogs.net/blog/18700/saving-20gj-yr-heating-by-upgrading-heat-exchanger" title="Saving 2.0GJ/yr heating by upgrading heat exchanger (10)">Saving 2.0GJ/yr heating by upgrading heat exchanger (10)</a></li><li><a href="https://atomstar.tweakblogs.net/blog/18398/backing-up-e-mail-with-offlineimap" title="Backing up e-mail with OfflineIMAP (12)">Backing up e-mail with OfflineIMAP (12)</a></li><li><a href="https://atomstar.tweakblogs.net/blog/18368/securely-wiping-ssds" title="Securely wiping SSDs (14)">Securely wiping SSDs (14)</a></li></ul>
+		</div>
+		<div class="categories">
+			<h4>Categories</h4><ul><li><a href="https://atomstar.tweakblogs.net/blog/cat/4020">ESP8266 (4)</a></li><li><a href="https://atomstar.tweakblogs.net/blog/cat/4191">HTPC (1)</a></li><li><a href="https://atomstar.tweakblogs.net/blog/cat/4005">Linux (12)</a></li><li><a href="https://atomstar.tweakblogs.net/blog/cat/4164">Mac (2)</a></li><li><a href="https://atomstar.tweakblogs.net/blog/cat/4022">RaspberryPi (6)</a></li><li><a href="https://atomstar.tweakblogs.net/blog/cat/4060">Security (6)</a></li><li><a href="https://atomstar.tweakblogs.net/blog/cat/4003">Smarthome (12)</a></li></ul>
+		</div>
+		<div class="archives">
+			<h4>Archives</h4><ul id="archiveList"><li class="closed" style="cursor: pointer;"><b>2020</b> (2)<ul class="ulChild"><li><a href="https://atomstar.tweakblogs.net/blog/archief/2020/04/">Apr 2020</a> (1)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2020/01/">Jan 2020</a> (1)</li></ul></li><li class="closed" style="cursor: pointer;"><b>2019</b> (17)<ul class="ulChild"><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/12/">Dec 2019</a> (2)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/11/">Nov 2019</a> (2)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/10/">Oct 2019</a> (1)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/09/">Sep 2019</a> (2)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/08/">Aug 2019</a> (1)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/06/">Jun 2019</a> (2)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/04/">Apr 2019</a> (2)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/03/">Mar 2019</a> (1)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/02/">Feb 2019</a> (3)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2019/01/">Jan 2019</a> (1)</li></ul></li><li class="open" style="cursor: pointer;"><b>2018</b> (7)<ul class="ulChild"><li><a href="https://atomstar.tweakblogs.net/blog/archief/2018/12/">Dec 2018</a> (6)</li><li><a href="https://atomstar.tweakblogs.net/blog/archief/2018/11/" class="current">Nov 2018</a> (1)</li></ul></li></ul><script type="text/javascript">weblogFolderTree('archiveList');</script>
+		</div>
+		<div class="about">
+			<h4>About</h4>
+			<p></p>
+			<ul>
+				<li class="user"><a href="https://tweakers.net/gallery/59952/" rel="nofollow">Tweakers.net Profile</a></li>
+			</ul>
+		</div></div>
+</div>
+            </div>
+
+        </div>    <script>
+                if(window.LazyLoadImages)LazyLoadImages.init();
+                if(window.SingleSignOn)SingleSignOn.init();
+                if(window.BehaviourManager)BehaviourManager.exec();
+            </script>
+    <noscript>
+                    <img src="https://tweakers.net/318816705845986/wt?p=328,blog%2F16983%2Freading-out-tp-link-hs110-on-linux-raspberry-pi&amp;cg1=tweakers.net&amp;cg2=Tweakblogs&amp;cg3=Beeld%20en%20geluid&amp;cp1=LG" width="1" height="1" alt="" style="display:none">
+            </noscript>
+<!-- Request ID: Twk-eun-web3_186.6.4_29299_5f101b9e5e0ad0.32768800, Env: frontpage-production, Server time: 0,0285 s (C: 0,0132 s; Q: 7; 0,0069 s; E: 2; 0,0129 s, M: 1; 0,0207 s, A: 3; 0,0153 s), Mem: 7035 KB, Engines: (S) twk-eun-web2 (2) -->
+        
+    
+<div style="background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 3px; position: absolute; transition: visibility 0s linear 0.3s, opacity 0.3s linear 0s; opacity: 0; visibility: hidden; z-index: 2000000000; left: 0px; top: -10000px;"><div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.05;"></div><div style="border: 11px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -11px; z-index: 2000000000;" class="g-recaptcha-bubble-arrow"></div><div style="border: 10px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -10px; z-index: 2000000000;" class="g-recaptcha-bubble-arrow"></div><div style="z-index: 2000000000; position: relative;"><iframe title="recaptcha challenge" src="Reading%20out%20TP-Link%20HS110%20on%20Linux_Raspberry%20Pi%20-%20Atomstar's%20blog%20-%20Tweakblogs%20-%20Tweakers_files/bframe." style="width: 100%; height: 100%;" name="c-1wl09u36yqb6" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" frameborder="0"></iframe></div></div></body></html>
