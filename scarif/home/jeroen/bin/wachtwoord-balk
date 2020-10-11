@@ -5,5 +5,7 @@ set -o pipefail
 
 wn=$(ls ~/passwords | dmenu "$@")
 
-wachtwoord cat ~/passwords/"$wn" | tr --delete '\n' | timeout 10 xsel -in
+ww=$(wachtwoord cat ~/passwords/"$wn" | tr --delete '\n')
+
+printf "%s" "$ww" | timeout 10 xsel -in
 
