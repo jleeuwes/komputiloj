@@ -3,6 +3,10 @@
 
 	network.description = "Our humble all-encompassing serviloj deployment";
 	network.enableRollback = true; # no idea what this does
+
+	# TODO quota
+	# TODO mail
+	# TODO monitoring
 	
 	servilo-1 = { config, nodes, lib, ... }: {
 		imports = [ ./modules/tilaa_vps.nix ];
@@ -10,7 +14,7 @@
 		deployment.targetHost = "servilo-1.tilaa.cloud";
 		
 		deployment.keys = {
-			"radstand.wolk.admin" = {
+			"radstand-wolk-admin" = {
 				destDir = "/run/ujoslosiloj/radstand/wolk";
 				keyFile = ./secrets.temp/radstand.wolk.admin;
 				user = "nextcloud-radstand";
@@ -19,6 +23,11 @@
 		
 		# The rest is a configuration just like nixos/configuration.nix
 		# TODO put database(s) on the machine itself and share them between containers
+		
+		systemd.services."container@wolk" = {
+			after = [ "radstand-wolk-admin-key.service" ];
+			wants = [ "radstand-wolk-admin-key.service" ];
+		};
 		
 		services.openssh.enable = true;
 		users.users = {
@@ -100,6 +109,19 @@
 			};
 		};
 
+		services.prometheus = {
+			# https://gist.github.com/globin/02496fd10a96a36f092a8e7ea0e6c7dd
+
+			enable = true;
+			
+			exporters = {
+				node = {
+					enable = true;
+					openFirewall = true;
+				};
+			};
+		};
+
 		# NOTE: to destroy a container,
 		# you have to remove/rename it here and deploy,
 		# then nixos-container destroy $containername (this doesn't seem to do much, so not sure if necessary)
@@ -108,6 +130,7 @@
 		containers = {
 			roodmijn = {
 				autoStart = true;
+				timeoutStartSec = "10min";
 				privateNetwork = true;
 				localAddress = "10.0.0.1";
 				hostAddress  = "10.0.1.1";
@@ -126,9 +149,18 @@
 					services.redmine.enable = true;
 				};
 			};
-
+	
+			# TODO this should be called radstand-wolk or wolk-radstand or
+			# something like that.
+			# Ideally we'd have a host per customer but we won't always have
+			# that, so we need to distinguish the containers from different
+			# customers some more.
+			# Note: customers could be me (radstand), gorinchemindialoog,
+			# cantorij. We could have separate apps for them, or we could have a
+			# radstand app in which those happen to be users.
 			wolk = {
 				autoStart = true;
+				timeoutStartSec = "10min";
 				privateNetwork = true;
 				localAddress = "10.0.0.2";
 				hostAddress  = "10.0.1.2";
