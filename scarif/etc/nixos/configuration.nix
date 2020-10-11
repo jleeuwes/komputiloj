@@ -35,7 +35,7 @@
 		[ # Include the results of the hardware scan.
 			./hardware-configuration.nix
 		];
-	hardware.pulseaudio.enable = true;
+	
 	hardware.acpilight.enable = true; # doesn't work
 
 	# also doesn't work:
@@ -131,6 +131,9 @@
 		gnupg paperkey qrencode zbar
 		telnet # for ftp for the nas
 		# TODO rclone (is now installed locally)
+
+		pamix pavucontrol alsaUtils
+		zstd # for unpacking arch packages
 		
 		# Install scanimage (saneBackends) and scanadf (saneFrontends),
 		# among other scanning tools.
@@ -227,6 +230,18 @@
 	
 	# Enable sound.
 	sound.enable = true;
+	sound.extraConfig = ''
+pcm.pulse {
+  type pulse
+  hint.description "PulseAudio device for audacity"
+}
+ctl.pulse {
+  type pulse
+}
+'';
+	hardware.pulseaudio.enable = true;
+	# Some NixOS packages can be built with explicit PulseAudio support which is disabled by default. This support can be enabled in all applicable packages by setting:
+	nixpkgs.config.pulseaudio = true;
 
 	# Screen locker
 	services.physlock = {
@@ -299,7 +314,7 @@
 		uid = 1000;
 		isNormalUser = true;
 		description = "Jeroen Leeuwestein";
-		extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video"
+		extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video" "audio"
 			"lp" # for scanning with Canon
 		];
 	};
