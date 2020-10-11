@@ -150,6 +150,7 @@
 		jq # json manipulation
 		unstable.android-studio
 		# jetbrains.idea-community
+		love_11
 
 		# LaTeX:
 		# (Not sure if rubber uses the chosen texlive distribution)
@@ -166,12 +167,16 @@
 		# support stuff (needed for generating thumbnails for instance - maar het werkt voor geen zak)
 		xfce.exo xfce.xfconf # xfce.xfce4settings
 		shared_mime_info xfce.tumbler # <- these two in particular seemed to do the trick!
+		# mindmapping-tools:
+		vym freemind
 		
 		hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way
 		# xorg.xbacklight # doesn't work anymore - https://github.com/NixOS/nixpkgs/issues/55520#issuecomment-470501591
 		brightnessctl
 		unclutter-xfixes # hides the mouse if unused
 		dmenu xsel # some helpers for menus
+		
+		pstree
 		
 		# actual programs:
 		xfce.terminal xfce.thunar xfce.ristretto
