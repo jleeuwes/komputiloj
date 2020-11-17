@@ -118,6 +118,9 @@
 		nixops
 		mkpasswd
 
+		# for running precompiled games:
+		steam-run-native
+
 		ocrad
 
 		# prettiness ( more inspiration at https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 and https://stackoverflow.com/questions/38576616/how-to-install-gtk-themes-under-nixos-without-hacky-scripts )
@@ -203,7 +206,8 @@
 	
 	# I suspect UPower hard-shutdowns my laptop if one battery is empty,
 	# so let's try with it disabled:
-	services.upower.enable = false;
+	# (mkForce because xfce wants to enable it)
+	services.upower.enable = pkgs.lib.mkForce false;
 
 	# Needed for ChromeCast to work in chromium,
 	# in combination with enabling
@@ -276,18 +280,23 @@ ctl.pulse {
 
 		windowManager.xmonad.enable = true;
 		windowManager.xmonad.enableContribAndExtras = true;
+		desktopManager.xterm.enable = false;
+		desktopManager.xfce.enable = true;
 	
 		# touchpad
-		synaptics = {
-			enable = true;
-			horizEdgeScroll = false;
-			horizTwoFingerScroll = true;
-			vertEdgeScroll = false;
-			vertTwoFingerScroll = true;
-			tapButtons = false;
-			maxSpeed = "2";
-			accelFactor = "0.04";
-		};
+		# (disabled for now because xfce wants libinput instead and they
+		# conflict; if I'm reading correctly libinput is 'better' than synaptics
+		# anyway, so maybe we should switch)
+		# synaptics = {
+		# 	enable = true;
+		# 	horizEdgeScroll = false;
+		# 	horizTwoFingerScroll = true;
+		# 	vertEdgeScroll = false;
+		# 	vertTwoFingerScroll = true;
+		# 	tapButtons = false;
+		# 	maxSpeed = "2";
+		# 	accelFactor = "0.04";
+		# };
 	};
 
 	# en xfce voor de goodies
@@ -322,6 +331,13 @@ ctl.pulse {
 		extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video" "audio"
 			"lp" # for scanning with Canon
 		];
+	};
+	users.extraUsers.speel = {
+		# A dedicated user account to play untrusted game binaries.
+		uid = 1001;
+		isNormalUser = true;
+		description = "Speel Spelletjes";
+		extraGroups = [ "video" "audio" ];
 	};
 
 	# The NixOS release to be compatible with for stateful data such as databases.
