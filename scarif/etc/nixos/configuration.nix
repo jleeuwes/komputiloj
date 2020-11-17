@@ -284,19 +284,16 @@ ctl.pulse {
 		desktopManager.xfce.enable = true;
 	
 		# touchpad
-		# (disabled for now because xfce wants libinput instead and they
-		# conflict; if I'm reading correctly libinput is 'better' than synaptics
-		# anyway, so maybe we should switch)
-		# synaptics = {
-		# 	enable = true;
-		# 	horizEdgeScroll = false;
-		# 	horizTwoFingerScroll = true;
-		# 	vertEdgeScroll = false;
-		# 	vertTwoFingerScroll = true;
-		# 	tapButtons = false;
-		# 	maxSpeed = "2";
-		# 	accelFactor = "0.04";
-		# };
+		# (this was synaptics before, but I had to change to libinput
+		# because xfce demands it, and it turns out to work better. Yay!)
+		libinput = {
+			enable = true;
+			scrollMethod = "twofinger";
+			sendEventsMode = "disabled-on-external-mouse";
+			tapping = false;
+			tappingDragLock = false;
+			disableWhileTyping = true;
+		};
 	};
 
 	# en xfce voor de goodies
