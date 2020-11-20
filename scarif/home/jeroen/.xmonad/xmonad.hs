@@ -34,6 +34,7 @@ import XMonad.Util.Run (safeSpawn)
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 
+import Graphics.X11.ExtraTypes.XF86
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -122,14 +123,15 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- Restart xmonad
     , ((modm              , xK_q     ), spawn "xmonad --recompile; xmonad --restart")
+
+    -- Brightness control
+    , ((0, xF86XK_MonBrightnessUp), spawn "brightnessctl set +5%")
+    , ((0, xF86XK_MonBrightnessDown), spawn "brightnessctl set 5%-")
     
-    -- Multimedia keys (zie /usr/include/X11/XF86keysym.h voor codes)
-    -- , ((0, 0x1008FF14), spawn "media playpause")
-    -- , ((0, 0x1008FF16), spawn "media prev")
-    -- , ((0, 0x1008FF17), spawn "media next")
-    -- , ((0, 0x1008FF11), spawn "media vol-")
-    -- , ((0, 0x1008FF12), spawn "media mute")
-    -- , ((0, 0x1008FF13), spawn "media vol+")
+    -- Multimedia keys
+    , ((0, xF86XK_AudioRaiseVolume), spawn "amixer set Master 5%+")
+    , ((0, xF86XK_AudioLowerVolume), spawn "amixer set Master 5%-")
+    , ((0, xF86XK_AudioMute), spawn "amixer set Master toggle")
     ]
     ++
 
