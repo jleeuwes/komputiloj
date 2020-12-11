@@ -124,6 +124,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Restart xmonad
     , ((modm              , xK_q     ), spawn "xmonad --recompile; xmonad --restart")
 
+    -- Switch to a not-yet-logged-in user (otherwise use Ctrl-Alt-F8 and co)
+    , ((0, xF86XK_LaunchA), spawn "dm-tool switch-to-greeter")
+
     -- Brightness control
     , ((0, xF86XK_MonBrightnessUp), spawn "brightnessctl set +5%")
     , ((0, xF86XK_MonBrightnessDown), spawn "brightnessctl set 5%-")
