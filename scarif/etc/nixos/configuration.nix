@@ -200,6 +200,18 @@
 
 	# List services that you want to enable:
 	
+	# For playing with kafka
+	services.apache-kafka = {
+		enable = true;
+		extraProperties = ''
+			# without this, Kafka will keep complaining about there not being 3
+			# brokers and won't work:
+			offsets.topic.replication.factor=1
+		'';
+	};
+	services.zookeeper = {
+		enable = true;
+	};
 
 	# Needed for ChromeCast to work in chromium,
 	# in combination with enabling
