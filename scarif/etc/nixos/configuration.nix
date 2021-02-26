@@ -127,6 +127,8 @@
 
 		pamix pavucontrol alsaUtils
 		zstd # for unpacking arch packages
+		glxinfo
+		xorg.xdpyinfo
 		
 		# Install scanimage (saneBackends) and scanadf (saneFrontends),
 		# among other scanning tools.
@@ -142,8 +144,10 @@
 		remarshal # for yaml2json etc
 		jq # json manipulation
 		unstable.android-studio
-		# jetbrains.idea-community
+		jetbrains.idea-community
+		openjdk11 maven
 		love_11
+		arduino
 
 		# LaTeX:
 		# (Not sure if rubber uses the chosen texlive distribution)
@@ -178,6 +182,8 @@
 
 		# other package managers (to be used for non-reproducable things only):
 		nodejs #npm
+
+		llvmPackages.bintools # to get ar (to extract .deb files)
 	];
 
 	programs.gnupg.agent = {
