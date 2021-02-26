@@ -36,16 +36,6 @@
 			./hardware-configuration.nix
 		];
 	
-	hardware.acpilight.enable = true; # doesn't work
-
-	# also doesn't work:
-	environment.etc."X11/xorg.conf.d/05-backlight.conf".text = ''
-		Section "Device"
-			Identifier "Intel Graphics"
-			Driver "intel"
-			Option "Backlight" "intel_backlight"
-		EndSection
-	'';
 
 	# Make sure ~/bin is added to PATH:
 	environment.homeBinInPath = true;
@@ -204,10 +194,6 @@
 
 	# List services that you want to enable:
 	
-	# I suspect UPower hard-shutdowns my laptop if one battery is empty,
-	# so let's try with it disabled:
-	# (mkForce because xfce wants to enable it)
-	services.upower.enable = pkgs.lib.mkForce false;
 
 	# Needed for ChromeCast to work in chromium,
 	# in combination with enabling
