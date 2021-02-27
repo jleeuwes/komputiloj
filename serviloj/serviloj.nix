@@ -23,6 +23,10 @@
 		
 		# The rest is a configuration just like nixos/configuration.nix
 		
+		# I set the stateVersion here because I don't want to use the nixops state file.
+		# stateVersion starts with 19.09 because that it the version nixos-infect installs.
+		# You should only update this if you think there is no (important) state created yet.
+		system.stateVersion = "20.03";
 		
 		services.openssh.enable = true;
 		users.users = {

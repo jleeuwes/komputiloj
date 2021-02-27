@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
 cd -- "$(dirname -- "$0")"
-./nixops-wrapper.sh check -d serviloj
+source ./_nixops_settings.sh
+
+"$NIXOPS_CMD" check -d serviloj
 

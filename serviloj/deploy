@@ -2,9 +2,11 @@
 
 set -Eeu -o pipefail
 
+cd -- "$(dirname -- "$0")"
+source ./_nixops_settings.sh
+
 SECRETS_DIR=$(mktemp -d) # we assume that the temp dir is volatile so we can put the decrypted secrets there for a little while
 
-cd -- "$(dirname -- "$0")"
 ln -sTf -- "$SECRETS_DIR" secrets.temp
 
 function clean_up_my_stuff() {
@@ -26,9 +28,15 @@ function decrypt_password() {
 	wachtwoord cat "$from" > "$to"
 }
 
+echo "## Preparing clean state (we want to keep things stateless)" >&2
+rm -f -- "$NIXOPS_STATE"
+"$NIXOPS_CMD" create serviloj.nix --deployment serviloj
+
 echo "## Now decrypting secrets. Keep your GPG passphrase ready." >&2
 decrypt_password admin@wolk.radstand.nl
 
 echo "## Now deploying. Keep your SSH passphrase ready." >&2
-./nixops-wrapper.sh deploy -d serviloj
+"$NIXOPS_CMD" deploy -d serviloj
+
+# Don't remove the state afterwards, otherwise check won't work.
 
