@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 cd -- "$(dirname -- "$0")"
-nix-shell shell.nix --run "nixops check -d serviloj"
+./nixops-wrapper.sh check -d serviloj
 
