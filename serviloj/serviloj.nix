@@ -17,7 +17,8 @@
 			"nextcloud-admin" = {
 				keyFile = ./. + "/secrets.temp/admin@wolk.radstand.nl";
 				user = "nextcloud";
-				permissions = "u=r,go=";
+				group = "nextcloud";
+				permissions = "ug=r,o=";
 			};
 		};
 		
@@ -26,6 +27,8 @@
 		# I set the stateVersion here because I don't want to use the nixops state file.
 		# stateVersion starts with 19.09 because that it the version nixos-infect installs.
 		# You should only update this if you think there is no (important) state created yet.
+		# NOTE: nixops determines the stateVersion based on /etc/os-release
+		# on the target machine, so I'm not sure if this setting here has any effect.
 		system.stateVersion = "20.03";
 		
 		services.openssh.enable = true;
@@ -46,6 +49,7 @@
 			# You have to rm /var/lib/nixos/uid-map and userdel the user.
 			nextcloud = {
 				uid = 70000;
+				extraGroups = [ "keys" ];
 			};
 		};
 
@@ -87,9 +91,8 @@
 			# manual installation
 
 			enable = true;
-			nginx.enable = true; # option removed in next NixOS version, but in 20.03 it is still needed
 
-			package = pkgs.nextcloud19; # TODO update our channel and go to 20
+			package = pkgs.nextcloud20;
 
 			home = "/srv/nextcloud";
 
