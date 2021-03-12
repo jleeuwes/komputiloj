@@ -173,5 +173,10 @@
 				overwriteProtocol = "https";
 			};
 		};
+
+		environment.systemPackages = with pkgs; [
+			screen
+			netcat
+		];
 	};
 }
