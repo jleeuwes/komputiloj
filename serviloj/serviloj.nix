@@ -55,10 +55,68 @@
 
 		networking = {
 			hostName = "gently";
+			domain = "radstand.nl";
+			interfaces.ens4.ipv4 = {
+				addresses = [{
+					# TODO ipconfig says broadcast is 0.0.0.0 - is that okay?
+					address = "10.0.0.1";
+					prefixLength = 24;
+				}];
+			};
 			firewall = {
 				allowPing = true;
-				# port 80 is only allowed for Let's Encrypt challenges
-				allowedTCPPorts = [ 22 80 443 ];
+				# we allow port 22 globally and for ens3
+				# in case the interface name changes and we were to be locked out
+				allowedTCPPorts = [ 22 ];
+				interfaces.ens3 = {
+					# port 80 is only allowed for Let's Encrypt challenges
+					allowedTCPPorts = [ 22 80 443 ];
+				};
+				interfaces.ens4 = {
+					allowedTCPPorts = [ 1234 ];
+				};
+				
+				# Make sure we don't allow traffic from IPs that shouldn't come
+				# through the corresponding interface.
+				# This prevents non-10.* traffic from coming in over ens4,
+				# as long as the mask (prefix) is set correctly on that interface (see above).
+				# It doesn't prevent 10.* traffic from the internet (I think),
+				# which is what the extraCommands below are for.
+				#
+				# Note that this is usually true by default, but I want to be explicit.
+				#
+				# Also, note that I'm being a bit paranoid here, because ISPs and Tilaa shouldn't route 10.*
+				# over the internet anyway. But let's call it defense in depth :P
+				checkReversePath = true;
+
+				extraCommands = ''
+					# Cleanup
+					ip46tables -D INPUT -j protect-wendimoor 2> /dev/null || true
+					ip46tables -D FORWARD -j protect-wendimoor 2> /dev/null || true
+					ip46tables -F protect-wendimoor 2> /dev/null || true
+					ip46tables -X protect-wendimoor 2> /dev/null || true
+
+					ip46tables -F log-refuse-wendimoor 2> /dev/null || true
+					ip46tables -X log-refuse-wendimoor 2> /dev/null || true
+
+					# Set up log+refuse chain
+					ip46tables -N log-refuse-wendimoor
+					ip46tables -A log-refuse-wendimoor -j LOG --log-prefix "foreign packet in wendimoor: " --log-level 4 # TODO actively do something with these warnings
+					ip46tables -A log-refuse-wendimoor -j DROP
+					
+					# Set up the actual protection
+					ip46tables -N protect-wendimoor
+					# Drop any packet from ens3 (the internet) that claims to be from 10.* (wendimoor, ens4)
+					iptables -A protect-wendimoor -i ens3 -s 10.0.0.0/8 -j log-refuse-wendimoor
+					# Drop any packet from ens3 (the internet) that wants to reach 10.* (wendimoor)
+					iptables -A protect-wendimoor -i ens3 -d 10.0.0.0/8 -j log-refuse-wendimoor
+					# Don't allow any IPv6 in wendimoor (we don't need it so let's just remove the possibility):
+					ip6tables -A protect-wendimoor -i ens4 -j log-refuse-wendimoor
+
+					# Put our checks before NixOS firewall checks
+					ip46tables -I INPUT -j protect-wendimoor
+					ip46tables -I FORWARD -j protect-wendimoor
+				'';
 			};
 		};
 
