@@ -55,6 +55,9 @@
 
 		networking = {
 			hostName = "gently";
+			hosts = {
+				"10.0.0.2" = [ "wilder.radstand.nl" "wilder" ];
+			};
 			domain = "radstand.nl";
 			interfaces.ens4.ipv4 = {
 				addresses = [{
