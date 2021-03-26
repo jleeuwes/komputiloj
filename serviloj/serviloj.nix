@@ -180,6 +180,7 @@
 		environment.systemPackages = with pkgs; [
 			screen
 			netcat
+			vim
 		];
 	};
 }
