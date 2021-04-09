@@ -122,8 +122,9 @@
 		# usefull programs:
 		gitFull vim file subversionClient pciutils pmount parted squashfsTools wget
 		unstable.gitAndTools.git-annex
+		rclone
 		sshpass
-		gnupg paperkey qrencode zbar
+		gnupg paperkey qrencode zbar pwgen
 		telnet # for ftp for the nas
 		# TODO rclone (is now installed locally)
 
@@ -169,7 +170,9 @@
 		# mindmapping-tools:
 		vym freemind
 
-		inkscape gimp
+		inkscape gimp exiftool
+		imagemagick scrot
+		libreoffice antiword
 		
 		hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way
 		# xorg.xbacklight # doesn't work anymore - https://github.com/NixOS/nixpkgs/issues/55520#issuecomment-470501591
@@ -189,6 +192,7 @@
 		nodejs #npm
 
 		llvmPackages.bintools # to get ar (to extract .deb files)
+		sqlite
 	];
 
 	programs.gnupg.agent = {
