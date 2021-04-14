@@ -15,7 +15,7 @@
 		
 		deployment.keys = {
 			"nextcloud-admin" = {
-				keyFile = ./. + "/secrets.temp/admin@wolk.radstand.nl";
+				keyCommand = [ "wachtwoord" "cat" "secrets/admin@wolk.radstand.nl" ];
 				user = "nextcloud";
 				group = "nextcloud";
 				permissions = "ug=r,o=";

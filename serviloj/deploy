@@ -5,37 +5,20 @@ set -Eeu -o pipefail
 cd -- "$(dirname -- "$0")"
 source ./_nixops_settings.sh
 
-SECRETS_DIR=$(mktemp -d) # we assume that the temp dir is volatile so we can put the decrypted secrets there for a little while
-
-ln -sTf -- "$SECRETS_DIR" secrets.temp
-
 function clean_up_my_stuff() {
-	if test -n "$SECRETS_DIR" -a -d "$SECRETS_DIR"; then
-		printf "Cleaning up %q\n" "$SECRETS_DIR" >&2
-		rm -r -- "$SECRETS_DIR"
-	fi
-	if test -L secrets.temp; then
-		printf "Cleaning up secrets.temp\n" >&2
-		rm secrets.temp
+	if test -L secrets; then
+		printf "Removing secrets symlink\n" >&2
+		rm secrets
 	fi
 }
 trap clean_up_my_stuff EXIT
-
-function decrypt_password() {
-	local from="$HOME"/passwords/"$1"
-	local to=secrets.temp/"$1"
-	printf "### Decrypting %q as %q\n" "$from" "$to"
-	wachtwoord cat "$from" > "$to"
-}
+ln -sT ~/datumoj/passwords secrets
 
 echo "## Preparing clean state (we want to keep things stateless)" >&2
 rm -f -- "$NIXOPS_STATE"
 "$NIXOPS_CMD" create serviloj.nix --deployment serviloj
 
-echo "## Now decrypting secrets. Keep your GPG passphrase ready." >&2
-decrypt_password admin@wolk.radstand.nl
-
-echo "## Now deploying. Keep your SSH passphrase ready." >&2
+echo "## Now deploying. Keep your GPG and SSH passphrases ready." >&2
 "$NIXOPS_CMD" deploy -d serviloj
 
 # Don't remove the state afterwards, otherwise check won't work.
