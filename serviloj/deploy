@@ -16,10 +16,10 @@ ln -sT ~/datumoj/passwords secrets
 
 echo "## Preparing clean state (we want to keep things stateless)" >&2
 rm -f -- "$NIXOPS_STATE"
-"$NIXOPS_CMD" create serviloj.nix --deployment serviloj
+"$NIXOPS_CMD" create serviloj.nix
 
 echo "## Now deploying. Keep your GPG and SSH passphrases ready." >&2
-"$NIXOPS_CMD" deploy -d serviloj
+"$NIXOPS_CMD" deploy
 
 # Don't remove the state afterwards, otherwise check won't work.
 

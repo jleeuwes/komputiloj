@@ -3,5 +3,5 @@
 cd -- "$(dirname -- "$0")"
 source ./_nixops_settings.sh
 
-"$NIXOPS_CMD" check
+"$NIXOPS_CMD" "$@"
 
