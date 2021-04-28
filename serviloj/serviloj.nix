@@ -20,6 +20,12 @@
 				group = "nextcloud";
 				permissions = "ug=r,o=";
 			};
+			"onedrive-js-token" = {
+				keyCommand = [ "wachtwoord" "cat" "secrets/oauth-token:ACCOUNT_NAME_OBFUSCATED@onedrive.com" ];
+				user = "js";
+				group = "js";
+				permissions = "u=r,go=";
+			};
 		};
 		
 		# The rest is a configuration just like nixos/configuration.nix
@@ -32,6 +38,11 @@
 		system.stateVersion = "20.03";
 		
 		services.openssh.enable = true;
+		users.groups = {
+			js = {
+				gid = 1000;
+			};
+		};
 		users.users = {
 			root = {
 				passwordFile = "/root/password"; # must be present on the machine
@@ -50,6 +61,13 @@
 			nextcloud = {
 				uid = 70000;
 				extraGroups = [ "keys" ];
+			};
+
+			js = {
+				uid = 1000;
+				group = "js";
+				extraGroups = [ "keys" ];
+				useDefaultShell = true;
 			};
 		};
 
@@ -180,6 +198,16 @@
 			screen
 			netcat
 			vim
+			rclone
 		];
 	};
+
+	# systemd.services = {
+	# 	onedrive-js = {
+	# 		after = ""; # TODO
+	# 		preStart = ''
+	# 			
+	# 		'';
+	# 	};
+	# };
 }
