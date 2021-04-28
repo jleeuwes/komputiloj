@@ -60,13 +60,19 @@ We want to have a root password so we can get into the system through the online
 
 To make this password permanent, see the next non-provider-specific section.
 
+### Cleanup
+
+The system installed by Hetzner is no longer needed:
+
+	ssh root@$VPS rm -rf /old-root
+
 ### A note on Hetzner's rescue system
 
 To enter Hetzner's rescue system
 (I haven't needed it during install yet),
 go to the server details on the Hetzner Cloud Console,
 go to RESCUE,
-and click ENABLE RESUCE & POWER CYCLE.
+and click ENABLE RESCUE & POWER CYCLE.
 
 The rescue OS has its keyboard set to German by default,
 and has other annoyances such not pressing shift on paste
@@ -82,6 +88,9 @@ We can fix the keyboard without needing to trust the server:
 
 Now we can log into the server through the virtual console,
 pasting the password displayed on the RESCUE page.
+
+TODO describe how to establish trust with the rescue system
+so we can use SSH and ignore the annoying virtual console.
 
 ## Install NixOS on a Tilaa VPS
 
