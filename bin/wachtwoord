@@ -25,6 +25,14 @@ main() {
 	fi
 
 	case "$command" in
+	get-exact)
+		if [ $# -ne 1 ]; then
+			echo "Please specify exactly one file" >&2
+			exit 1
+		fi
+		content=$($CMD_GPG --use-agent --batch --decrypt -- "$1")
+		printf %s "$content"
+	;;
 	show|cat)
 		local success=0
 		local prefix=""
