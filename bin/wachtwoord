@@ -17,7 +17,7 @@ fi
 
 main() {
 	local command
-	if test $# = 0; then
+	if test $# -eq 0; then
 		command=""
 	else
 		command="$1"
@@ -37,7 +37,7 @@ main() {
 		local success=0
 		local prefix=""
 		local content
-		if [ $# = 0 ]; then
+		if [ $# -eq 0 ]; then
 			echo "Reading from stdin..." >&2
 			set -- -
 		fi
@@ -46,7 +46,7 @@ main() {
 				prefix="$file: "
 			fi
 			# We let gpg produce any errors for us and use && to make sure we continue with the other files in case of an error
-			content=$($CMD_GPG --use-agent --batch --decrypt "$file") && {
+			content=$($CMD_GPG --use-agent --batch --decrypt -- "$file") && {
 				printf "%s%s\n" "$prefix" "$content"
 				let ++success # ++ first because of weird exit code if expression is 0
 			}
