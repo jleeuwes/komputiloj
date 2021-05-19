@@ -14,21 +14,13 @@
 		deployment.provisionSSHKey = false;
 		
 		deployment.keys = {
-			"nextcloud-admin" = {
-				keyCommand = [ "wachtwoord" "cat" "secrets/admin@wolk.radstand.nl" ];
-				user = "nextcloud";
-				group = "nextcloud";
-				permissions = "ug=r,o=";
-			};
 		};
 		
 		# The rest is a configuration just like nixos/configuration.nix
 		
-		# I set the stateVersion here because I don't want to use the nixops state file.
-		# stateVersion starts with 19.09 because that it the version nixos-infect installs.
-		# You should only update this if you think there is no (important) state created yet.
-		# NOTE: nixops determines the stateVersion based on /etc/os-release
-		# on the target machine, so I'm not sure if this setting here has any effect.
+		# WARNING this setting is not used
+		# Instead, nixops determines the stateVersion at first deploy based on the NixOS version it encounters.
+		# TODO change our deployment scripts so they keep the state db, maybe on the server itself?
 		system.stateVersion = "20.03";
 		
 		services.openssh.enable = true;
@@ -37,6 +29,11 @@
 				passwordFile = "/root/password"; # must be present on the machine
 				openssh.authorizedKeys.keyFiles = [
 					../scarif/home/jeroen/.ssh/id_rsa.pub
+				];
+				openssh.authorizedKeys.keys = [
+					''
+					ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDafdp3tAbIxh12qC4aBaYcI19vZ3IwqZu3wl1GiZscKVpWmDoqhKyjyZ8Ep5odXbL8+6D4FI1UOqBvX872I0eeQuekIppSi07xFJxc6+zFTNXUN1K4+IoiLyQ5yDGDndxplXWgL751r3IB2Ozv+YE5YPm7kjzxYmNq9a+x2SsKr5KNiM2uySDbGrYhdEnqwwp8qz2I9ikNoSCmHuXGR16HLptJHLxTCRlzyxXb7zocN5owQ/kXzl9Ks0nNyiCcs5q4CdSzfzHBUgoe7Pkqvunnp4hRSsDk0ZSCdLtaJm280sRrE1Ff5+FgHIdj+CxvdiRdftK4SJ5GpZMjl1ocYAxkrzK4YwT9Ha9TAuMGq4g8pgEi50unyj+OH3Oc9oZ9plfbT10jJ4uIP+RfJpD3OKrFjlLsno2ZBuE77SXuij4/duVuCghviVqkm1lD24WMR89aIJceWREn1eqEJuUz5HnlrB6uOrXXp/hnN6MA5FztMj0Dw9cMjLvNCcFxISTQxf8= root@gently2
+					''
 				];
 			};
 
@@ -147,15 +144,144 @@
 			};
 		};
 
-		services.nextcloud = {
-			# TODO take relevant php/nextcloud config from current
-			# manual installation
+		environment.systemPackages = with pkgs; [
+			screen
+			netcat
+			vim
+		];
+	};
 
+	# will supersede gently
+	gently2 = { config, nodes, lib, pkgs, ... }: {
+		imports = [ ./modules/hetzner_vps.nix ];
+
+		deployment.targetHost = "gently2.radstand.nl";
+		deployment.provisionSSHKey = false;
+		
+		deployment.keys = {
+			"luks-storage" = {
+				keyCommand = [ "wachtwoord" "get-exact" "secrets/luks-storage@hetzner" ];
+			};
+			"nextcloud-admin" = {
+				keyCommand = [ "wachtwoord" "get-exact" "secrets/admin@wolk.radstand.nl" ];
+				user = "nextcloud";
+				group = "nextcloud";
+				permissions = "ug=r,o=";
+			};
+		};
+		
+		# The rest is a configuration just like nixos/configuration.nix
+		
+		# WARNING this setting is not used
+		# Instead, nixops determines the stateVersion at first deploy based on the NixOS version it encounters.
+		# TODO change our deployment scripts so they keep the state db, maybe on the server itself?
+		# See also https://github.com/NixOS/nixops/issues/1340 (mkForce doesn't work)
+		# TODO try and see what the actually used stateVersion is by putting it
+		# in some file in /etc
+		system.stateVersion = lib.mkForce "20.09";
+
+		systemd.services.mount-storage = {
+			serviceConfig = {
+				Type = "oneshot";
+				RemainAfterExit = true;
+			};
+			requires = [ "luks-storage-key.service" ];
+			after    = [ "luks-storage-key.service" ];
+			wantedBy = [ "multi-user.target" ];
+			requiredBy = [
+				"nextcloud-cron.service"
+				"nextcloud-setup.service"
+				"nextcloud-update-plugins.service"
+				"phpfpm-nextcloud.service"
+			];
+			before = [
+				"nextcloud-cron.service"
+				"nextcloud-setup.service"
+				"nextcloud-update-plugins.service"
+				"phpfpm-nextcloud.service"
+			];
+			path = [ pkgs.cryptsetup pkgs.utillinux pkgs.unixtools.mount pkgs.unixtools.umount ];
+			script = ''
+				cryptsetup open UUID=6c8d5be7-ae46-4e51-a270-fd5bdce46f3b storage --type luks --key-file /run/keys/luks-storage
+				mkdir -p /mnt/storage
+				mount /dev/mapper/storage /mnt/storage
+			'';
+			postStop = ''
+				if mountpoint -q /mnt/storage; then
+					umount /mnt/storage
+				fi
+				cryptsetup close storage
+			'';
+		};
+
+		services.openssh.enable = true;
+		users = {
+			users.root = {
+				passwordFile = "/root/password"; # must be present on the machine
+				openssh.authorizedKeys.keyFiles = [
+					../scarif/home/jeroen/.ssh/id_rsa.pub
+				];
+			};
+
+			# Make sure users have the same uid on all our machines.
+			# Add users here that don't have a fixed uid in nixpkgs/nixos.
+			# also exist on the machine (actually, in our whole deployment), with a fixed uid.
+			# Warning: changing uids here after a user has been created has no effect!
+			# (I think - the note here was about containers.)
+			# You have to rm /var/lib/nixos/uid-map and userdel the user.
+			users.nextcloud = {
+				uid = 70000;
+				group = "nextcloud";
+				extraGroups = [ "keys" ];
+			};
+			groups.nextcloud = {
+				gid = 70000;
+			};
+		};
+
+		networking = {
+			hostName = "gently2";
+			domain = "radstand.nl";
+			interfaces.ens3 = {
+				useDHCP = true;
+			};
+			firewall = {
+				allowPing = true;
+				# port 80 is only allowed for Let's Encrypt challenges
+				allowedTCPPorts = [ 22 80 443 ];
+			};
+		};
+
+		services.fail2ban.enable = true;
+
+		security.acme = {
+			acceptTerms = true;
+			# I'm guessing the rest of the cert config is autogenerated
+			# due to the nginx config.
+			certs."wolk.radstand.nl".email = "jeroen@lwstn.eu";
+		};
+
+		services.nginx = {
+			enable = true;
+			recommendedGzipSettings = true;
+			recommendedOptimisation = true;
+			recommendedProxySettings = true;
+			recommendedTlsSettings = true;
+
+			virtualHosts = {
+				"wolk.radstand.nl" = {
+					forceSSL = true;
+					enableACME = true;
+				};
+			};
+		};
+
+		services.nextcloud = {
 			enable = true;
 
 			package = pkgs.nextcloud20;
 
-			home = "/srv/nextcloud";
+			home = "/mnt/storage/live/nextcloud";
 
 			autoUpdateApps = {
 				enable = true;
@@ -180,6 +306,7 @@
 			screen
 			netcat
 			vim
+			cryptsetup btrfs-progs parted
 		];
 	};
 }
