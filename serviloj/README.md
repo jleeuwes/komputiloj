@@ -4,6 +4,87 @@ Work in progress to set up a more
 [cattle-like](https://medium.com/@Joachim8675309/devops-concepts-pets-vs-cattle-2380b5aab313)
 (set of) server(s) for running my online services.
 
+## Storage
+
+### Design
+
+We want some permanent storage, of course,
+but it should be separated from the OS and unimportant data.
+To achieve this we put permanent data on a Hetzner volume.
+At any time, we should be able to
+detach the volume from the VPS,
+delete and recreate the VPS,
+attach the volume
+and have a working system again.
+Nothing of value should be lost.
+
+We use a BTRFS filesystem
+on top of LUKS
+on top of the Hetzner volume.
+
+#### subvolumes
+
+We have these subvolumes:
+
+- `live` holds persistent data for day-to-day use
+- `backups` holds backup data from other systems
+- `snapshots` holds read-only snapshots of the `live` volume
+
+Some notes:
+
+- TODO We should make regular automatic snapshots of the `live` volume under the `snapshots` volume.
+- TODO We should make regular backups from the `snapshots` volume to an external system.
+- It doesn't make sense to place backups of our server under `backups` - this is what `snapshots` is for.
+- It doesn't make sense to make snapshots of stuff under `backups`,
+  because then files from external systems will end up in a loop
+  external system > `backups` > `snapshots` > external system
+
+### One time setup
+
+I used a part of the instructions on
+<https://binfalse.de/2018/11/28/mount-multiple-subvolumes-of-a-luks-encrypted-btrfs-through-pam-mount/>
+and created the filesystem as follows
+from a clean install NixOS VPS.
+
+**Only run the `nix-env` commands if you intend to recreate the VPS afterwards!**
+We don't want to end up with an imperatively modified system.
+
+Create the LUKS partition:
+
+	nix-env iA nixos.cryptsetup
+	cryptsetup --verify-passphrase -v --cipher aes-xts-plain64 --key-size 256 luksFormat /dev/sdb
+
+The cipher and key size were chosen based on the results of
+`cryptsetup benchmark`.
+
+I created a random password and put that in my password store.
+Using `--verify-passphrase` I pasted the password once from my store,
+and typed in in for verification,
+to make sure I have the correct password set.
+
+Decrypt and map to `/dev/mapper/storage`:
+
+	cryptsetup luksOpen UUID=6c8d5be7-ae46-4e51-a270-fd5bdce46f3b storage
+
+The UUID can be obtained by running `cryptsetup luksDump /dev/sdb`.
+
+Now create the BTRFS filesystem:
+
+	nix-env -iA nixos.btrfs-progs
+	mkfs.btrfs /dev/mapper/storage
+
+Now mount the filesystem:
+
+	mkdir -p /mnt/storage
+	mount /dev/mapper/storage /mnt/storage
+	cd /mnt/storage
+
+And set up the volumes as defined above:
+
+	btrfs subvolume create live
+	btrfs subvolume create snapshots
+	btrfs subvolume create backups
+
 ## Install NixOS on a Hetzner VPS
 
 On Hetzner, create a virtual machine with the following settings:
