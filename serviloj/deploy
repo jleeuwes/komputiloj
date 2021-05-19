@@ -5,15 +5,6 @@ set -Eeu -o pipefail
 cd -- "$(dirname -- "$0")"
 source ./_nixops_settings.sh
 
-function clean_up_my_stuff() {
-	if test -L secrets; then
-		printf "Removing secrets symlink\n" >&2
-		rm secrets
-	fi
-}
-trap clean_up_my_stuff EXIT
-ln -sT ~/datumoj/passwords secrets
-
 echo "## Preparing clean state (we want to keep things stateless)" >&2
 rm -f -- "$NIXOPS_STATE"
 "$NIXOPS_CMD" create serviloj.nix
