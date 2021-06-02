@@ -266,6 +266,16 @@ ctl.pulse {
 		layout = "us";
 		xkbOptions = "compose:ralt eurosign:e";
 
+		displayManager.lightdm.greeters.gtk.cursorTheme = {
+			# This only sets the cursor on the greeter screen,
+			# but it also install the cursor package,
+			# which we use in a bunch of our user-local config to configure the
+			# cursor theme and size *inside* an X session.
+			name = "Vanilla-DMZ";
+			package = pkgs.vanilla-dmz;
+			size = 32;
+		};
+
 		displayManager.sessionCommands = ''
 			# # ( adapted from https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 )
 			# # (lijkt allemaal voor geen flikker te werken)
