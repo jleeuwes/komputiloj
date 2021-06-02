@@ -127,6 +127,7 @@
 		gnupg paperkey qrencode zbar pwgen
 		telnet # for ftp for the nas
 		# TODO rclone (is now installed locally)
+		openssl
 
 		pamix pavucontrol alsaUtils
 		zstd # for unpacking arch packages
@@ -151,6 +152,7 @@
 		openjdk11 maven
 		love_11
 		arduino
+		haskellPackages.ghc
 
 		# LaTeX:
 		# (Not sure if rubber uses the chosen texlive distribution)
@@ -191,6 +193,7 @@
 		# other package managers (to be used for non-reproducable things only):
 		nodejs #npm
 
+		unzip
 		llvmPackages.bintools # to get ar (to extract .deb files)
 		sqlite
 	];
