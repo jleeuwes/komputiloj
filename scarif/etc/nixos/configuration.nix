@@ -193,7 +193,7 @@
 		# other package managers (to be used for non-reproducable things only):
 		nodejs #npm
 
-		unzip
+		zip unzip
 		llvmPackages.bintools # to get ar (to extract .deb files)
 		sqlite
 	];
