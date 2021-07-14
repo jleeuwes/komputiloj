@@ -47,6 +47,9 @@
 	# Make /tmp in-memory:
 	boot.tmpOnTmpfs = true;
 
+	# Enable read-write NTFS support:
+	boot.supportedFilesystems = [ "ntfs" ];
+
 	# Here I was looking into creating a ramfs mount with /tmp properties
 	# (i.e. anyone can write) for temporarily decripted keys.
 	# However, this is discouraged as size limits are not enforced?
