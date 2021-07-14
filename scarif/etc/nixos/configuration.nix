@@ -174,10 +174,12 @@
 		shared_mime_info xfce.tumbler # <- these two in particular seemed to do the trick!
 		# mindmapping-tools:
 		vym freemind
+		vlc
 
 		inkscape gimp exiftool
 		imagemagick scrot
 		libreoffice antiword
+		audacity
 		
 		hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way
 		# xorg.xbacklight # doesn't work anymore - https://github.com/NixOS/nixpkgs/issues/55520#issuecomment-470501591
