@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -Eeu
+set -o pipefail
+
+LAPTOP=eDP-1
+DP=DP-1
+HDMI=HDMI-2
+
+case "$1" in
+	dual)
+		xrandr --output "$LAPTOP" --primary --output "$DP" --right-of "$LAPTOP" --auto
+	;;
+	hdmi)
+		if xrandr --query|egrep "^$HDMI connected" > /dev/null; then
+			# NOTE (nog van toepassing?) gek: in hdmi-modus hoor je ineens beeps op de laptop,
+			# terwijl beeps anders uitgeschakeld zijn
+			xrandr --output "$LAPTOP" --off --output "$HDMI" --auto
+		else
+			echo "$HDMI is not connected. Doing nothing." >&2
+		fi
+	;;
+	dp)
+		if xrandr --query|egrep "^$DP connected" > /dev/null; then
+			xrandr --output "$LAPTOP" --off --output "$DP" --auto
+		else
+			echo "$DP is not connected. Doing nothing." >&2
+		fi
+	;;
+	laptop)
+		# pactl move-sink-input 31 1 && \
+		xrandr --output "$LAPTOP" --auto --output "$DP" --off --output "$HDMI" --off
+		# xset s on && \
+		# echo set-default-sink 1 | pacmd > /dev/null
+	;;
+esac
+
+# xrefresh
