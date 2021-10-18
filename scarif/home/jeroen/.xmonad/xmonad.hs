@@ -195,14 +195,14 @@ myLayout = layoutHintsToCenter $ smartSpacing 2 $ smartBorders $ avoidStruts $
            (wide ||| tall ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
-     tall    = Tall 1 delta (3/5)
-     wide    = Mirror $ Tall 1 delta {- <- requires some tweaking to reduce wasted space when resizing -} (7/10)
+     tall    = Tall 1 (3/100) (3/5) -- TODO tweak as good as wide
+     wide    = Mirror $ Tall 1
+                  (22.54 / 1080) -- increments - perfect for our border+strut size + terminal line height at 1080p
+                  (761/1000) -- starting ratio - perfect for a terminal under or above a browser,
+                             -- or two terminals, on 1080p
 
      -- The default number of windows in the master pane
      nmaster = 1
-
-     -- Percent of screen to increment by when resizing panes
-     delta   = 3/100
 
 -- Omring standaard layout met ruimte voor gimp-balkjes, indien van toepassing
 -- (http://nathanhowell.net/2009/03/08/xmonad-and-the-gimp/)
