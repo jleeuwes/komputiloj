@@ -174,7 +174,7 @@
 		shared_mime_info xfce.tumbler # <- these two in particular seemed to do the trick!
 		# mindmapping-tools:
 		vym freemind
-		vlc
+		vlc ffmpeg
 
 		inkscape gimp exiftool
 		imagemagick scrot
