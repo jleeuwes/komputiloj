@@ -152,7 +152,7 @@
 		jq # json manipulation
 		unstable.android-studio
 		jetbrains.idea-community
-		openjdk11 maven
+		openjdk11 maven visualvm
 		love_11
 		arduino
 		haskellPackages.ghc
