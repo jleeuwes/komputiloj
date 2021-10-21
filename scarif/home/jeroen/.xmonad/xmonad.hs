@@ -128,8 +128,14 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((0, xF86XK_LaunchA), spawn "dm-tool switch-to-greeter")
 
     -- Brightness control
-    , ((0, xF86XK_MonBrightnessUp), spawn "brightnessctl set +5%")
-    , ((0, xF86XK_MonBrightnessDown), spawn "brightnessctl set 5%-")
+    -- Step size 23 is chosen so we can go from 852 (100%) to 1 (absolute minimum brightness).
+    -- When going up from 0, the min-value options make sure we get back to a proper multiple-of-23-plus-1.
+    -- Without shift we do 10 steps, which approximately cuts the space in four brightness levels,
+    -- and also goes down to 1 (and then 0 if you press again).
+    , ((0         , xF86XK_MonBrightnessUp   ), spawn "brightnessctl set +230 --min-value=231")
+    , ((0         , xF86XK_MonBrightnessDown ), spawn "brightnessctl set 230-")
+    , ((shiftMask , xF86XK_MonBrightnessUp   ), spawn "brightnessctl set +23 --min-value=24")
+    , ((shiftMask , xF86XK_MonBrightnessDown ), spawn "brightnessctl set 23-")
     
     -- Multimedia keys
     , ((0, xF86XK_AudioRaiseVolume), spawn "amixer set Master 5%+")
