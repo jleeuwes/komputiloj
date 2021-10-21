@@ -46,8 +46,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm .|. shiftMask, xK_KP_Enter), safeSpawn (XMonad.terminal conf) [])
 
     -- launch dmenu
-    , ((modm, xK_p),                      dmenu_run)
-    , ((modm, xK_w),                      dmenu_ww)
+    , ((modm, xK_p),                      runDmenu "dmenu_run")
+    , ((modm, xK_w),                      runDmenu "wachtwoord-balk")
+    , ((modm, xK_s),                      runDmenu "beeld-balk")
     
     -- close focused window
     , ((modm .|. shiftMask, xK_c     ), kill)
@@ -396,11 +397,10 @@ withIndex f = f . index
     index
       = read . ('0' :) . filter (`elem` "0123456789")
 
-dmenu_run = safeSpawn "dmenu_run" dmenu_opts
-dmenu_ww  = safeSpawn "wachtwoord-balk" dmenu_opts
-dmenu_opts =
-  ["-nb", "#000", "-nf", "#fff", "-sb", "#fff", "-sf", "#000", "-fn",
-  "inconsolata:size=14"]
+runDmenu cmd = safeSpawn cmd dmenu_opts
+  where
+    dmenu_opts
+      = ["-nb", "#000", "-nf", "#fff", "-sb", "#fff", "-sf", "#000", "-fn", "inconsolata:size=14"]
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will

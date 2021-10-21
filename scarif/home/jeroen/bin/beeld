@@ -33,6 +33,12 @@ case "$1" in
 		# xset s on && \
 		# echo set-default-sink 1 | pacmd > /dev/null
 	;;
+	list)
+		echo laptop
+		echo dp
+		echo hdmi
+		echo dual
+	;;
 esac
 
 # xrefresh

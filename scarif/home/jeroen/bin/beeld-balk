@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -Eeu
+set -o pipefail
+
+bn=$(beeld list | dmenu "$@")
+
+beeld "$bn"
+
