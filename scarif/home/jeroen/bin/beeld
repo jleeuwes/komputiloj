@@ -7,38 +7,58 @@ LAPTOP=eDP-1
 DP=DP-1
 HDMI=HDMI-2
 
-case "$1" in
-	dual)
-		xrandr --output "$LAPTOP" --primary --output "$DP" --right-of "$LAPTOP" --auto
-	;;
-	hdmi)
-		if xrandr --query|egrep "^$HDMI connected" > /dev/null; then
-			# NOTE (nog van toepassing?) gek: in hdmi-modus hoor je ineens beeps op de laptop,
-			# terwijl beeps anders uitgeschakeld zijn
-			xrandr --output "$LAPTOP" --off --output "$HDMI" --auto
-		else
-			echo "$HDMI is not connected. Doing nothing." >&2
-		fi
-	;;
-	dp)
-		if xrandr --query|egrep "^$DP connected" > /dev/null; then
-			xrandr --output "$LAPTOP" --off --output "$DP" --auto
-		else
-			echo "$DP is not connected. Doing nothing." >&2
-		fi
-	;;
-	laptop)
-		# pactl move-sink-input 31 1 && \
-		xrandr --output "$LAPTOP" --auto --output "$DP" --off --output "$HDMI" --off
-		# xset s on && \
-		# echo set-default-sink 1 | pacmd > /dev/null
-	;;
-	list)
-		echo laptop
-		echo dp
-		echo hdmi
-		echo dual
-	;;
-esac
+# Note: there's also /sys/class/drm/card0-* where connected/disconnected and
+# modes can be seen. However, annoyingly, the names do not match those in
+# xrandr.
+
+switch_conditionally() {
+	local thing="$1"
+	shift
+	if xrandr --query|egrep "^$thing connected" > /dev/null; then
+		xrandr --output "$LAPTOP" --off --output "$thing" "$@"
+	else
+		echo "$thing is not connected. Doing nothing." >&2
+		return 2
+	fi
+}
+
+main() {
+	case "$1" in
+		dual)
+			xrandr --output "$LAPTOP" --primary --output "$DP" --right-of "$LAPTOP" --auto
+		;;
+		hdmi_auto)
+			switch_conditionally "$HDMI" --auto
+		;;
+		dp_auto)
+			switch_conditionally "$DP" --auto
+		;;
+		dp_4k)
+			switch_conditionally "$DP" --mode 3840x2160
+		;;
+		dp_hd)
+			switch_conditionally "$DP" --mode 1920x1080
+		;;
+		laptop)
+			# pactl move-sink-input 31 1 && \
+			xrandr --output "$LAPTOP" --auto --output "$DP" --off --output "$HDMI" --off
+			# xset s on && \
+			# echo set-default-sink 1 | pacmd > /dev/null
+		;;
+		list)
+			echo laptop \
+				dp_auto dp_4k dp_hd \
+				hdmi_auto \
+				dual \
+			| xargs -n1
+		;;
+		*)
+			echo "Unknown setup $1" >&2
+			return 1
+		;;
+	esac
+}
+
+main "$@"
 
 # xrefresh
