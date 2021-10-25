@@ -301,7 +301,7 @@ myEventHook = mempty
 --
 updateBackgroundHook = do
     workspace <- gets (W.tag . W.workspace . W.current . windowset)
-    setBgH $ withIndex workspaceColor workspace
+    setBgX $ withIndex workspaceColor workspace
 
   where
     -- Set background using hsetroot because that is compatible with
