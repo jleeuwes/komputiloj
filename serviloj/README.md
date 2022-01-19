@@ -26,9 +26,10 @@ on top of the Hetzner volume.
 
 We have these subvolumes:
 
-- `live` holds persistent data for day-to-day use
+- `live` holds a subvolume per app/service, holding persistent data for day-to-day use
 - `backups` holds backup data from other systems
-- `snapshots` holds read-only snapshots of the `live` volume
+- `snapshots` holds read-only snapshots of volumes under `live`
+- `archives` holds read-only subvolumes that are not in active use
 
 Some notes:
 
@@ -38,6 +39,8 @@ Some notes:
 - It doesn't make sense to make snapshots of stuff under `backups`,
   because then files from external systems will end up in a loop
   external system > `backups` > `snapshots` > external system
+- We might also want a subvolume holding temporary subvolumes for working on some data?
+  We might also consider such work a service and put it under `live`.
 
 ### One time setup
 
@@ -84,6 +87,7 @@ And set up the volumes as defined above:
 	btrfs subvolume create live
 	btrfs subvolume create snapshots
 	btrfs subvolume create backups
+	btrfs subvolume create archives
 
 ## Install NixOS on a Hetzner VPS
 
