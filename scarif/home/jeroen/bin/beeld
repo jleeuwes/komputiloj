@@ -25,7 +25,7 @@ switch_conditionally() {
 main() {
 	case "$1" in
 		dual)
-			xrandr --output "$LAPTOP" --primary --output "$DP" --right-of "$LAPTOP" --auto
+			xrandr --output "$LAPTOP" --primary --output "$DP" --above "$LAPTOP" --auto
 		;;
 		hdmi_auto)
 			switch_conditionally "$HDMI" --auto
