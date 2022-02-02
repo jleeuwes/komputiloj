@@ -123,7 +123,8 @@
 		# gtk
 		hicolor_icon_theme xfce.xfce4icontheme tango-icon-theme
 		# usefull programs:
-		gitFull vim file subversionClient pciutils pmount parted squashfsTools wget
+		gitFull vim file subversionClient pciutils pmount parted squashfsTools
+		wget rtorrent
 		unstable.gitAndTools.git-annex
 		rclone
 		sshpass
@@ -136,6 +137,7 @@
 		zstd # for unpacking arch packages
 		glxinfo
 		xorg.xdpyinfo
+		xorg.xev
 		
 		# Install scanimage (saneBackends) and scanadf (saneFrontends),
 		# among other scanning tools.
@@ -157,10 +159,11 @@
 		arduino
 		haskellPackages.ghc
 
-		# LaTeX:
+		# LaTeX and PDF:
 		# (Not sure if rubber uses the chosen texlive distribution)
 		texlive.combined.scheme-medium
 		rubber
+		poppler_utils
 
 		firefox thunderbird
 		chromium
