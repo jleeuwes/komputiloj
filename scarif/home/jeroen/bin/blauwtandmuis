@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+MOUSE_ID_FILE=~/.blauwtandmuis
+
+MOUSE_ID=$(egrep '^[0-9A-F]{2}(:[0-9A-F]{2}){5}$' -- "$MOUSE_ID_FILE")
+if [[ "$?" -ne 0 ]]; then 
+	echo "Please put the id of the mouse in $MOUSE_ID_FILE"
+	echo "in this form: AB:CD:EF:01:23:45"
+	exit 1
+fi
+
+bluetoothctl remove "$MOUSE_ID"
+bluetoothctl --timeout 5 scan on
+bluetoothctl pair "$MOUSE_ID"
+bluetoothctl connect "$MOUSE_ID"

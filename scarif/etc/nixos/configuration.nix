@@ -264,6 +264,10 @@ ctl.pulse {
 	# Some NixOS packages can be built with explicit PulseAudio support which is disabled by default. This support can be enabled in all applicable packages by setting:
 	nixpkgs.config.pulseaudio = true;
 
+	hardware.bluetooth = {
+		enable = true;
+	};
+
 	# Screen locker
 	services.physlock = {
 		enable = true;
