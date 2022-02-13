@@ -27,13 +27,10 @@
 		
 		# The rest is a configuration just like nixos/configuration.nix
 		
-		# WARNING this setting is not used
+		# WARNING this setting is ignored.
 		# Instead, nixops determines the stateVersion at first deploy based on the NixOS version it encounters.
-		# TODO change our deployment scripts so they keep the state db, maybe on the server itself?
-		# See also https://github.com/NixOS/nixops/issues/1340 (mkForce doesn't work)
-		# TODO try and see what the actually used stateVersion is by putting it
-		# in some file in /etc
-		system.stateVersion = lib.mkForce "20.09";
+		# Our deploy script stores this state on gently now to keep the correct stateVersion.
+		# system.stateVersion = lib.mkForce "20.09";
 
 		systemd.services.mount-storage = {
 			serviceConfig = {
