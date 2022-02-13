@@ -161,7 +161,7 @@
 
 			package = pkgs.nextcloud20;
 
-			home = "/mnt/storage/live/nextcloud";
+			home = "/mnt/storage/live/nextcloud/rootdir";
 
 			autoUpdateApps = {
 				enable = true;
@@ -193,7 +193,7 @@
 
 			log.level = "Info";
 
-			stateDir = "/mnt/storage/live/gitea";
+			stateDir = "/mnt/storage/live/gitea/rootdir";
 
 			disableRegistration = true;
 

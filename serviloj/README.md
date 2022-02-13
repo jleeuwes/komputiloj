@@ -27,12 +27,20 @@ on top of the Hetzner volume.
 We have these subvolumes:
 
 - `live` holds a subvolume per app/service, holding persistent data for day-to-day use
+	- `live/komputiloj` holds data pertaining to komputiloj as a whole.
+	  At the moment only the NixOps state file is kept here,
+	  but we could also use it, for instance, for logs that we want to really keep.
 - `backups` holds backup data from other systems
 - `snapshots` holds read-only snapshots of volumes under `live`
 - `archives` holds read-only subvolumes that are not in active use
 
 Some notes:
 
+- Make sure ALL subvolumes are owned by root and no regular user has write permission on them.
+  Otherwise, read-only subvolume snapshots are not safe against modification,
+  because the owner, which the snapshot inherits, can make such snapshots writeable.
+- If some app/service needs to own its root folder, create a `rootdir` inside
+  the subvolume with the non-root owner, so the subvolume can be owned by root.
 - TODO We should make regular automatic snapshots of the `live` volume under the `snapshots` volume.
 - TODO We should make regular backups from the `snapshots` volume to an external system.
 - It doesn't make sense to place backups of our server under `backups` - this is what `snapshots` is for.
@@ -85,6 +93,9 @@ Now mount the filesystem:
 And set up the volumes as defined above:
 
 	btrfs subvolume create live
+	btrfs subvolume create live/komputiloj
+	btrfs subvolume create live/nextcloud
+	btrfs subvolume create live/gitea
 	btrfs subvolume create snapshots
 	btrfs subvolume create backups
 	btrfs subvolume create archives
