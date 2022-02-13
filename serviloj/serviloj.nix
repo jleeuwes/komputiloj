@@ -56,9 +56,20 @@
 			];
 			path = [ pkgs.cryptsetup pkgs.utillinux pkgs.unixtools.mount pkgs.unixtools.umount ];
 			script = ''
-				cryptsetup open UUID=6c8d5be7-ae46-4e51-a270-fd5bdce46f3b storage --type luks --key-file /run/keys/luks-storage
+				if mountpoint -q /mnt/storage; then
+					echo "Storage already mounted. Done here."
+					exit 0
+				fi
+				if [ -b /dev/mapper/storage ]; then
+					echo "LUKS mapping already opened."
+				else
+					echo "Opening LUKS mapping..."
+					cryptsetup open UUID=6c8d5be7-ae46-4e51-a270-fd5bdce46f3b storage --type luks --key-file /run/keys/luks-storage
+				fi
+				echo "Mounting..."
 				mkdir -p /mnt/storage
 				mount /dev/mapper/storage /mnt/storage
+				echo "Done here."
 			'';
 			preStop = ''
 				if mountpoint -q /mnt/storage; then
