@@ -6,7 +6,14 @@ and maybe someone might find something useful in there for their own config.
 
 ## How to use this (on scarif)
 
-1. Clone this repository into `~/komputiloj`.
+1. Clone this repository into `~/komputiloj`:
+    ```
+    cd
+    git clone git@github.com:jleeuwes/komputiloj.git
+    cd komputiloj
+    git submodule init    # only for serviloj at the moment
+    git submodule update  # only for serviloj at the moment
+    ```
 2. Make some symlinks:
     ```
     mkdir -p /etc/nixos
