@@ -60,7 +60,7 @@
 				mkdir -p /mnt/storage
 				mount /dev/mapper/storage /mnt/storage
 			'';
-			postStop = ''
+			preStop = ''
 				if mountpoint -q /mnt/storage; then
 					umount /mnt/storage
 				fi
