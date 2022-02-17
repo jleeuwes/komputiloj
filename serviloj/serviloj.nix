@@ -79,6 +79,12 @@
 			'';
 		};
 
+		services.btrfs.autoScrub = {
+			enable = true;
+			fileSystems = [ "/mnt/storage" ];
+			interval = "weekly";
+		};
+
 		services.openssh.enable = true;
 		users = {
 			users.root = {
