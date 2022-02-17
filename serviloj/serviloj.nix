@@ -193,6 +193,7 @@
 
 			log.level = "Info";
 
+			# NOTE: after changing the stateDir, regenerate gitea's authorized_keys file through the admin webinterface.
 			stateDir = "/mnt/storage/live/gitea/rootdir";
 
 			disableRegistration = true;
