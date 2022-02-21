@@ -166,6 +166,7 @@
 		poppler_utils
 
 		firefox thunderbird
+		isync # for e-mail backups
 		chromium
 		geany
 		zathura # pdf viewer
@@ -202,6 +203,7 @@
 		nodejs #npm
 
 		zip unzip
+		par2cmdline # for error-correcting archives
 		llvmPackages.bintools # to get ar (to extract .deb files)
 		sqlite
 	];
