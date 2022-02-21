@@ -46,6 +46,7 @@
 				"nextcloud-update-plugins.service"
 				"phpfpm-nextcloud.service"
 				"gitea.service"
+				"btrbk-storage.service"
 			];
 			before = [
 				"nextcloud-cron.service"
@@ -53,6 +54,7 @@
 				"nextcloud-update-plugins.service"
 				"phpfpm-nextcloud.service"
 				"gitea.service"
+				"btrbk-storage.service"
 			];
 			path = [ pkgs.cryptsetup pkgs.utillinux pkgs.unixtools.mount pkgs.unixtools.umount ];
 			script = ''
@@ -77,6 +79,25 @@
 				fi
 				cryptsetup close storage
 			'';
+		};
+		
+		services.btrbk = {
+			instances = {
+				storage = {
+					settings = {
+						timestamp_format = "long-iso"; # safe from the caveat at https://digint.ch/btrbk/doc/btrbk.conf.5.html#_reference_time as long as we don't use btrbk for backups
+						snapshot_preserve_min = "24h"; # for manual snapshots? not sure, but we need to set it to something other than "all"
+						snapshot_preserve = "24h 7d 5w 12m *y";
+						preserve_day_of_week = "monday";
+						preserve_hour_of_day = "0";
+						volume."/mnt/storage" = {
+							snapshot_dir = "snapshots";
+							subvolume."live/*" = {};
+						};
+					};
+					onCalendar = "hourly";
+				};
+			};
 		};
 
 		services.btrfs.autoScrub = {
