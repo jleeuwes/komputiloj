@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+#
+# NOTE: you should NOT run this script multiple times simultaneously.
+# Currently, no locking is implemented to prevent this.
+
+set -Eeu -o pipefail
+
+case "$HOSTNAME" in
+scarif)
+	BACKUP_TARGET=~/probeer # /root/backup/storage
+;;
+*)
+	printf "No configuration for hostname %s\n" "$HOSTNAME" >&2
+	exit 1
+;;
+esac
+
+# mkdir -p -- "$BACKUP_TARGET"
+
+if [[ -t 2 ]]; then
+	# stderr is a terminal, so display progress
+	RSYNC=(rsync --progress)
+else
+	# don't litter redirected stdout with progress info
+	RSYNC=(rsync)
+fi
+
+action_required=no
+printf "Hi! Here we go!\n" >&2
+
+rotate() {
+	target_base="$1"
+	
+	if [[ ! -e "$target_base".new ]]; then
+		# Nothing to do here
+		return 0
+	fi
+	if [[ -e "$target_base".latest ]]; then
+		# We want to rename .new to .latest but we need to move the 'current' .latest first.
+		if [[ -e "$target_base".previous ]]; then
+			# We want to rename .latest to .previous but we need to remove the 'current' .previous first.
+			if [[ -e "$target_base".previous_ ]]; then
+				printf "Deleting %q presumably left over from interrupted earlier run...\n" "$target_base".previous_ >&2
+				rm -rf -- "$target_base".previous_
+			fi
+			printf "Deleting %q to make room for %q...\n" "$target_base".{previous,latest} >&2
+			mv -T -- "$target_base".previous{,_} # mark backup as incomplete with _
+			rm -rf -- "$target_base".previous_ # remove previous (if interrupted, previous_ remains and is cleaned up the next time)
+		fi
+		printf "Moving %q to %q...\n" "$target_base".{latest,previous} >&2
+		mv -T -- "$target_base".{latest,previous}
+	fi
+	printf "Moving %q to %q...\n" "$target_base".{new,latest} >&2
+	mv -T -- "$target_base".{new,latest}
+}
+
+set -o noglob
+IFS=$'\n'
+for line in `ssh root@gently btrbk --config=/etc/btrbk/storage.conf list latest --format=raw`; do
+	echo >&2
+
+	if ! printf "%s\n" "$line" | egrep '^format="latest"' > /dev/null; then
+		printf "ACTION REQUIRED. Could not parse line: %q\n" "$line" >&2
+		printf "Is btrbk list latest broken?\n" >&2
+		action_required=yes
+		continue
+	fi
+
+	snapshot_path=${line##*snapshot_path=\"}
+	snapshot_path=${snapshot_path%%\"*}
+	snapshot_name=${snapshot_path##*/}
+	snapshot_name=${snapshot_name%%.*}
+	printf "%s\n" "$snapshot_name" >&2
+	printf "=====\n" >&2
+	printf "Based on line: %q\n" "$line" >&2
+	
+	target_base="$BACKUP_TARGET"/"$snapshot_name"
+
+	if [[ -e "$target_base".new_ ]]; then
+		printf "ACTION REQUIRED. An incomplete backup %q exists. Please investigate and delete it.\n" "$target_base".new_ >&2
+		action_required=yes
+		continue
+	fi
+
+	rotate "$target_base"
+	
+	if [[ -e "$target_base".latest ]]; then
+		printf "Using %q for incremental backup.\n" "$target_base".latest >&2
+		RSYNC+=(--link-dest="$target_base".latest)
+	elif [[ -e "$target_base".previous ]]; then
+		printf "No %q found. Using %q for incremental backup.\n" "$target_base".{latest,previous} >&2
+		RSYNC+=(--link-dest="$target_base".previous)
+	else
+		printf "No %q or %q found. Doing full backup.\n" "$target_base".{latest,previous} >&2
+	fi
+
+	printf "Copying %q to %q...\n" "$snapshot_path" "$target_base".new >&2
+	"${RSYNC[@]}" -a --numeric-ids root@gently:"$snapshot_path"/ "$target_base".new_ \
+		| sed -E 's/^/  rsync: /' >&2
+	mv -T -- "$target_base".new{_,}
+
+	rotate "$target_base"
+done
+
+echo >&2
+if [[ "$action_required" != no ]]; then
+	printf "Warning: some backups require attention. See ACTION REQUIRED above.\n" >&2
+	exit 9
+else
+	printf "Done. Everything is fine!\n" >&2
+fi
