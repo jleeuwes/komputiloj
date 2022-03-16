@@ -2,12 +2,20 @@
 #
 # NOTE: you should NOT run this script multiple times simultaneously.
 # Currently, no locking is implemented to prevent this.
+#
+# LIMITATION: we sync ownership and permissions, but not extended file attributes!
+# I think rsync can do this, but we'd have to think about how this interferes
+# with out use of the immutability flag!
+# Ideally, we would put each backup on a read-only btrfs subvolume and protect
+# them that way instead of with an immutable flag on each file.
 
 set -Eeu -o pipefail
 
+USER_AT_HOST=root@gently.radstand.nl
+
 case "$HOSTNAME" in
 scarif)
-	BACKUP_TARGET=~/probeer # /root/backup/storage
+	BACKUP_TARGET=/root/backup/storage
 ;;
 *)
 	printf "No configuration for hostname %s\n" "$HOSTNAME" >&2
@@ -15,20 +23,48 @@ scarif)
 ;;
 esac
 
-# mkdir -p -- "$BACKUP_TARGET"
+mkdir -p -- "$BACKUP_TARGET"
 
-if [[ -t 2 ]]; then
-	# stderr is a terminal, so display progress
-	RSYNC=(rsync --progress)
+if [[ "$(id -u)" = 0 ]]; then
+	chattr_if_possible() {
+		chattr "$@"
+	}
+	chattr_dir() {
+		local dir
+		# replacement for chattr -R that doesn't freak out about symlinks
+		dir="$1"
+		shift
+		# https://stackoverflow.com/questions/4286073/find-in-directory-that-starts-with-dash
+		find "${dir/#-/./-}" ! -type l -print0 | xargs -0 chattr "$@" --
+	}
+	# Numeric userids are preserved, so make sure we lock down the target directory to prevent weird access issues:
+	chown root:root -- "$BACKUP_TARGET"
+	chmod go= -- "$BACKUP_TARGET"
 else
-	# don't litter redirected stdout with progress info
-	RSYNC=(rsync)
+	# NOTE: running as non-root has other limitations, such as not preserving permissons and ownership.
+	printf "Not running as root. Skipping immutability stuff.\n" >&2
+	chattr_if_possible() {
+		:
+	}
+	chattr_dir() {
+		:
+	}
 fi
 
-action_required=no
-printf "Hi! Here we go!\n" >&2
+
+move_i() {
+	chattr_if_possible -i -- "$1"
+	mv -T -- "$1" "$2"
+	chattr_if_possible +i -- "$2"
+}
+
+rm_dir_i() {
+	chattr_dir "$1" -i
+	rm -rf -- "$1"
+}
 
 rotate() {
+	local target_base
 	target_base="$1"
 	
 	if [[ ! -e "$target_base".new ]]; then
@@ -41,22 +77,37 @@ rotate() {
 			# We want to rename .latest to .previous but we need to remove the 'current' .previous first.
 			if [[ -e "$target_base".previous_ ]]; then
 				printf "Deleting %q presumably left over from interrupted earlier run...\n" "$target_base".previous_ >&2
-				rm -rf -- "$target_base".previous_
+				rm_dir_i "$target_base".previous_
 			fi
 			printf "Deleting %q to make room for %q...\n" "$target_base".{previous,latest} >&2
-			mv -T -- "$target_base".previous{,_} # mark backup as incomplete with _
-			rm -rf -- "$target_base".previous_ # remove previous (if interrupted, previous_ remains and is cleaned up the next time)
+			move_i "$target_base".previous{,_} # mark backup as incomplete with _
+			rm_dir_i "$target_base".previous_ # remove previous (if interrupted, previous_ remains and is cleaned up the next time)
 		fi
 		printf "Moving %q to %q...\n" "$target_base".{latest,previous} >&2
-		mv -T -- "$target_base".{latest,previous}
+		move_i "$target_base".{latest,previous}
 	fi
 	printf "Moving %q to %q...\n" "$target_base".{new,latest} >&2
-	mv -T -- "$target_base".{new,latest}
+	move_i "$target_base".{new,latest}
 }
+
+if [[ -t 2 ]]; then
+	# stderr is a terminal, so display progress
+	RSYNC=(rsync --progress)
+else
+	# don't litter redirected stdout with progress info
+	RSYNC=(rsync)
+fi
+
+action_required=no
+printf "Here we go!\n" >&2
+
+printf "Retrieving list of latest snapsnots...\n" >&2
+list_file=$(mktemp)
+ssh "$USER_AT_HOST" btrbk --config=/etc/btrbk/storage.conf list latest --format=raw > "$list_file"
 
 set -o noglob
 IFS=$'\n'
-for line in `ssh root@gently btrbk --config=/etc/btrbk/storage.conf list latest --format=raw`; do
+for line in `cat -- "$list_file"`; do
 	echo >&2
 
 	if ! printf "%s\n" "$line" | egrep '^format="latest"' > /dev/null; then
@@ -86,21 +137,34 @@ for line in `ssh root@gently btrbk --config=/etc/btrbk/storage.conf list latest 
 	
 	if [[ -e "$target_base".latest ]]; then
 		printf "Using %q for incremental backup.\n" "$target_base".latest >&2
-		RSYNC+=(--link-dest="$target_base".latest)
+		link_dest="$target_base".latest
 	elif [[ -e "$target_base".previous ]]; then
 		printf "No %q found. Using %q for incremental backup.\n" "$target_base".{latest,previous} >&2
-		RSYNC+=(--link-dest="$target_base".previous)
+		link_dest="$target_base".previous
 	else
 		printf "No %q or %q found. Doing full backup.\n" "$target_base".{latest,previous} >&2
+		link_dest=""
+	fi
+
+	if [[ -n "$link_dest" ]]; then
+		chattr_dir "$link_dest" -i # needed to be able to hardlink to the files
+		RSYNC+=(--link-dest="$link_dest")
 	fi
 
 	printf "Copying %q to %q...\n" "$snapshot_path" "$target_base".new >&2
-	"${RSYNC[@]}" -a --numeric-ids root@gently:"$snapshot_path"/ "$target_base".new_ \
-		| sed -E 's/^/  rsync: /' >&2
+	"${RSYNC[@]}" -a --numeric-ids "$USER_AT_HOST":"$snapshot_path"/ "$target_base".new_ \
+		| sed -E 's/^/rsync: /' >&2
 	mv -T -- "$target_base".new{_,}
+	chattr_dir "$target_base".new +i # make backup immutable
+
+	if [[ -n "$link_dest" ]]; then
+		chattr_dir "$link_dest" +i # restore immutability
+	fi
 
 	rotate "$target_base"
 done
+
+rm -f -- "$list_file"
 
 echo >&2
 if [[ "$action_required" != no ]]; then
