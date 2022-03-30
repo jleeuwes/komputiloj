@@ -102,6 +102,8 @@
 		];
 	};
 
+	virtualisation.docker.enable = true;
+
 	# List packages installed in system profile. To search by name, run:
 	# $ nix-env -qaP | grep wget
 	environment.systemPackages = let
@@ -202,6 +204,7 @@
 
 		# other package managers (to be used for non-reproducable things only):
 		nodejs #npm
+		docker # ugh
 
 		zip unzip
 		par2cmdline # for error-correcting archives
@@ -356,6 +359,7 @@ ctl.pulse {
 		description = "Jeroen Leeuwestein";
 		extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video" "audio"
 			"lp" # for scanning with Canon
+			"docker"
 		];
 	};
 	users.extraUsers.speel = {
