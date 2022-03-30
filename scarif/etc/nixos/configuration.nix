@@ -209,6 +209,7 @@
 		zip unzip
 		par2cmdline # for error-correcting archives
 		llvmPackages.bintools # to get ar (to extract .deb files)
+		patchelf
 		sqlite
 	];
 
