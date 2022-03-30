@@ -164,6 +164,7 @@
 		texlive.combined.scheme-medium
 		rubber
 		poppler_utils
+		qpdf pdftk
 
 		firefox thunderbird
 		isync # for e-mail backups
