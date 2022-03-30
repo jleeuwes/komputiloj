@@ -281,7 +281,7 @@ ctl.pulse {
 	services.xserver = {
 		enable = true;
 		layout = "us";
-		xkbOptions = "compose:ralt eurosign:e";
+		xkbOptions = "compose:ralt,eurosign:e";
 
 		displayManager.lightdm.greeters.gtk.cursorTheme = {
 			# This only sets the cursor on the greeter screen,

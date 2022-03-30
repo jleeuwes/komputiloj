@@ -28,9 +28,6 @@ unset SSH_AGENT_PID
 export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 gpg-agent --daemon
 
-# Set compose key
-setxkbmap -option compose:ralt
-
 # Remove ugly X root cursor
 xsetroot -cursor_name left_ptr
 
