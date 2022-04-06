@@ -41,8 +41,8 @@ Some notes:
   because the owner, which the snapshot inherits, can make such snapshots writeable.
 - If some app/service needs to own its root folder, create a `rootdir` inside
   the subvolume with the non-root owner, so the subvolume can be owned by root.
-- TODO We should make regular automatic snapshots of the `live` volume under the `snapshots` volume.
-- TODO We should make regular backups from the `snapshots` volume to an external system.
+- We make regular automatic snapshots of the `live` volume under the `snapshots` volume.
+- We make **irregular** backups from the `snapshots` volume to an external system (my laptop).
 - It doesn't make sense to place backups of our server under `backups` - this is what `snapshots` is for.
 - It doesn't make sense to make snapshots of stuff under `backups`,
   because then files from external systems will end up in a loop
