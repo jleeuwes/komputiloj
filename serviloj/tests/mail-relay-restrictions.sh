@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
-set -Eeu -o pipefail
+## WARNING
+## I was editing this but than I nuked all changes.
+## The changes are in changes-i-accidentally-nuked.patch
+## but I wasn't able to apply that patch.
+## So do that first when you go work on this!
+## (Or start again, whatever.)
 
+set -Eeu -o pipefail
 
 try_mail() {
 	local from="$1"

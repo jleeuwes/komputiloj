@@ -1,0 +1,164 @@
+diff --git a/serviloj/tests/mail-relay-restrictions.sh b/serviloj/tests/mail-relay-restrictions.sh
+index a1ac637..eab13fd 100644
+--- a/serviloj/tests/mail-relay-restrictions.sh
++++ b/serviloj/tests/mail-relay-restrictions.sh
+@@ -3,22 +3,35 @@
+ set -Eeu -o pipefail
+ 
+ 
+-try_mail() {
+-       local from="$1"
+-       local to="$2"
+-       printf "Trying mail from %q to %q through %q...\n" "$from" "$to" "$MAIL_SERVER" >&2
++talk_smtp() {
++       printf "EHLO test\n"
++       if [[ -n "$USERNAME" ]]; then
++               echo -n "AUTH PLAIN "
++               echo -ne "\0$USERNAME\0$PASSWORD" | base64
++       fi
++       printf "MAIL FROM: <%s>\n" "$FROM"
++       printf "RCPT TO: <%s>\n" "$TO"
+        # We don't send QUIT so we don't get a Bye so we can just
+        # regard the last line as the result.
+        # This does mean the server won't end the connection,
+        # so we give a timeout to nc to do it ourselves.
+-       (ssh root@gently.radstand.nl bash <<-EOF
+-               nc -w 1 $MAIL_SERVER 25 <<-FOE
+-                       EHLO test
+-                       MAIL FROM: <$from>
+-                       RCPT TO: <$to>
+-               FOE
+-       EOF
+-       ) | tail -n 1
++}
++
++try_mail() {
++       FROM="$1"
++       TO="$2"
++       printf "Trying mail from %q to %q sent by %q through %q...\n" "$FROM" "$TO" "$SEND_SERVER" "$MAIL_SERVER:$MAIL_PORT" >&2
++       local transport
++       if [[ "$STARTTLS" = yes ]]; then
++               transport="timeout 1 openssl s_client -host $MAIL_SERVER -port $MAIL_PORT -starttls smtp -quiet -verify_quiet"
++       else
++               transport="nc -w 1 $MAIL_SERVER $MAIL_PORT"
++       fi
++       if [[ "$SEND_SERVER" = localhost ]]; then
++               talk_smtp | eval -- "$transport" | tail -n 1
++       else
++               talk_smtp | ssh "$SEND_SERVER" "$transport" | tail -n 1
++       fi
+ }
+ 
+ match() {
+@@ -46,9 +59,10 @@ test_external() {
+        # because home ISPs block port 25.
+        # To make the test more robust with respect to where it will run,
+        # we hardcode the IP address.
+-       MAIL_SERVER=164.138.27.107
+-
+-       local result
++       SEND_SERVER=localhost
++       MAIL_SERVER=mail.radstand.nl
++       MAIL_PORT=40025
++       # MAIL_SERVER=164.138.27.107
+ 
+        # Mail originating from outside destined for radstand.nl should be fine
+        # (ignoring DKIM etc for a moment)
+@@ -75,9 +89,85 @@ test_external() {
+ 
+ test_internal() {
+        # Emulate an relay from inside our network.
+-       MAIL_SERVER=10.0.0.2
++       SEND_SERVER=root@wilder.radstand.nl
++       MAIL_SERVER=localhost
++       MAIL_PORT=25
++       # MAIL_SERVER=10.0.0.2
+ 
+-       local result
++       # Mail originating from outside destined for radstand.nl should be fine
++       # (ignoring DKIM etc for a moment)
++       match "250 2.1.5 *" "$(try_mail jeroen@lwstn.eu jeroen@radstand.nl)"
++       match "250 2.1.5 *" "$(try_mail jeroen@lwstn.eu jeroen@gorinchemindialoog.nl)"
++       match "550 5.1.1 *" "$(try_mail jeroen@lwstn.eu pietjepuk@radstand.nl)" # doesn't exist
++       
++       # Check some internal-to-internal mails.
++       match "250 2.1.5 *" "$(try_mail pietjepuk@radstand.nl jeroen@radstand.nl)"
++       match "250 2.1.5 *" "$(try_mail jeroen@radstand.nl jeroen@gorinchemindialoog.nl)"
++
++       # Outgoing mail should be allowed internally
++       match "250 2.1.5 *" "$(try_mail jeroen@radstand.nl jeroen@lwstn.eu)"
++       match "250 2.1.5 *" "$(try_mail jeroen@radstand.nl jeroenleeuwestein@a-eskwadraat.nl)"
++       # TODO what about mail from *@gorinchemindialoog.nl?
++       
++       # Mail that neither comes from or is destined for our server should be
++       # a big no-no!
++       # Internally, we do allow anything,
++       # because local relay is used for outgoing mail.
++       # This is not ideal, but it was the easily configurable route.
++       # It's okay as long as we fully trust all users on our system to not send mails with fake from addresses.
++       # Better would be to disallow arbitrary relay locally just like externally,
++       # and require authenticated mail submission with some sort of From check.
++       match "250 2.1.5 *" "$(try_mail jeroen@lwstn.eu jeroenleeuwestein@a-eskwadraat.nl)"
++       match "250 2.1.5 *" "$(try_mail jeroenleeuwestein@a-eskwadraat.nl jeroen@lwstn.eu)"
++}
++
++test_submission_notls() {
++       # TODO
++       :
++}
++
++test_submission_unauthenticated() {
++       # Submit from outside the network
++       # without authentication.
++       # Everything should fail.
++       SEND_SERVER=localhost
++       MAIL_SERVER=mail.radstand.nl
++       MAIL_PORT=587
++       STARTTLS=yes
++
++       match "554 5.7.1 *" "$(try_mail jeroen@lwstn.eu jeroen@radstand.nl)"
++       match "554 5.7.1 *" "$(try_mail jeroen@lwstn.eu jeroen@gorinchemindialoog.nl)"
++       match "554 5.7.1 *" "$(try_mail jeroen@lwstn.eu pietjepuk@radstand.nl)" # doesn't exist
++       
++       match "554 5.7.1 *" "$(try_mail jeroen@radstand.nl jeroen@lwstn.eu)"
++       match "554 5.7.1 *" "$(try_mail jeroen@radstand.nl jeroenleeuwestein@a-eskwadraat.nl)"
++
++       match "554 5.7.1 *" "$(try_mail jeroen@lwstn.eu jeroenleeuwestein@a-eskwadraat.nl)"
++       match "554 5.7.1 *" "$(try_mail jeroenleeuwestein@a-eskwadraat.nl jeroen@lwstn.eu)"
++}
++
++test_submission_wrong_authentication() {
++       # Submit from outside the network,
++       # but authenticated,
++       # so we should have 'internal' privileges.
++       SEND_SERVER=localhost
++       MAIL_SERVER=mail.radstand.nl
++       MAIL_PORT=587
++       STARTTLS=yes
++       USERNAME=wrong
++       PASSWORD=wrong
++
++       # TODO
++
++test_submission_authenticated() {
++       # Submit from outside the network,
++       # but authenticated,
++       # so we should have 'internal' privileges.
++       SEND_SERVER=localhost
++       MAIL_SERVER=mail.radstand.nl
++       MAIL_PORT=587
++       STARTTLS=yes
++       USERNAME=gently2-system
+ 
+        # Mail originating from outside destined for radstand.nl should be fine
+        # (ignoring DKIM etc for a moment)
+@@ -106,5 +196,7 @@ test_internal() {
+        match "250 2.1.5 *" "$(try_mail jeroenleeuwestein@a-eskwadraat.nl jeroen@lwstn.eu)"
+ }
+ 
+-test_external
+-test_internal
++#test_external
++#test_internal
++test_submission_unauthenticated
++
