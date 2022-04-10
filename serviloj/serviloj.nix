@@ -1,4 +1,8 @@
-{
+let
+	util = import ./util.nix;
+	# Import some stuff that is not supersecret, but is sensitive enough to not want it in a public git repo:
+	sensitives = import <sensitives>;
+in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
 	network.description = "Our humble all-encompassing serviloj deployment";
@@ -258,7 +262,7 @@
 			sendingFqdn = "gently.radstand.nl";
 			domains = [ "testdomein.radstand.nl" ];
 
-			forwards = {
+			forwards = util.mapNames (name : name + "@gorinchemindialoog.nl") sensitives.gid_forwards // {
 				"jeroen@testdomein.radstand.nl" = "jeroen@lwstn.eu";
 			};
 
