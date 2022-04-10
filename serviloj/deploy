@@ -42,15 +42,12 @@ if [[ ! -f "$NIXOPS_STATE" ]]; then
 	exit 1
 fi
 
-sensitives_file=$(mktemp)
-echo "## Decrypting sensitive config to $sensitives_file"
-wachtwoord get-exact secrets/serviloj-sensitives.nix > "$sensitives_file"
+echo "## Decrypting sensitive config"
+rm -f sentemoj.nix
+wachtwoord get-exact sentemoj.nix.encrypted > sentemoj.nix
 
 echo "## Now deploying. Keep your GPG and SSH passphrases ready." >&2
-"$NIXOPS_CMD" deploy -Isensitives="$sensitives_file"
-
-echo "## Removing sensitive config in $sensitives_file"
-rm -- "$sensitives_file"
+"$NIXOPS_CMD" deploy -Isentemoj=sentemoj.nix
 
 echo "## Pushing new state to gently" >&2
 scp -- "$NIXOPS_STATE" root@gently.radstand.nl:/mnt/storage/live/komputiloj/serviloj-state.nixops
