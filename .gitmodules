@@ -2,3 +2,6 @@
 	path = nixpkgs
 	url = git@github.com:NixOS/nixpkgs.git
 	branch = nixos-21.11
+[submodule "serviloj/gorinchemindialoog"]
+	path = serviloj/gorinchemindialoog
+	url = gitea@thee.radstand.nl:gorinchemindialoog/infra.git

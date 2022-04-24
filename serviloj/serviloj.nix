@@ -1,4 +1,7 @@
-{
+let
+	util = import ./util.nix;
+	gorinchemindialoog = import ./gorinchemindialoog/serviloj.nix;
+in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
 	network.description = "Our humble all-encompassing serviloj deployment";
@@ -258,7 +261,7 @@
 			sendingFqdn = "gently.radstand.nl";
 			domains = [ "testdomein.radstand.nl" ];
 
-			forwards = {
+			forwards = util.mapNames (name : name + "@gorinchemindialoog.nl") gorinchemindialoog.forwards // {
 				"jeroen@testdomein.radstand.nl" = "jeroen@lwstn.eu";
 			};
 
