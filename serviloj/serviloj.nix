@@ -29,6 +29,9 @@ in {
 				group = "nextcloud";
 				permissions = "ug=r,o=";
 			};
+			"account-gorinchemindialoog" = {
+				keyCommand = [ "wachtwoord" "hash" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
+			};
 		};
 		
 		# The rest is a configuration just like nixos/configuration.nix
@@ -259,8 +262,14 @@ in {
 			# TODO get rid of nginx welcome page on mail2.radstand.nl
 			fqdn = "mail2.radstand.nl";
 			sendingFqdn = "gently.radstand.nl";
-			domains = [ "testdomein.radstand.nl" ];
+			domains = [ "gorinchemindialoog.nl" "radstand.nl" ];
 
+			loginAccounts = {
+				"gorinchemindialoog@radstand.nl" = {
+					name = "gorinchemindialoog";
+					hashedPasswordFile = "/run/keys/account-gorinchemindialoog";
+				};
+			};
 			forwards = util.mapNames (name : name + "@gorinchemindialoog.nl") gorinchemindialoog.forwards // {
 				"jeroen@testdomein.radstand.nl" = "jeroen@lwstn.eu";
 			};
