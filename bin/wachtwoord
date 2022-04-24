@@ -5,15 +5,18 @@ set -o pipefail
 
 set -o noclobber
 
-CMD_GPG=gpg2
+# Hackily on-the-fly 'install' some tools.
+# We should really make a package out of this.
+CMD_GPG=$(nix-build --no-out-link --attr gnupg '<nixpkgs>')/bin/gpg2
+CMD_HTPASSWD=$(nix-build --no-out-link --attr apacheHttpd '<nixpkgs>')/bin/htpasswd
 
 # Identity to sign with and to always encrypt for:
 ME=jeroen@lwstn.eu
 
-if ! type -P "$CMD_GPG" > /dev/null; then
-	echo "Ja, hallo, ik kan $CMD_GPG niet vinden." >&2
-	exit 1
-fi
+# if ! type -P "$CMD_GPG" > /dev/null; then
+# 	echo "Ja, hallo, ik kan $CMD_GPG niet vinden." >&2
+# 	exit 1
+# fi
 
 main() {
 	local command
@@ -26,34 +29,17 @@ main() {
 
 	case "$command" in
 	get-exact)
-		if [ $# -ne 1 ]; then
-			echo "Please specify exactly one file" >&2
-			exit 1
-		fi
-		content=$($CMD_GPG --use-agent --batch --decrypt -- "$1")
-		printf %s "$content"
+		# get-exact is a bit of a misnomer: it will not show the exact password
+		# all it did was not append a newline
+		printf '`%q get-exact` is deprecated; use `%q cat -n` instead.\n' "$0" "$0" >&2
+		do_show plain -n -- "$@"
 	;;
 	show|cat)
-		local success=0
-		local prefix=""
-		local content
-		if [ $# -eq 0 ]; then
-			echo "Reading from stdin..." >&2
-			set -- -
-		fi
-		for file in "$@"; do
-			if [ $# -gt 1 ]; then
-				prefix="$file: "
-			fi
-			# We let gpg produce any errors for us and use && to make sure we continue with the other files in case of an error
-			content=$($CMD_GPG --use-agent --batch --decrypt -- "$file") && {
-				printf "%s%s\n" "$prefix" "$content"
-				let ++success # ++ first because of weird exit code if expression is 0
-			}
-		done
-		if [ $success -lt $# ]; then
-			exit 1
-		fi
+		do_show plain "$@"
+	;;
+	hash)
+		# output passwords in /etc/shadow-like format
+		do_show hashed "$@"
 	;;
 	add|new)
 		file="$1"
@@ -95,5 +81,78 @@ main() {
 	;;
 	esac
 }
+
+do_show() {
+	local cmd="$1"
+	shift
+	local success=0
+	local seen=0
+	local prefix=""
+	local content
+	local suppress_last_newline=no
+	while [ $# -ge 1 ]; do
+		case "$1" in
+		-n)
+			suppress_last_newline=yes
+			shift
+		;;
+		--)
+			shift
+			break
+		;;
+		-*)
+			echo "Unrecognized option: $1" >&2
+			exit 1
+		;;
+		*)
+			break
+		;;
+		esac
+	done
+	if [ $# -eq 0 ]; then
+		echo "Reading from stdin..." >&2
+		set -- -
+	fi
+	if [ $# -gt 1 ]; then
+		cmd=show_"$cmd"_multi
+	else
+		cmd=show_"$cmd"_single
+	fi
+	for file in "$@"; do
+		# We let gpg produce any errors for us and use && to make sure we continue with the other files in case of an error
+		content=$($CMD_GPG --use-agent --batch --decrypt -- "$file") && {
+			if [ $success -gt 0 ]; then
+				# This approach gives a messy combination of stdout and stderr,
+				# but it does make sure we never put empty lines on stdout.
+				printf '\n'
+			fi
+			"$cmd" "$file" "$content"
+			let ++success # ++ first because of weird exit code if expression is 0
+		}
+	done
+	if [ "$suppress_last_newline" = no -a $success -gt 0 ]; then
+		printf '\n'
+	fi
+	if [ $success -lt $# ]; then
+		exit 1
+	fi
+}
+
+show_plain_single() {
+	printf "%s" "$2"
+}
+show_plain_multi() {
+	printf "%s: %s" "$1" "$2"
+}
+show_hashed_single() {
+	# We use bcrypt, which is more costly than SHA.
+	# That way the output is as robust as possible to offline brute-forcing.
+	# This is the reason we use Apache's htpasswd instead of the more standard mkpasswd.
+	printf '%s' "$2" | "$CMD_HTPASSWD" -niB "$1" | cut -d: -f2 | tr -d $'\n'
+}
+show_hashed_multi() {
+	printf '%s' "$2" | "$CMD_HTPASSWD" -niB "$1" | tr -d $'\n'
+}
+
 
 main "$@"
