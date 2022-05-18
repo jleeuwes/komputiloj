@@ -9,6 +9,7 @@ in {
 	# TODO quota
 	# TODO mail
 	# TODO monitoring
+	# TODO FIXME: nextcloudversies hopen zich op in /nix/store op gently en nix-collect-garbage doet niks :|
 	
 	gently2 = { config, nodes, lib, pkgs, ... }: {
 		imports = [
