@@ -93,6 +93,55 @@ in {
 				cryptsetup close storage
 			'';
 		};
+
+		systemd.timers.dagelijks-rapport = {
+			wantedBy = [ "timers.target" ];
+			partOf = [ "dagelijks-rapport.service" ];
+			timerConfig.OnCalendar = "17:00";
+		};
+		systemd.services.dagelijks-rapport = {
+			serviceConfig.Type = "oneshot";
+			script = ''
+				# vandaag=$(LC_TIME=nl_NL.UTF8 date '+%A')
+				schijven=$(df -h | fgrep -v tmp)
+				gebruik=$(find / -mindepth 1 -maxdepth 1 -a -not -name mnt | xargs du -hs | sort -hr)
+				${pkgs.mailutils}/bin/mail -s "[gently] overzichtje" jeroen@lwstn.eu <<-EOF
+					Hoi,
+
+					Zo staat het met de schijfruimte:
+
+					$schijven
+
+					En dit is de grootte per dir in / (zonder mnt):
+
+					$gebruik
+
+					Groetjes!
+				EOF
+			'';
+		};
+		systemd.timers.check-disk-usage = {
+			wantedBy = [ "timers.target" ];
+			partOf = [ "check-disk-usage.service" ];
+			timerConfig.OnCalendar = "*:0,15,30,45";
+		};
+		systemd.services.check-disk-usage = {
+			serviceConfig.Type = "oneshot";
+			script = ''
+				problems=$(df -h | egrep '(100|9[0-9])%')
+				if [ $? -eq 0 ]; then
+					${pkgs.mailutils}/bin/mail -s '[gently] bijna vol!' jeroen@lwstn.eu <<-EOF
+						Hoi,
+
+						De volgende schijven zijn bijna vol:
+
+						$problems
+
+						Succes ermee!
+					EOF
+				fi
+			'';
+		};
 		
 		services.btrbk = {
 			instances = {
