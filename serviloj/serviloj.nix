@@ -18,6 +18,7 @@ in {
 
 		deployment.targetHost = "gently2.radstand.nl";
 		deployment.provisionSSHKey = false;
+		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
 		
 		deployment.keys = {
 			"luks-storage" = {
@@ -307,6 +308,13 @@ in {
 
 		mailserver = {
 			enable = true;
+			
+			# We won't get nameservers from DHCP if this if true (the default)!
+			# See https://discourse.nixos.org/t/how-to-use-a-nameserver-with-a-static-networking-configuration/10932/3
+			# and https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/issues/206
+			# Maybe configure nameservers ourselves and make a PR for the docs
+			# at https://nixos-mailserver.readthedocs.io/en/latest/options.html
+			localDnsResolver = false;
 	
 			# TODO get rid of nginx welcome page on mail2.radstand.nl
 			fqdn = "mail2.radstand.nl";
