@@ -7,9 +7,15 @@ in {
 	network.description = "Our humble all-encompassing serviloj deployment";
 
 	# TODO quota
-	# TODO mail
-	# TODO monitoring
-	# TODO FIXME: nextcloudversies hopen zich op in /nix/store op gently en nix-collect-garbage doet niks :|
+	# TODO monitoring:
+	# - laat backupscript zijn laatste backup vermelden ergens op de server,
+	#   zodat de server ons kan herinneren als er te lang geen backup is gemaakt
+	# - ...
+	#
+	# Zaken hopen zich op in /nix/store op gently en nix-collect-garbage doet niks :|
+	# Blijkbaar moet ik af en toe sudo nix-collect-garbage -d doen.
+	# TODO bestudeer https://nixos.wiki/wiki/Storage_optimization nog eens en
+	# verzin een automatische oplossing.
 	
 	gently2 = { config, nodes, lib, pkgs, ... }: {
 		imports = [
