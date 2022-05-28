@@ -104,7 +104,7 @@ in {
 
 		systemd.services.dagelijks-rapport = {
 			serviceConfig.Type = "oneshot";
-			startAt = "17:00";
+			startAt = "03:00 Europe/Amsterdam"; # avoid 02:00-03:00 because of DST ambiguity
 			script = ''
 				vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
 				schijven=$(df -h | fgrep -v tmp)
