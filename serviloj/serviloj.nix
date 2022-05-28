@@ -110,10 +110,10 @@ in {
 		systemd.services.dagelijks-rapport = {
 			serviceConfig.Type = "oneshot";
 			script = ''
-				# vandaag=$(LC_TIME=nl_NL.UTF8 date '+%A')
+				vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
 				schijven=$(df -h | fgrep -v tmp)
 				gebruik=$(find / -mindepth 1 -maxdepth 1 -a -not -name mnt | xargs du -hs | sort -hr)
-				${pkgs.mailutils}/bin/mail -s "[gently] overzichtje" jeroen@lwstn.eu <<-EOF
+				${pkgs.mailutils}/bin/mail -s "[gently] overzicht voor $vandaag" jeroen@lwstn.eu <<-EOF
 					Hoi,
 
 					Zo staat het met de schijfruimte:
