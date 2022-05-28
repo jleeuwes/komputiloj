@@ -102,13 +102,9 @@ in {
 			'';
 		};
 
-		systemd.timers.dagelijks-rapport = {
-			wantedBy = [ "timers.target" ];
-			partOf = [ "dagelijks-rapport.service" ];
-			timerConfig.OnCalendar = "17:00";
-		};
 		systemd.services.dagelijks-rapport = {
 			serviceConfig.Type = "oneshot";
+			startAt = "17:00";
 			script = ''
 				vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
 				schijven=$(df -h | fgrep -v tmp)
@@ -128,13 +124,9 @@ in {
 				EOF
 			'';
 		};
-		systemd.timers.check-disk-usage = {
-			wantedBy = [ "timers.target" ];
-			partOf = [ "check-disk-usage.service" ];
-			timerConfig.OnCalendar = "*:0,15,30,45";
-		};
 		systemd.services.check-disk-usage = {
 			serviceConfig.Type = "oneshot";
+			startAt = "*:0,15,30,45";
 			script = ''
 				problems=$(df -h | egrep '(100|9[0-9])%')
 				if [ $? -eq 0 ]; then
