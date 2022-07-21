@@ -206,6 +206,12 @@ in {
 			groups.vmail = {
 				gid = 70002;
 			};
+			users.gorinchemindialoog = {
+				isNormalUser = true;
+				createHome = false;
+				uid = 1001;
+				passwordFile = "/run/keys/account-gorinchemindialoog";
+			};
 		};
 
 		networking = {

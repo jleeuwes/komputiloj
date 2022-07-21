@@ -8,7 +8,7 @@ set -o noclobber
 # Hackily on-the-fly 'install' some tools.
 # We should really make a package out of this.
 CMD_GPG=$(nix-build --no-out-link --attr gnupg '<nixpkgs>')/bin/gpg2
-CMD_HTPASSWD=$(nix-build --no-out-link --attr apacheHttpd '<nixpkgs>')/bin/htpasswd
+# CMD_HTPASSWD=$(nix-build --no-out-link --attr apacheHttpd '<nixpkgs>')/bin/htpasswd
 
 # Identity to sign with and to always encrypt for:
 ME=jeroen@lwstn.eu
@@ -145,13 +145,17 @@ show_plain_multi() {
 	printf "%s: %s" "$1" "$2"
 }
 show_hashed_single() {
-	# We use bcrypt, which is more costly than SHA.
-	# That way the output is as robust as possible to offline brute-forcing.
-	# This is the reason we use Apache's htpasswd instead of the more standard mkpasswd.
-	printf '%s' "$2" | "$CMD_HTPASSWD" -niB "$1" | cut -d: -f2 | tr -d $'\n'
+	printf '%s' "$2" | mkpasswd --stdin --method=sha512crypt | tr -d %'\n'
+	# Alternative using Apache's htpasswd, which uses bcrypt which is more
+	# robust against offline brute-forcing, but does not seem to be supported
+	# for use in /etc/shadow
+	# printf '%s' "$2" | "$CMD_HTPASSWD" -niB "$1" | cut -d: -f2 | tr -d $'\n'
 }
 show_hashed_multi() {
-	printf '%s' "$2" | "$CMD_HTPASSWD" -niB "$1" | tr -d $'\n'
+	printf "%s: " "$1"
+	printf '%s' "$2" | mkpasswd --stdin --method=sha512crypt | tr -d $'\n'
+	# Alternative using Apache's htpasswd (see above)
+	# printf '%s' "$2" | "$CMD_HTPASSWD" -niB "$1" | tr -d $'\n'
 }
 
 
