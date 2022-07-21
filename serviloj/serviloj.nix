@@ -209,6 +209,7 @@ in {
 			users.gorinchemindialoog = {
 				isNormalUser = true;
 				createHome = false;
+				home = "/mnt/storage/live/gorinchemindialoog/home";
 				uid = 1001;
 				passwordFile = "/run/keys/account-gorinchemindialoog";
 			};
@@ -262,6 +263,11 @@ in {
 					locations."/" = {
 						proxyPass = "http://localhost:3000";
 					};
+				};
+				"www2.gorinchemindialoog.nl" = {
+					forceSSL = true;
+					enableACME = true;
+					root = "/mnt/storage/live/gorinchemindialoog/home/Website/Live";
 				};
 			};
 		};
