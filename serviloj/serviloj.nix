@@ -168,7 +168,16 @@ in {
 			interval = "weekly";
 		};
 
-		services.openssh.enable = true;
+		services.openssh = {
+			enable = true;
+			extraConfig = ''
+				Match Group sftp_only
+					ChrootDirectory %h
+					ForceCommand internal-sftp
+					AllowTcpForwarding no
+			'';
+		};
+
 		users = {
 			users.root = {
 				passwordFile = "/root/password"; # must be present on the machine
@@ -206,12 +215,16 @@ in {
 			groups.vmail = {
 				gid = 70002;
 			};
+			groups.sftp_only = {
+				gid = 2001;
+			};
 			users.gorinchemindialoog = {
 				isNormalUser = true;
 				createHome = false;
 				home = "/mnt/storage/live/gorinchemindialoog/home";
 				uid = 1001;
 				passwordFile = "/run/keys/account-gorinchemindialoog";
+				extraGroups = [ "sftp_only" ];
 			};
 		};
 
