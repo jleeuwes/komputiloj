@@ -2,6 +2,8 @@
 # TODO https://github.com/NixOS/nixpkgs/issues/62832
 # and/or use our own fork of nixpkgs
 
+let sources = import <sources>;
+in
 { config, pkgs, lib, ... }:
 
 {
@@ -11,15 +13,20 @@
 	# nix.extraOptions = ''
 	# 	plugin-files = ${pkgs.nix-plugins.override { nix = config.nix.package; }}/lib/nix/plugins/libnix-extra-builtins.so
 	# '';
+	
+	# https://github.com/NixOS/nixpkgs/issues/62832#issuecomment-500198852
+	nix.nixPath = [
+		"nixpkgs=${<nixpkgs>}"
+		"unstable=${sources.unstable.unpacked}"
+		"nixos_18_09=${sources.nixos_18_09.unpacked}"
+	];
 
 	nixpkgs.config = {
 		packageOverrides = pkgs: {
-			# You need to first add the nixos-unstable channel as 'unstable' using nix-channel
-			unstable = import <unstable> {
+			unstable = import sources.unstable.unpacked {
 				config = config.nixpkgs.config;
 			};
-			# You need to first add a nixos-18.09 channel called nixos_18_09 using nix-channel
-			nixos_18_09 = import <nixos_18_09> {
+			nixos_18_09 = import sources.nixos_18_09.unpacked {
 				config = config.nixpkgs.config;
 			};
 		};

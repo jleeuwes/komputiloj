@@ -19,7 +19,7 @@ and maybe someone might find something useful in there for their own config.
     mkdir -p /etc/nixos
     sudo ln -s ~/komputiloj/scarif/etc/nixos/* /etc/nixos/
     ```
-3. (Re)build the NixOS configuration with `nixos-rebuild --switch`
+3. (Re)build the NixOS configuration with `~/komputiloj/nixos-rebuild --switch`
 4. Add a bunch of symlinks from `~` to files/dirs in `~/komputiloj/scarif/home/jeroen`
    (use `ls -A ~/komputiloj/scarif/home/jeroen` to see all the dotfiles).
 
