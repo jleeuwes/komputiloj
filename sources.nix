@@ -13,11 +13,21 @@
 # 
 # TODO: implement a script that can update these 'channels' based on channel_url.
 #       Maybe useful: https://unix.stackexchange.com/questions/45325/get-urls-redirect-target-with-curl
+# 
+# Currently, to update:
+#
+# 1. Go to the channel_url
+# 2. Put the url to which you are redirected in current_url, appending /nixexprs.tar.xz
+# 3. Call `nix-prefetch-url --unpack` with the current_url
+#    and put the resulting hash in current_sha.
+#    WARNING: if you forget to update the hash, nix will keep using the old unpacked tarball, as long as it is available.
+#
+# TODO: we might need to do some trickery to make sure the actively used channels are not gc'ed:
+# https://discourse.nixos.org/t/pinned-nixpkgs-keeps-getting-garbage-collected/12912/6
 rec {
 	nixos_18_09 = rec {
 		channel_url = "https://channels.nixos.org/nixos-18.09";
 		current_url = "https://releases.nixos.org/nixos/18.09/nixos-18.09.2574.a7e559a5504/nixexprs.tar.xz";
-		# This needs to be obtained with nix-prefetch-url --unpack - you can't use the hash listed
 		current_sha = "0f3y936zqblzvl76gpd9awamfyxxqck3y6z82hsq50d3bmb779zx";
 		unpacked = builtins.fetchTarball {
 			url = current_url; # "https://releases.nixos.org/nixos/18.09/nixos-18.09.2574.a7e559a5504/nixexprs.tar.xz";
@@ -27,7 +37,6 @@ rec {
 	nixpkgs = rec {
 		channel_url = "https://channels.nixos.org/nixos-21.05";
 		current_url = "https://releases.nixos.org/nixos/21.05/nixos-21.05.4735.7ca652795e3/nixexprs.tar.xz";
-		# This needs to be obtained with nix-prefetch-url --unpack - you can't use the hash listed
 		current_sha = "16kwvgw2pb5pz8zbhyixsr4gwbaxyig567sk066rlr0na2lkv18m";
 		unpacked = builtins.fetchTarball {
 			url = current_url;
