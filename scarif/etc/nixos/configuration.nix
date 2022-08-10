@@ -164,7 +164,7 @@ in
 		dejsonlz4 # for reading firefox jsonlz4 files
 		remarshal # for yaml2json etc
 		jq # json manipulation
-		unstable.android-studio
+		# unstable.android-studio
 		jetbrains.idea-community
 		openjdk11 maven visualvm
 		love_11
