@@ -1,4 +1,9 @@
 
+# work around https://github.com/NixOS/nixpkgs/issues/119513
+if [ -z $_XPROFILE_SOURCED ]; then
+export _XPROFILE_SOURCED=1
+
+
 # Make sure our .cache-dir is not on SSD but in-memory
 # So for instance Firefox doesn't trash our SSD
 # (Assuming /tmp is in-memory)
@@ -28,8 +33,12 @@ unset SSH_AGENT_PID
 export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 gpg-agent --daemon
 
-# Remove ugly X root cursor
-xsetroot -cursor_name left_ptr
+# Remove ugly X root cursor.
+# This seems no longer necessary since NixOS 21.05.
+# In fact, running this command at this point results in a black pointer cursor.
+# Running the same command from a terminal within the X session fixes the cursor again.
+# But just *not* running the command at all already yields the correct cursor.
+# xsetroot -cursor_name left_ptr
 
 # Make Java applications work
 export _JAVA_AWT_WM_NONREPARENTING=1
@@ -37,3 +46,10 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 # Hide the mouse when inactive:
 unclutter --timeout 2 &
 
+
+# end of workaround
+else
+# Note: this log will end up in journalctl but not in .xsessions-errors,
+# since the latter is truncated by the second sourcing of .xprofile
+echo ".xprofile was already sourced, skipping" >&2
+fi

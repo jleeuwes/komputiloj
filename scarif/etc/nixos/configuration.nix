@@ -68,8 +68,11 @@ in
 	# };
 
 	networking.hostName = "scarif";
-	networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+	networking.wireless = {
+		enable = true;  # Enables wireless support via wpa_supplicant.
+		interfaces = [ "wlp4s0" ];
 	# Netwerken staan in /etc/wpa_supplicant.conf vanwege passphrases
+	};
 	networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
 	# Select internationalisation properties.
@@ -324,8 +327,8 @@ ctl.pulse {
 		# touchpad
 		# (this was synaptics before, but I had to change to libinput
 		# because xfce demands it, and it turns out to work better. Yay!)
-		libinput = {
-			enable = true;
+		libinput.enable = true;
+		libinput.touchpad = {
 			scrollMethod = "twofinger";
 			sendEventsMode = "disabled-on-external-mouse";
 			tapping = false;

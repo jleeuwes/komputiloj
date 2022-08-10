@@ -25,10 +25,10 @@ rec {
 		};
 	};
 	nixpkgs = rec {
-		channel_url = "https://channels.nixos.org/nixos-20.09";
-		current_url = "https://releases.nixos.org/nixos/20.09/nixos-20.09.4407.1c1f5649bb9/nixexprs.tar.xz";
+		channel_url = "https://channels.nixos.org/nixos-21.05";
+		current_url = "https://releases.nixos.org/nixos/21.05/nixos-21.05.4735.7ca652795e3/nixexprs.tar.xz";
 		# This needs to be obtained with nix-prefetch-url --unpack - you can't use the hash listed
-		current_sha = "17k7lac5gkfs8fz0ynw6wbgbqx1qsgzgdilggq7rqylm9b4nn6iw";
+		current_sha = "16kwvgw2pb5pz8zbhyixsr4gwbaxyig567sk066rlr0na2lkv18m";
 		unpacked = builtins.fetchTarball {
 			url = current_url;
 			sha256 = current_sha;
