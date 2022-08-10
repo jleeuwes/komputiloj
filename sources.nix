@@ -35,9 +35,9 @@ rec {
 		};
 	};
 	nixpkgs = rec {
-		channel_url = "https://channels.nixos.org/nixos-21.05";
-		current_url = "https://releases.nixos.org/nixos/21.05/nixos-21.05.4735.7ca652795e3/nixexprs.tar.xz";
-		current_sha = "16kwvgw2pb5pz8zbhyixsr4gwbaxyig567sk066rlr0na2lkv18m";
+		channel_url = "https://channels.nixos.org/nixos-21.11";
+		current_url = "https://releases.nixos.org/nixos/21.11/nixos-21.11.337975.eabc3821918/nixexprs.tar.xz";
+		current_sha = "1fq3zz7qfavksdbqvicns7hg61q3hhbxs2ibm818gy629hwkvsvm";
 		unpacked = builtins.fetchTarball {
 			url = current_url;
 			sha256 = current_sha;

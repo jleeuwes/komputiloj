@@ -36,6 +36,13 @@ in
 		allowUnfreePredicate = pkg:
 			builtins.match "android-studio-.*" (lib.getName pkg) != null
 		;
+
+		# Selectively allow some packages with known vulnerabilities
+		# - https://nixos.org/manual/nixpkgs/stable/#sec-allow-insecure
+		permittedInsecurePackages = [
+			"python2.7-urllib3-1.26.2" # used by... something? TODO get rid of it
+			"python2.7-PyJWT-1.7.1"    # TODO get rid of this
+		];
 	};
 
 	imports =
@@ -229,8 +236,18 @@ in
 
 	# Generate setuid wrappers for pmount:
 	security.wrappers = {
-		pmount.source  = "${pkgs.pmount}/bin/pmount";
-		pumount.source = "${pkgs.pmount}/bin/pumount";
+		pmount = {
+			source  = "${pkgs.pmount}/bin/pmount";
+			setuid = true;
+			owner = "root";
+			group = "root";
+		};
+		pumount = {
+			source = "${pkgs.pmount}/bin/pumount";
+			setuid = true;
+			owner = "root";
+			group = "root";
+		};
 	};
 
 	# List services that you want to enable:
