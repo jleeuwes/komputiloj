@@ -11,16 +11,9 @@
 # - https://nixos.wiki/wiki/How_to_fetch_Nixpkgs_with_an_empty_NIX_PATH
 # - https://nix.dev/reference/pinning-nixpkgs
 # 
-# TODO: implement a script that can update these 'channels' based on channel_url.
-#       Maybe useful: https://unix.stackexchange.com/questions/45325/get-urls-redirect-target-with-curl
-# 
-# Currently, to update:
-#
-# 1. Go to the channel_url
-# 2. Put the url to which you are redirected in current_url, appending /nixexprs.tar.xz
-# 3. Call `nix-prefetch-url --unpack` with the current_url
-#    and put the resulting hash in current_sha.
-#    WARNING: if you forget to update the hash, nix will keep using the old unpacked tarball, as long as it is available.
+# To update, run `nixos-fetch-channel nixos-xx.yy`
+# and paste the result into the relevant nix expression below.
+# TODO automate this to make it effortless.
 #
 # TODO: we might need to do some trickery to make sure the actively used channels are not gc'ed:
 # https://discourse.nixos.org/t/pinned-nixpkgs-keeps-getting-garbage-collected/12912/6
