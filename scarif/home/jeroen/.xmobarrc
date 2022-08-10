@@ -1,4 +1,4 @@
-Config { font = "xft:DejaVu Sans Mono:size=13"
+Config { font = "xft:DejaVu Sans Mono:size=11"
        , bgColor = "black"
        , fgColor = "white"
        , position = Top
@@ -21,9 +21,10 @@ Config { font = "xft:DejaVu Sans Mono:size=13"
               "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
               "-t", "<fc=#a0e0f0><essid></fc>≈<quality>"] 10
           , Run Com "/home/jeroen/bin/xmobar-selection" [] "xsel" 10
+          , Run Com "/home/jeroen/bin/visual-agent-status" [] "keys" 10
           , Run StdinReader
           ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " %StdinReader% }{ <fc=#a0a0a0>%xsel%</fc> %wlp4s0wi% <fc=#a0e0f0>⚒-</fc> %BAT1% %BAT0% %date%"
+       , template = " %StdinReader% }{ <fc=#a0a0a0>%xsel%</fc> %wlp4s0wi% <fc=#e0e070>%keys%</fc> %BAT1% %BAT0% %date%"
        }

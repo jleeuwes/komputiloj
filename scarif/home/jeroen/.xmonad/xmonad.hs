@@ -400,7 +400,7 @@ withIndex f = f . index
 runDmenu cmd = safeSpawn cmd dmenu_opts
   where
     dmenu_opts
-      = ["-nb", "#000", "-nf", "#fff", "-sb", "#fff", "-sf", "#000", "-fn", "inconsolata:size=14"]
+      = ["-b", "-nb", "#000", "-nf", "#fff", "-sb", "#fff", "-sf", "#000", "-fn", "inconsolata:size=14"]
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
