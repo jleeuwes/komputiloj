@@ -124,8 +124,8 @@ in
 	environment.systemPackages = let
 		# this incomprehensible magic incantation was conjured by TheMsDosNerd at https://www.reddit.com/r/NixOS/comments/8cq4ic/problem_installing_python_package/
 		myPythonPackages = pythonPackages: with pythonPackages; [
-				flask
-				flask-api
+				# flask
+				# flask-api
 		]; in with pkgs; [
 		nixops
 		mkpasswd
