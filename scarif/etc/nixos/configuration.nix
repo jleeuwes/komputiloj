@@ -130,15 +130,17 @@ in
 		# gtk
 		hicolor_icon_theme xfce.xfce4icontheme tango-icon-theme
 		# usefull programs:
-		gitFull vim file subversionClient pciutils pmount parted squashfsTools
+		gitFull vim file subversionClient pciutils pmount squashfsTools
+		parted gparted
 		wget rtorrent
 		unstable.gitAndTools.git-annex
 		rclone
 		sshpass
 		gnupg paperkey qrencode zbar pwgen
 		telnet # for ftp for the nas
-		# TODO rclone (is now installed locally)
 		openssl
+		ncat
+		tree
 
 		pamix pavucontrol alsaUtils
 		zstd # for unpacking arch packages
@@ -174,7 +176,7 @@ in
 		qpdf pdftk
 
 		firefox thunderbird
-		isync # for e-mail backups
+		isync # for e-mail backups (eigenlijk mbsync)
 		chromium
 		geany
 		zathura # pdf viewer
