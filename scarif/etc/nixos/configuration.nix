@@ -34,14 +34,16 @@ in
 		# Selectively allow some unfree packages
 		# - https://nixos.org/nixpkgs/manual/#sec-allow-unfree
 		allowUnfreePredicate = pkg:
-			builtins.match "android-studio-.*" (lib.getName pkg) != null
-		;
+			builtins.elem (lib.getName pkg) [
+				"steam-original"
+				"android-studio"
+			];
 
 		# Selectively allow some packages with known vulnerabilities
 		# - https://nixos.org/manual/nixpkgs/stable/#sec-allow-insecure
 		permittedInsecurePackages = [
 			"python2.7-urllib3-1.26.2" # used by... something? TODO get rid of it
-			"python2.7-PyJWT-1.7.1"    # TODO get rid of this
+			"python2.7-pyjwt-1.7.1"    # TODO get rid of this
 		];
 	};
 
@@ -138,7 +140,7 @@ in
 		# prettiness ( more inspiration at https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 and https://stackoverflow.com/questions/38576616/how-to-install-gtk-themes-under-nixos-without-hacky-scripts )
 		# gtk-engine-murrine arc-theme arc-icon-theme elementary-icon-theme
 		# gtk
-		hicolor_icon_theme xfce.xfce4icontheme tango-icon-theme
+		hicolor-icon-theme xfce.xfce4-icon-theme tango-icon-theme
 		# usefull programs:
 		gitFull vim file subversionClient pciutils pmount squashfsTools
 		parted gparted
@@ -147,9 +149,9 @@ in
 		rclone
 		sshpass
 		gnupg paperkey qrencode zbar pwgen
-		telnet # for ftp for the nas
+		inetutils # for ftp for the nas
 		openssl
-		ncat
+		nmap
 		tree
 
 		pamix pavucontrol alsaUtils
@@ -164,7 +166,7 @@ in
 		#     scanimage -d pixma:04A91824_214FE1 --batch=scan%02d.png --format tiff --batch-start 1 --batch-double --batch-count 3 --source "Automatic Document Feeder"
 		# But it gives "scanimage: sane_read: Operation was cancelled"
 		# - this is probably related to https://gitlab.com/sane-project/backends/-/merge_requests/213
-		saneBackends saneFrontends
+		sane-backends sane-frontends
 		
 		# programming:
 		(python3.withPackages myPythonPackages)
@@ -195,7 +197,7 @@ in
 		# xfce stuff:
 		# support stuff (needed for generating thumbnails for instance - maar het werkt voor geen zak)
 		xfce.exo xfce.xfconf # xfce.xfce4settings
-		shared_mime_info xfce.tumbler # <- these two in particular seemed to do the trick!
+		shared-mime-info xfce.tumbler # <- these two in particular seemed to do the trick!
 		# mindmapping-tools:
 		vym freemind
 		vlc ffmpeg
@@ -215,7 +217,7 @@ in
 		pstree
 		
 		# actual programs:
-		xfce.terminal xfce.thunar xfce.ristretto
+		xfce.xfce4-terminal xfce.thunar xfce.ristretto
 		# Belgian eID (it looks in /run/current-system/sw/ by default for some things so it's easier to have it installed system-wide):
 		eid-mw
 
@@ -323,18 +325,18 @@ ctl.pulse {
 			size = 32;
 		};
 
-		displayManager.sessionCommands = ''
-			# # ( adapted from https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 )
-			# # (lijkt allemaal voor geen flikker te werken)
-			# # This allows GTK to load SVG icons.
-			# export GDK_PIXBUF_MODULE_FILE=$(echo ${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/*/loaders.cache)
-			# # Set GTK_PATH so that GTK+ can find the Xfce theme engine.
-			# export GTK_PATH=${pkgs.gtk-engine-murrine}/lib/gtk-2.0
-			# # Set GTK_DATA_PREFIX so that GTK+ can find the Xfce themes.
-			# export GTK_DATA_PREFIX=${config.system.path}
-			# # Launch xfce settings daemon.
-			# ${pkgs.xfce.xfce4settings}/bin/xfsettingsd &
-		'';
+		# displayManager.sessionCommands = ''
+		# 	# ( adapted from https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 )
+		# 	# (lijkt allemaal voor geen flikker te werken)
+		# 	# This allows GTK to load SVG icons.
+		# 	export GDK_PIXBUF_MODULE_FILE=$(echo ${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/*/loaders.cache)
+		# 	# Set GTK_PATH so that GTK+ can find the Xfce theme engine.
+		# 	export GTK_PATH=${pkgs.gtk-engine-murrine}/lib/gtk-2.0
+		# 	# Set GTK_DATA_PREFIX so that GTK+ can find the Xfce themes.
+		# 	export GTK_DATA_PREFIX=${config.system.path}
+		# 	# Launch xfce settings daemon.
+		# 	${pkgs.xfce.xfce4-settings}/bin/xfsettingsd &
+		# '';
 
 		windowManager.xmonad.enable = true;
 		windowManager.xmonad.enableContribAndExtras = true;

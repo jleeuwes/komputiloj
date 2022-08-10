@@ -347,7 +347,7 @@ main = statusBar "xmobar" myPP toggleStrutsKey myConfig
 -- ...
 -- ▪ ↓ ⋅ ▼ ◆ ● ◉ ○ ◌ ◎
 myPP :: PP
-myPP = defaultPP
+myPP = def
   { ppCurrent         = withIndex $ \i -> xmobarColor "#000000" (workspaceColor i) " ● " -- (workspaceText Hi i)
   , ppVisible         = withIndex $ \i -> xmobarColor "#000000" (workspaceColor i) " ◉ " -- whatever, we don't use xinerama
   , ppHidden          = withIndex $ \i -> xmobarColor "#000000" (workspaceColor i) " ○ "
@@ -408,7 +408,7 @@ runDmenu cmd = safeSpawn cmd dmenu_opts
 --
 -- No need to modify this.
 --
-myConfig = defaultConfig {
+myConfig = def {
       -- simple stuff
         terminal           = "xfce4-terminal",
         focusFollowsMouse  = True,
