@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+sudo -v # getting sudo early
+echo "Here are the current system generations:"
+echo
+sudo nix-env -p /nix/var/nix/profiles/system --list-generations
+echo
+echo "To delete:"
+echo "    sudo nix-env -p /nix/var/nix/profiles/system --delete-generations NUMBER..."
+echo "    sudo nix-collect-garbage"
