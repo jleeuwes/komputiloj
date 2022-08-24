@@ -11,38 +11,20 @@
 # - https://nixos.wiki/wiki/How_to_fetch_Nixpkgs_with_an_empty_NIX_PATH
 # - https://nix.dev/reference/pinning-nixpkgs
 # 
-# To update, run `nixos-fetch-channel nixos-xx.yy`
-# and paste the result into the relevant nix expression below.
-# TODO automate this to make it effortless.
+# To update, run `update-sources`,
+# then rebuild nixos.
 #
 # TODO: we might need to do some trickery to make sure the actively used channels are not gc'ed:
 # https://discourse.nixos.org/t/pinned-nixpkgs-keeps-getting-garbage-collected/12912/6
-rec {
-	nixos_18_09 = rec {
-		channel_url = "https://channels.nixos.org/nixos-18.09";
-		current_url = "https://releases.nixos.org/nixos/18.09/nixos-18.09.2574.a7e559a5504/nixexprs.tar.xz";
-		current_sha = "0f3y936zqblzvl76gpd9awamfyxxqck3y6z82hsq50d3bmb779zx";
-		unpacked = builtins.fetchTarball {
-			url = current_url; # "https://releases.nixos.org/nixos/18.09/nixos-18.09.2574.a7e559a5504/nixexprs.tar.xz";
-			sha256 = current_sha; # "0f3y936zqblzvl76gpd9awamfyxxqck3y6z82hsq50d3bmb779zx";
-		};
-	};
-	nixpkgs = rec {
-		channel_url = "https://channels.nixos.org/nixos-22.05";
-		current_url = "https://releases.nixos.org/nixos/22.05/nixos-22.05.2340.490f6174c03/nixexprs.tar.xz";
-		current_sha = "0jagkrrv62fvgxbpvvpph5w3mn8ljywf3cf7jraibcczf3q1zc7c";
+let
+	channel_dirs = builtins.attrNames (builtins.readDir ./sources.d);
+	channel = (channel_dir: rec {
+		current_url = builtins.readFile ./sources.d/${channel_dir}/current_url;
+		current_sha = builtins.readFile ./sources.d/${channel_dir}/current_sha;
 		unpacked = builtins.fetchTarball {
 			url = current_url;
 			sha256 = current_sha;
 		};
-	};
-	unstable = rec {
-		channel_url = "https://channels.nixos.org/nixos-unstable";
-		current_url = "https://releases.nixos.org/nixos/unstable/nixos-22.11pre396557.5857574d459/nixexprs.tar.xz";
-		current_sha = "16l0k5w5xb5d3jiiqc4jdhxn3szbsccs3i2lr7gbwdqafq6lnxwh";
-		unpacked = builtins.fetchTarball {
-			url = current_url;
-			sha256 = current_sha;
-		};
-	};
-}
+	});
+in
+builtins.listToAttrs (map (channel_dir: {name = channel_dir; value = channel channel_dir;}) channel_dirs)
