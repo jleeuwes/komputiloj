@@ -255,14 +255,7 @@ Now update your NixOps deployment and deploy!
 
 ## Upgrading
 
-Upgrade within same NixOS version:
-
-	cd ~/komputiloj
-	git submodule update --remote nixpkgs
-	./deploy
-
-To upgrade the NixOS version, first change the branch in `.gitmodules`,
-then run the above.
+See [the general readme](../README.md).
 
 ## Other ways
 

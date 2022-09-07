@@ -1,10 +1,12 @@
 let
+	sources = import ../sources.nix;
 	util = import ./util.nix;
 	gorinchemindialoog = import ./gorinchemindialoog/serviloj.nix;
 in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
 	network.description = "Our humble all-encompassing serviloj deployment";
+	network.nixpkgs = import sources.nixos_21_11.unpacked {};
 
 	# TODO quota
 	# TODO monitoring:

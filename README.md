@@ -11,15 +11,15 @@ and maybe someone might find something useful in there for their own config.
     cd
     git clone git@github.com:jleeuwes/komputiloj.git
     cd komputiloj
-    git submodule init    # only for serviloj at the moment
-    git submodule update  # only for serviloj at the moment
+    git submodule init    # some external repo(s) used by serviloj
+    git submodule update  # some external repo(s) used by serviloj at the moment
     ```
 2. Make some symlinks:
     ```
     mkdir -p /etc/nixos
     sudo ln -s ~/komputiloj/scarif/etc/nixos/* /etc/nixos/
     ```
-3. (Re)build the NixOS configuration with `~/komputiloj/nixos-rebuild --switch`
+3. (Re)build the NixOS configuration with `~/komputiloj/nixos-rebuild switch`
 4. Add a bunch of symlinks from `~` to files/dirs in `~/komputiloj/scarif/home/jeroen`
    (use `ls -A ~/komputiloj/scarif/home/jeroen` to see all the dotfiles).
 
@@ -27,6 +27,26 @@ and maybe someone might find something useful in there for their own config.
 stuff. See <https://github.com/argumatronic/home-nixos> and
 <https://www.reddit.com/r/NixOS/comments/6zn5tv/manage_nixos_config_from_git_without_having_to/>
 for some good (and bad) ideas.)
+
+## Upgrading
+
+Upgrade within same NixOS version:
+
+	cd ~/komputiloj
+	./update-sources
+	./nixos-rebuild switch # local machine
+	cd serviloj
+	./deploy               # server(s)
+
+To upgrade the NixOS version for the local machine,
+change the version in `~/komputiloj/sources.d/nixpkgs/channel_url`,
+then run the above commands.
+
+To upgrade the NixOS version for our servers,
+change `network.nixpkgs` in `serviloj.nix` to the major version you want,
+then run the above.
+TODO switch serviloj over to the nixpkgs 'channel' as well,
+so local and remote machines are on the same major version.
 
 ## Private/non-config data
 

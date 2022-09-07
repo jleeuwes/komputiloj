@@ -5,9 +5,9 @@ set -o pipefail
 
 set -o noclobber
 
-# Hackily on-the-fly 'install' some tools.
+# We rely on tools in PATH.
 # We should really make a package out of this.
-CMD_GPG=$(nix-build --no-out-link --attr gnupg '<nixpkgs>')/bin/gpg2
+CMD_GPG=gpg2
 # CMD_HTPASSWD=$(nix-build --no-out-link --attr apacheHttpd '<nixpkgs>')/bin/htpasswd
 
 # Identity to sign with and to always encrypt for:
