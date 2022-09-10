@@ -1,5 +1,5 @@
 # This is not a Nix concept, but a roll-your-own pinning system that replaces channels.
-# Entries are used as a kind of channels in our configuration.nix.
+# Sources are used as a kind of channels in our configuration.nix.
 # One entry, which must be named nixpkgs, is special:
 # nixos-rebuild is hardcoded to load <nixpkgs/nixos>, which in turn loads our configuration.nix,
 # so by the time configuration.nix is evaluated, the 'main' nixpkgs is already chosen.
@@ -14,17 +14,19 @@
 # To update, run `update-sources`,
 # then rebuild nixos.
 #
-# TODO: we might need to do some trickery to make sure the actively used channels are not gc'ed:
+# TODO: we might need to do some trickery to make sure the actively used sources are not gc'ed:
 # https://discourse.nixos.org/t/pinned-nixpkgs-keeps-getting-garbage-collected/12912/6
+with builtins;
+with (import ./util.nix);
 let
-	channel_dirs = builtins.attrNames (builtins.readDir ./sources.d);
-	channel = (channel_dir: rec {
-		current_url = builtins.readFile ./sources.d/${channel_dir}/current_url;
-		current_sha = builtins.readFile ./sources.d/${channel_dir}/current_sha;
-		unpacked = builtins.fetchTarball {
+	source_dirs = attrNames (filterAttrs (d: d.value == "directory") (readDir ./sources.d));
+	source = (source_dir: rec {
+		current_url = readFile ./sources.d/${source_dir}/current_url;
+		current_sha = readFile ./sources.d/${source_dir}/current_sha;
+		unpacked = fetchTarball {
 			url = current_url;
 			sha256 = current_sha;
 		};
 	});
 in
-builtins.listToAttrs (map (channel_dir: {name = channel_dir; value = channel channel_dir;}) channel_dirs)
+listToAttrs (map (source_dir: {name = source_dir; value = source source_dir;}) source_dirs)

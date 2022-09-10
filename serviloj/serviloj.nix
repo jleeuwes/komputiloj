@@ -1,6 +1,6 @@
 let
 	sources = import ../sources.nix;
-	util = import ./util.nix;
+	util = import ../util.nix;
 	gorinchemindialoog = import ./gorinchemindialoog/serviloj.nix;
 in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix

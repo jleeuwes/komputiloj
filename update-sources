@@ -2,18 +2,17 @@
 
 set -Eeu -o pipefail
 
-for channel_dir in ~/komputiloj/sources.d/*; do
-	channel_url=$(cat -- "$channel_dir"/channel_url)
-	current_overview_url=$(curl --head --silent --write-out "%{redirect_url}\n" --output /dev/null "$channel_url")
-	if [[ -z "$current_overview_url" ]]; then
-		echo "Could not determine current url for channel $channel_url" >&2
-		echo "Likely cause: a typo in the channel name." >&2
-		echo "Less likely cause: a change in nixos.org redirect structure." >&2
-		exit 2
+for source_dir in ~/komputiloj/sources.d/*; do
+	if [[ -d "$source_dir" ]]; then
+	(
+		cd -- "$source_dir"
+		if [[ -x update ]]; then
+			printf "Updating source %s\n" "$source_dir" >&2
+			./update
+		else
+			printf "Skipping source without update script: %s\n" "$source_dir" >&2
+		fi
+	)
 	fi
-	current_url="$current_overview_url"/nixexprs.tar.xz
-	current_sha=$(nix-prefetch-url --unpack "$current_url")
-	printf "%s" "$current_url" > "$channel_dir"/current_url
-	printf "%s" "$current_sha" > "$channel_dir"/current_sha
 done
 

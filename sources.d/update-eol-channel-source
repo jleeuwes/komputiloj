@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+printf "!!! %s no longer receives updates. Please stop using it !!!\n" "$(basename -- "$PWD")" >&2
+
