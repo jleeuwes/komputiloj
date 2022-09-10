@@ -1,7 +1,3 @@
-
-# TODO https://github.com/NixOS/nixpkgs/issues/62832
-# and/or use our own fork of nixpkgs
-
 let sources = import <sources>;
 in
 { config, pkgs, lib, ... }:
@@ -14,11 +10,18 @@ in
 	# 	plugin-files = ${pkgs.nix-plugins.override { nix = config.nix.package; }}/lib/nix/plugins/libnix-extra-builtins.so
 	# '';
 	
-	# https://github.com/NixOS/nixpkgs/issues/62832#issuecomment-500198852
+	# We need to construct our own NIX_PATH, because the default becomes very weird with our scheme.
+	# Also, make sure you don't have a ~/.nix-defexpr because that gets added
+	# too (see /etc/set-environment).
 	nix.nixPath = [
-		"nixpkgs=${<nixpkgs>}"
-		"unstable=${sources.unstable.unpacked}"
-		"nixos_18_09=${sources.nixos_18_09.unpacked}"
+		# First, reconstruct the NIX_PATH defined by with-pinned-NIX_PATH.
+		# This assumes no extra paths are added there in the future.
+		# Don't do ${<sources>}, because that makes a weird non-working copy of
+		# our sources.nix in the nix-store. With toString the literal path is
+		# used instead.
+		"sources=${builtins.toString <sources>}"
+		"nixpkgs=${sources.nixpkgs.unpacked}"
+		"nixos-config=${builtins.toString <nixos-config>}"
 	];
 
 	nixpkgs.config = {
