@@ -129,7 +129,6 @@ in
 				# flask
 				# flask-api
 		]; in with pkgs; [
-		nixops
 		mkpasswd
 
 		# for running precompiled games:

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-sources_path=/home/jeroen/komputiloj/sources.nix
+set -Eeu -o pipefail
 
-nixpkgs_path=$(nix-instantiate --eval "$sources_path" -A nixpkgs.unpacked | egrep -o '[^"]+')
-export NIX_PATH="sources=$sources_path:nixpkgs=$nixpkgs_path:nixos-config=/etc/nixos/configuration.nix"
-"$@"
+source -- "$(dirname -- "$0")"/_pinned_NIX_PATH.sh
+exec "$@"

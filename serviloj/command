@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -Eeu -o pipefail
+
 cd -- "$(dirname -- "$0")"
 source ./_nixops_settings.sh
 
