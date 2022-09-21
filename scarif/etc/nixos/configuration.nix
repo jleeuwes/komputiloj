@@ -49,6 +49,10 @@ in
 			"python2.7-pyjwt-1.7.1"    # TODO get rid of this
 		];
 	};
+	nixpkgs.overlays = [
+		# Alternative is to make this stuff sources as well. Not sure yet.
+		(import (<komputiloj> + /packages/git-annex-overlay.nix))
+	];
 
 	imports =
 		[ # Include the results of the hardware scan.
@@ -147,8 +151,7 @@ in
 		gitFull vim file subversionClient pciutils pmount squashfsTools
 		parted gparted
 		wget rtorrent
-		unstable.gitAndTools.git-annex
-		rclone
+		unstable.git-annex git-annex-remote-rclone rclone
 		sshpass
 		gnupg paperkey qrencode zbar pwgen
 		inetutils # for ftp for the nas
