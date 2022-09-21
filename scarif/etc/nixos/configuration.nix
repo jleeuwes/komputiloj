@@ -1,4 +1,4 @@
-let sources = import <sources>;
+let sources = import (<komputiloj> + /sources.nix);
 in
 { config, pkgs, lib, ... }:
 
@@ -16,10 +16,10 @@ in
 	nix.nixPath = [
 		# First, reconstruct the NIX_PATH defined by with-pinned-NIX_PATH.
 		# This assumes no extra paths are added there in the future.
-		# Don't do ${<sources>}, because that makes a weird non-working copy of
+		# Don't do ${<komputiloj>}, because that makes a weird non-working copy of
 		# our sources.nix in the nix-store. With toString the literal path is
 		# used instead.
-		"sources=${builtins.toString <sources>}"
+		"komputiloj=${builtins.toString <komputiloj>}"
 		"nixpkgs=${sources.nixpkgs.unpacked}"
 		"nixos-config=${builtins.toString <nixos-config>}"
 	];
