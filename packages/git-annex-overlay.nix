@@ -1,13 +1,13 @@
 # https://nixos.wiki/wiki/Overlays#Overriding_a_version
 self: super: {
 	git-annex-remote-rclone = super.git-annex-remote-rclone.overrideAttrs (old: rec {
-		version = "frankenstein";
-		rev = "79f1a1bbda88238de822f21828cdf3df957dff92";
+		version = "v0.7+1";
+		rev = "0dc3baac40c5c7795fd1c6dac302dfe93f9bd5dd";
 		src = super.fetchFromGitHub {
 			inherit rev;
-			owner = "jleeuwes";
+			owner = "DanielDent";
 			repo = "git-annex-remote-rclone";
-			sha256 = "0c41mbfckwvrb45mhpggs43v6x9js05iyls7vjblpq3d5scmvcwi";
+			sha256 = "1v2jmpapkxf9xzqs0chc2j5x3pw4rjrv2bvadhfspzl3n4myj63l";
 		};
 	});
 }
