@@ -17,6 +17,6 @@ sz() {
 }
 
 # Alias for git add that bypasses git-annex
-# (only relevant in v7 mode which is becoming the default)
-alias ga="git -c annex.largefiles=nothing add"
+# (preferably configure largefiles correctly)
+alias ga="git annex add --force-small"
 
