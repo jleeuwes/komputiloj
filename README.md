@@ -56,7 +56,27 @@ See <file:///home/jeroen/datumoj/README.md>.
 TODO describe setting up datumoj from scratch,
 including access to special remotes.
 
-Also important: [secrets management](secrets-management.md).
+### Disaster recovery
+
+TODO describe the concrete steps and test them.
+
+The git part of datumoj lives on scarif and on gitea (storage volume).
+The full annex content should be in at least two physically separate locations:
+on scarif and on some external remote. Important rules to be able to
+retrieve the content in case of scarif failing:
+
+- The external remote's credentials MUST be stored in the _git_ part of datumoj.
+  If it's part of the annex content, we would have a chicken-and-egg problem:
+  we would need to retrieve datumoj's content in order to retrieve datumoj's content.
+- We MUST have a way to access the git part of datumoj without already having a
+  git checkout of datumoj.
+  So, we need to be able to access our [Hetzner volume](serviloj/README.md),
+  which hosts gitea data.
+  This can be achieved by storing our Hetzner
+  credentials and the LUKS password with our paper private key
+  as described in [secrets management](secrets-management.md).
+  Of course this will need to be kept in sync.
+  TODO how can we 'automate' this?
 
 ## Useful inspiration
 

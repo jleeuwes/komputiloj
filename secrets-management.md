@@ -56,4 +56,5 @@ unattended use by some device configured in komputiloj.
 
 Komputiloj being public and datumoj being duplicated/synchronizated between
 multiple devices will make sure these secrets are backed up.
+(But note that we need to ensure we can always access a copy! See [README.md].)
 
