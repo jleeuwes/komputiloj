@@ -401,6 +401,22 @@ in {
 			disableRegistration = true;
 
 			# mailerPasswordFile = ...;
+			settings = {
+				mailer = {
+					ENABLED = true;
+					FROM = "thee@radstand.nl";
+					# https://docs.gitea.io/en-us/config-cheat-sheet/#mailer-mailer
+					HOST = "localhost:25";
+					SKIP_VERIFY = true; # this is okay, as long as it's localhost
+					# https://github.com/NixOS/nixpkgs/issues/103446
+					# MAILER_TYPE = "sendmail"; # not sure which of...
+					# PROTOCOL = "sendmail";    # ...these two we need
+					# SENDMAIL_PATH = "${pkgs.system-sendmail}/bin/sendmail";
+				};
+				other = {
+					SHOW_FOOTER_VERSION = false;
+				};
+			};
 		};
 
 		mailserver = {
