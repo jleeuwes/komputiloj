@@ -51,11 +51,13 @@ in {
 		# Our deploy script stores this state on gently now to keep the correct stateVersion.
 		# system.stateVersion = lib.mkForce "20.09";
 
+		# TODO shouldn't 'storage-mounted' be a target?
 		systemd.services.mount-storage = {
 			serviceConfig = {
 				Type = "oneshot";
 				RemainAfterExit = true;
 			};
+			# onFailure = [ "failure-mailer@%n.service" ]; # not useful; postfix depends on this service
 			requires = [ "luks-storage-key.service" ];
 			after    = [ "luks-storage-key.service" ];
 			wantedBy = [ "multi-user.target" ];
@@ -105,7 +107,8 @@ in {
 		};
 
 		systemd.services.dagelijks-rapport = {
-			serviceConfig.Type = "oneshot";
+			serviceConfig.Type = "simple";
+			onFailure = [ "failure-mailer@%n.service" ];
 			startAt = "03:00 Europe/Amsterdam"; # avoid 02:00-03:00 because of DST ambiguity
 			script = ''
 				vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
@@ -127,7 +130,8 @@ in {
 			'';
 		};
 		systemd.services.check-disk-usage = {
-			serviceConfig.Type = "oneshot";
+			serviceConfig.Type = "simple";
+			onFailure = [ "failure-mailer@%n.service" ];
 			startAt = "*:0,15,30,45";
 			script = ''
 				problems=$(df -h | egrep '(100|9[0-9])%')
@@ -142,6 +146,59 @@ in {
 						Succes ermee!
 					EOF
 				fi
+			'';
+		};
+		systemd.services.setup-persistent-homedirs = {
+			serviceConfig.Type = "oneshot";
+			onFailure = [ "failure-mailer@%n.service" ];
+			wantedBy = [ "multi-user.target" ];
+			script = ''
+				ln -sfT /mnt/storage/live/home/gorinchemindialoog /home/gorinchemindialoog
+			'';
+		};
+		systemd.services.gorinchemindialoog-autocommit = {
+			serviceConfig = {
+				Type = "simple";
+				User = "gorinchemindialoog";
+			};
+			onFailure = [ "failure-mailer@%n.service" ];
+			startAt = "04:00";
+			requisite = [ "mount-storage.service" ];
+			path = [ pkgs.gitMinimal ];
+			script = ''
+				# The git working tree with the actual website files:
+				export GIT_WORK_TREE=/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live
+				# The git administration dir (normally .git):
+				export GIT_DIR=/mnt/storage/live/home/gorinchemindialoog/website.git
+
+				git add --all
+				stamp=$(LANG=nl_NL.UTF-8 TZ=Europe/Amsterdam date)
+				git commit -m "Autocommit $stamp"
+				git push
+			'';
+			# One-time setup (as gorinchemindialoog, with storage mounted and prepare-chroots done):
+			# 1. Run: ssh-keygen
+			# 2. Add the SSH key to gidbot on thee.radstand.nl
+			# 3. Export the environment variables in the script above.
+			# 4. Run: mkdir -p $GIT_WORK_TREE && git init && git remote add gitea@thee.radstand.nl:gorinchemindialoog/website.git && git fetch origin && git checkout main
+			# 5. Run: git config --global user.email gorinchemindialoog@radstand.nl ; git config --global user.name 'Gorinchem in Dialoog'
+		};
+
+		systemd.services."failure-mailer@" = {
+			serviceConfig.Type = "simple";
+			scriptArgs = "%I";
+			script = ''
+				unit="$1"
+				${pkgs.mailutils}/bin/mail -s "[gently] probleem met $unit" jeroen@lwstn.eu <<-EOF
+					Hoi,
+
+					Ja, dus $unit heeft een ongelukje gehad:
+
+					$(systemctl status -- $unit)
+
+					Succes ermee!
+				EOF
+				
 			'';
 		};
 		
@@ -172,11 +229,19 @@ in {
 
 		services.openssh = {
 			enable = true;
+			knownHosts = {
+				"thee.radstand.nl" = {
+					# Needed for gorinchemindialoog autocommit.
+					# I guess this key is regenerated on gitea install, so we'll have to update this if rebuilding.
+					publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHmMPh91t1reE1ddLcFYyddQs0hx4v41KcaNBS2UVnEA";
+				};
+			};
 			extraConfig = ''
 				Match Group sftp_only
-					ChrootDirectory %h
+					ChrootDirectory /mnt/storage/live/sftp/%u
 					ForceCommand internal-sftp
 					AllowTcpForwarding no
+					X11Forwarding no
 			'';
 		};
 
@@ -223,7 +288,7 @@ in {
 			users.gorinchemindialoog = {
 				isNormalUser = true;
 				createHome = false;
-				home = "/mnt/storage/live/gorinchemindialoog/home";
+				home = "/home/gorinchemindialoog"; # must exist both inside and outside the sftp_only chroot
 				uid = 1001;
 				passwordFile = "/run/keys/account-gorinchemindialoog";
 				extraGroups = [ "sftp_only" ];
@@ -279,10 +344,17 @@ in {
 						proxyPass = "http://localhost:3000";
 					};
 				};
+				# TODO strict transport security (not critical for gorinchemindialoog)
+				# TODO compare access logs
 				"www2.gorinchemindialoog.nl" = {
 					forceSSL = true;
 					enableACME = true;
-					root = "/mnt/storage/live/gorinchemindialoog/home/Website/Live";
+					root = "/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live";
+					# TODO redirect www to non-www: globalRedirect = "gorinchemindialoog.nl";
+					extraConfig = ''
+						disable_symlinks if_not_owner;
+						add_header Cache-Control "no-cache";
+					'';
 				};
 			};
 		};
@@ -372,6 +444,9 @@ in {
 			netcat
 			vim
 			cryptsetup btrfs-progs parted
+			mailutils
+			gitMinimal
+			gitAndTools.git-annex
 		];
 	};
 }
