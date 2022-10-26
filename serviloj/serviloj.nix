@@ -114,7 +114,7 @@ in {
 				vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
 				schijven=$(df -h | fgrep -v tmp)
 				gebruik=$(find / -mindepth 1 -maxdepth 1 -a -not -name mnt | xargs du -hs | sort -hr)
-				${pkgs.mailutils}/bin/mail -s "[gently] overzicht voor $vandaag" jeroen@lwstn.eu <<-EOF
+				${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] overzicht voor $vandaag" jeroen@lwstn.eu <<-EOF
 					Hoi,
 
 					Zo staat het met de schijfruimte:
@@ -135,7 +135,7 @@ in {
 			startAt = "*:0,15,30,45";
 			script = ''
 				if problems=$(df -h | egrep '(100|9[0-9])%'); then
-					${pkgs.mailutils}/bin/mail -s '[gently] bijna vol!' jeroen@lwstn.eu <<-EOF
+					${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] bijna vol!' jeroen@lwstn.eu <<-EOF
 						Hoi,
 
 						De volgende schijven zijn bijna vol:
@@ -188,7 +188,7 @@ in {
 			scriptArgs = "%I";
 			script = ''
 				unit="$1"
-				${pkgs.mailutils}/bin/mail -s "[gently] probleem met $unit" jeroen@lwstn.eu <<-EOF
+				${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] probleem met $unit" jeroen@lwstn.eu <<-EOF
 					Hoi,
 
 					Ja, dus $unit heeft een ongelukje gehad:
@@ -425,7 +425,8 @@ in {
 				};
 			};
 			forwards = util.mapNames (name : name + "@gorinchemindialoog.nl") gorinchemindialoog.forwards // {
-				"jeroen@testdomein.radstand.nl" = "jeroen@lwstn.eu";
+				# catch-all:
+				"@radstand.nl" = "jeroen@lwstn.eu";
 			};
 
 			indexDir = "/var/mail-indexes";
