@@ -134,8 +134,7 @@ in {
 			onFailure = [ "failure-mailer@%n.service" ];
 			startAt = "*:0,15,30,45";
 			script = ''
-				problems=$(df -h | egrep '(100|9[0-9])%')
-				if [ $? -eq 0 ]; then
+				if problems=$(df -h | egrep '(100|9[0-9])%'); then
 					${pkgs.mailutils}/bin/mail -s '[gently] bijna vol!' jeroen@lwstn.eu <<-EOF
 						Hoi,
 
