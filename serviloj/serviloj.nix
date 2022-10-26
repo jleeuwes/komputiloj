@@ -25,7 +25,7 @@ in {
 			./modules/mailserver_21_11.nix
 		];
 
-		deployment.targetHost = "gently2.radstand.nl";
+		deployment.targetHost = "gently.radstand.nl";
 		deployment.provisionSSHKey = false;
 		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
 		
@@ -295,7 +295,7 @@ in {
 		};
 
 		networking = {
-			hostName = "gently2";
+			hostName = "gently";
 			domain = "radstand.nl";
 			interfaces.ens3 = {
 				useDHCP = true;
