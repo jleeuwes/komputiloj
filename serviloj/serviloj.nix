@@ -25,6 +25,10 @@ in {
 			./modules/mailserver_21_11.nix
 		];
 
+		nixpkgs.overlays = [
+			(import (../packages/undesired-packages-overlay.nix))
+		];
+
 		deployment.targetHost = "gently.radstand.nl";
 		deployment.provisionSSHKey = false;
 		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server

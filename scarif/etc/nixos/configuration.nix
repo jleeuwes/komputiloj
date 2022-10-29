@@ -25,6 +25,8 @@ in
 	];
 
 	nixpkgs.config = {
+		# TODO convert these to overlays, to make the order explicit.
+		# TODO pass these extra package sets through undesired-packages-overlay as well.
 		packageOverrides = pkgs: {
 			unstable = import sources.unstable.unpacked {
 				config = config.nixpkgs.config;
@@ -50,8 +52,8 @@ in
 		];
 	};
 	nixpkgs.overlays = [
-		# Alternative is to make this stuff sources as well. Not sure yet.
 		(import (<komputiloj> + /packages/git-annex-overlay.nix))
+		(import (<komputiloj> + /packages/undesired-packages-overlay.nix))
 	];
 
 	imports =
