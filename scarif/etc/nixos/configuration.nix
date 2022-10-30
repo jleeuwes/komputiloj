@@ -25,17 +25,6 @@ in
 	];
 
 	nixpkgs.config = {
-		# TODO convert these to overlays, to make the order explicit.
-		# TODO pass these extra package sets through undesired-packages-overlay as well.
-		packageOverrides = pkgs: {
-			unstable = import sources.unstable.unpacked {
-				config = config.nixpkgs.config;
-			};
-			nixos_18_09 = import sources.nixos_18_09.unpacked {
-				config = config.nixpkgs.config;
-			};
-		};
-
 		# Selectively allow some unfree packages
 		# - https://nixos.org/nixpkgs/manual/#sec-allow-unfree
 		allowUnfreePredicate = pkg:
@@ -51,10 +40,30 @@ in
 			"python2.7-pyjwt-1.7.1"    # TODO get rid of this
 		];
 	};
-	nixpkgs.overlays = [
-		(import (<komputiloj> + /packages/git-annex-overlay.nix))
-		(import (<komputiloj> + /packages/undesired-packages-overlay.nix))
-	];
+	nixpkgs.overlays =
+		let
+			overrideUndesiredPackages = import (<komputiloj> + /packages/undesired-packages-override.nix);
+			mergeUndesiredPackages = prefix: pkgs: pkgs // overrideUndesiredPackages prefix pkgs;
+		in [
+			(import (<komputiloj> + /packages/git-annex-overlay.nix))
+			(self: super: overrideUndesiredPackages "" super)
+			(self: super: {
+				# NOTE: a lot of fiddling around to mark undesired packages inside our sub-packagesets.
+				# Please not that if we use a package from unstable, its dependencies seem to come from
+				# the combines packageset, not from unstable.
+				# So all this fiddling around might not be super useful.
+				unstable = mergeUndesiredPackages "unstable." (
+					import sources.unstable.unpacked {
+						config = config.nixpkgs.config;
+					}
+				);
+				nixos_18_09 = mergeUndesiredPackages "nixos_18_09." (
+					import sources.nixos_18_09.unpacked {
+						config = config.nixpkgs.config;
+					}
+				);
+			})
+		];
 
 	imports =
 		[ # Include the results of the hardware scan.
