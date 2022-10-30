@@ -4,9 +4,6 @@ let
 	nixos_unstable = import sources.unstable.unpacked {
 		config = config.nixpkgs.config;
 	};
-	nixos_18_09 = import sources.nixos_18_09.unpacked {
-		config = config.nixpkgs.config;
-	};
 in {
 	# # Add the --option extra-builtins-file to nix
 	# # using a magic spell from https://elvishjerricco.github.io/2018/06/24/secure-declarative-key-management.html
@@ -36,6 +33,9 @@ in {
 			builtins.elem (lib.getName pkg) [
 				"steam-original"
 				"android-studio"
+				"symbola" # non-commercial, no modifications,
+				          # no redistribution, "a single instantiation and no
+				          # network installation"
 			];
 
 		# Selectively allow some packages with known vulnerabilities
@@ -49,7 +49,6 @@ in {
 		(self: super: {
 			git-annex = nixos_unstable.git-annex;
 			git-annex-remote-rclone = import (<komputiloj> + /packages/git-annex-remote-rclone.nix) super;
-			symbola = nixos_18_09.symbola;
 		})
 		(import (<komputiloj> + /packages/undesired-packages-overlay.nix))
 	];
@@ -120,7 +119,7 @@ in {
 			# WE HEBBEN EEN WINNAAR!
 			# symbola heeft mooie zwartwit-emoji op normale grootte.
 			# woooooooot \o/
-			# (is unfree tegenwoordig dus we gebruiken een oudere versie)
+			# UPDATE 30 oktober: dit is kapot, ik zie nu kleur-emoji
 			pkgs.symbola
 
 			pkgs.dejavu_fonts
