@@ -1,8 +1,13 @@
-let sources = import (<komputiloj> + /sources.nix);
-in
 { config, pkgs, lib, ... }:
-
-{
+let
+	sources = import (<komputiloj> + /sources.nix);
+	nixos_unstable = import sources.unstable.unpacked {
+		config = config.nixpkgs.config;
+	};
+	nixos_18_09 = import sources.nixos_18_09.unpacked {
+		config = config.nixpkgs.config;
+	};
+in {
 	# # Add the --option extra-builtins-file to nix
 	# # using a magic spell from https://elvishjerricco.github.io/2018/06/24/secure-declarative-key-management.html
 	# (Doesn't work: warning: ignoring the user-specified setting 'extra-builtins-file', because it is a restricted setting and you are not a trusted user)
@@ -25,17 +30,6 @@ in
 	];
 
 	nixpkgs.config = {
-		# TODO convert these to overlays, to make the order explicit.
-		# TODO pass these extra package sets through undesired-packages-overlay as well.
-		packageOverrides = pkgs: {
-			unstable = import sources.unstable.unpacked {
-				config = config.nixpkgs.config;
-			};
-			nixos_18_09 = import sources.nixos_18_09.unpacked {
-				config = config.nixpkgs.config;
-			};
-		};
-
 		# Selectively allow some unfree packages
 		# - https://nixos.org/nixpkgs/manual/#sec-allow-unfree
 		allowUnfreePredicate = pkg:
@@ -52,7 +46,11 @@ in
 		];
 	};
 	nixpkgs.overlays = [
-		(import (<komputiloj> + /packages/git-annex-overlay.nix))
+		(self: super: {
+			git-annex = nixos_unstable.git-annex;
+			git-annex-remote-rclone = import (<komputiloj> + /packages/git-annex-remote-rclone.nix) super;
+			symbola = nixos_18_09.symbola;
+		})
 		(import (<komputiloj> + /packages/undesired-packages-overlay.nix))
 	];
 
@@ -123,7 +121,7 @@ in
 			# symbola heeft mooie zwartwit-emoji op normale grootte.
 			# woooooooot \o/
 			# (is unfree tegenwoordig dus we gebruiken een oudere versie)
-			pkgs.nixos_18_09.symbola
+			pkgs.symbola
 
 			pkgs.dejavu_fonts
 			pkgs.ubuntu_font_family
@@ -153,7 +151,7 @@ in
 		gitFull vim file subversionClient pciutils pmount squashfsTools
 		parted gparted
 		wget rtorrent
-		unstable.git-annex git-annex-remote-rclone rclone
+		git-annex git-annex-remote-rclone rclone
 		sshpass
 		gnupg paperkey qrencode zbar pwgen
 		inetutils # for ftp for the nas
