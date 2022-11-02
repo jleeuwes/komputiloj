@@ -369,7 +369,7 @@ in {
 		services.nextcloud = {
 			enable = true;
 
-			package = pkgs.nextcloud21;
+			package = pkgs.nextcloud24;
 
 			home = "/mnt/storage/live/nextcloud/rootdir";
 
