@@ -331,7 +331,9 @@ in {
 
 		security.acme = {
 			acceptTerms = true;
-			email = "jeroen@lwstn.eu";
+			defaults = {
+				email = "jeroen@lwstn.eu";
+			};
 		};
 
 		services.nginx = {
