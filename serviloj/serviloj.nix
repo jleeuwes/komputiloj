@@ -64,7 +64,7 @@ in {
 				RemainAfterExit = true;
 			};
 			# onFailure = [ "failure-mailer@%n.service" ]; # not useful; postfix depends on this service
-			requires = [ "luks-storage-key.service" ];
+			wants = [ "luks-storage-key.service" ];
 			after    = [ "luks-storage-key.service" ];
 			wantedBy = [ "multi-user.target" ];
 			requiredBy = [
