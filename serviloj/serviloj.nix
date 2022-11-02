@@ -169,7 +169,7 @@ in {
 			onFailure = [ "failure-mailer@%n.service" ];
 			startAt = "04:00";
 			requisite = [ "mount-storage.service" ];
-			path = [ pkgs.gitMinimal ];
+			path = [ pkgs.gitMinimal pkgs.openssh ];
 			script = ''
 				# The git working tree with the actual website files:
 				export GIT_WORK_TREE=/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live
