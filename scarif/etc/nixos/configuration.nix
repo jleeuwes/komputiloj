@@ -258,11 +258,13 @@ in {
 	# List services that you want to enable:
 	
 
-	# Needed for ChromeCast to work in chromium,
+	# Set this to true if you want to cast with chromium,
 	# in combination with enabling
 	# chrome://flags/#load-media-router-component-extension and
 	# chrome://flags/#cast-media-route-provider
-	services.avahi.enable = true;
+	# Note that cupsd spams the log if this is true, so disable if not used.
+	# (See https://github.com/NixOS/nixpkgs/issues/195090)
+	services.avahi.enable = false;
 
 	# Enable the OpenSSH daemon.
 	# services.openssh.enable = true;
