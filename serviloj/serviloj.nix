@@ -176,7 +176,11 @@ in {
 
 				git add --all
 				stamp=$(LANG=nl_NL.UTF-8 TZ=Europe/Amsterdam date)
-				git commit -m "Autocommit $stamp"
+				if git diff --staged --quiet --exit-code; then
+					echo Nothing to commit.
+				else
+					git commit -m "Autocommit $stamp"
+				fi
 				git push
 			'';
 			# One-time setup (as gorinchemindialoog, with storage mounted and prepare-chroots done):
