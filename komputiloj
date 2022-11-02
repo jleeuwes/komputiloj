@@ -13,6 +13,38 @@ printf 'Using KOMPUTILOJ_PATH=%q\n' "$KOMPUTILOJ_PATH" >&2
 
 DEFAULT_NIXOS=nixos_22_05 # the source we use as nixpkgs in nixos-rebuild
 
+main() {
+	local cmd
+	
+	if [[ "$#" -eq 0 ]]; then
+		printf 'Usage: %q COMMAND\n' "$0" >&2
+		exit 1
+	fi
+
+	cmd="$1"
+	shift
+	case "$cmd" in
+		update-sources)
+			do_update_sources
+		;;
+		nixos-rebuild)
+			do_nixos_rebuild "$@"
+		;;
+		deploy)
+			exec -- "$KOMPUTILOJ_PATH"/serviloj/deploy "$@"
+		;;
+		nixops)
+			exec -- "$KOMPUTILOJ_PATH"/serviloj/command "$@"
+		;;
+		cleanup)
+			do_cleanup "$@"
+		;;
+		*)
+			printf 'Unknown command %q\n' "$cmd" >&2
+		;;
+	esac
+}
+
 do_update_sources() {
 	for source_dir in "$KOMPUTILOJ_PATH"/sources.d/*; do
 		if [[ -d "$source_dir" ]]; then
@@ -74,38 +106,6 @@ do_cleanup() {
 		;;
 	esac
 	fi
-}
-
-main() {
-	local cmd
-	
-	if [[ "$#" -eq 0 ]]; then
-		printf 'Usage: %q COMMAND\n' "$0" >&2
-		exit 1
-	fi
-
-	cmd="$1"
-	shift
-	case "$cmd" in
-		update-sources)
-			do_update_sources
-		;;
-		nixos-rebuild)
-			do_nixos_rebuild "$@"
-		;;
-		deploy)
-			exec -- "$KOMPUTILOJ_PATH"/serviloj/deploy "$@"
-		;;
-		nixops)
-			exec -- "$KOMPUTILOJ_PATH"/serviloj/command "$@"
-		;;
-		cleanup)
-			do_cleanup "$@"
-		;;
-		*)
-			printf 'Unknown command %q\n' "$cmd" >&2
-		;;
-	esac
 }
 
 main "$@"
