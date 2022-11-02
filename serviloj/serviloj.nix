@@ -1,8 +1,8 @@
 let
 	sources            = import ../sources.nix;
 	util               = import ../util.nix;
-	nixpkgs            = import sources.nixos_21_11.unpacked {};
-	mailserver         = import sources.mailserver_21_11.unpacked;
+	nixpkgs            = import sources.nixos_22_05.unpacked {};
+	mailserver         = import sources.mailserver_22_05.unpacked;
 	gorinchemindialoog = import ./gorinchemindialoog/serviloj.nix;
 in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix

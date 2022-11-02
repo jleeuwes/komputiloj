@@ -21,6 +21,7 @@ let
 	# (i.e. we can't define vulnerable_openssl_packages and map markInsecure on that)
 	# because then nix(pkg) somehow tries to check against the version in the final package set,
 	# leading to infinite recursion.
-	openssl_vulnerable = pkg: compareVersions pkg.version "3" >= 0;
+	openssl_vulnerable = pkg: compareVersions pkg.version "3" >= 0
+		&& compareVersions pkg.version "3.0.7" < 0;
 in
 	apply (markInsecureIf openssl_vulnerable "UNDISCLOSED") openssl_packages
