@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+gitlab_repo=$(cat gitlab_repo)
+gitlab_org=${gitlab_repo%/*}
+gitlab_project=${gitlab_repo##*/}
+git_repo=https://gitlab.com/"$gitlab_repo"
+git_branch=$(cat git_branch)
+
+determine_head() {
+	local checkout_dir
+	checkout_dir=$(mktemp -d)
+	(
+		cd -- "$checkout_dir"
+		git clone --depth 1 --single-branch --branch "$git_branch" --quiet -- "$git_repo" .
+		git rev-parse HEAD
+	)
+	rm -rf -- "$checkout_dir"
+}
+
+git_commit=$(determine_head)
+
+current_url=https://gitlab.com/"$gitlab_repo"/-/archive/"$git_commit"/"$gitlab_project"-"$git_commit".tar.gz
+current_sha=$(nix-prefetch-url --unpack "$current_url")
+printf "%s" "$current_url" > current_url
+printf "%s" "$current_sha" > current_sha
+

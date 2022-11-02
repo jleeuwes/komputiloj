@@ -2,6 +2,7 @@ let
 	sources            = import ../sources.nix;
 	util               = import ../util.nix;
 	nixpkgs            = import sources.nixos_21_11.unpacked {};
+	mailserver         = import sources.mailserver_21_11.unpacked;
 	gorinchemindialoog = import ./gorinchemindialoog/serviloj.nix;
 in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
@@ -23,7 +24,7 @@ in {
 	gently2 = { config, nodes, lib, pkgs, ... }: {
 		imports = [
 			./modules/hetzner_vps.nix
-			./modules/mailserver_21_11.nix
+			mailserver
 		];
 
 		nixpkgs.overlays = [
