@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-set -Eeu -o pipefail
-
-source -- "$(dirname -- "$0")"/_pinned_NIX_PATH.sh
-exec "$@"

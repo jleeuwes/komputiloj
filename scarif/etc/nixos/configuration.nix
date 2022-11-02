@@ -16,14 +16,13 @@ in {
 	# Also, make sure you don't have a ~/.nix-defexpr because that gets added
 	# too (see /etc/set-environment).
 	nix.nixPath = [
-		# First, reconstruct the NIX_PATH defined by with-pinned-NIX_PATH.
-		# This assumes no extra paths are added there in the future.
-		# Don't do ${<komputiloj>}, because that makes a weird non-working copy of
+		# Don't do ${<nixpkgs>}, because that makes a weird non-working copy of
 		# our sources.nix in the nix-store. With toString the literal path is
 		# used instead.
-		"komputiloj=${builtins.toString <komputiloj>}"
-		"nixpkgs=${sources.nixpkgs.unpacked}"
-		"nixos-config=${builtins.toString <nixos-config>}"
+		"nixpkgs=${builtins.toString <nixpkgs>}"
+		# I don't think we need these during normal operation:
+		# "komputiloj=${builtins.toString <komputiloj>}"
+		# "nixos-config=${builtins.toString <nixos-config>}"
 	];
 
 	nixpkgs.config = {

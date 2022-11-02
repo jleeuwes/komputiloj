@@ -19,7 +19,7 @@ and maybe someone might find something useful in there for their own config.
     mkdir -p /etc/nixos
     sudo ln -s ~/komputiloj/scarif/etc/nixos/* /etc/nixos/
     ```
-3. (Re)build the NixOS configuration with `~/komputiloj/nixos-rebuild switch`
+3. (Re)build the NixOS configuration with `~/komputiloj/komputiloj nixos-rebuild switch`
 4. Add a bunch of symlinks from `~` to files/dirs in `~/komputiloj/scarif/home/jeroen`
    (use `ls -A ~/komputiloj/scarif/home/jeroen` to see all the dotfiles).
 
@@ -33,20 +33,17 @@ for some good (and bad) ideas.)
 Upgrade within same NixOS version:
 
 	cd ~/komputiloj
-	./update-sources
-	./nixos-rebuild switch # local machine
-	cd serviloj
-	./deploy               # server(s)
+	./komputiloj update-sources
+	./komputiloj nixos-rebuild switch # local machine
+	./komputiloj deploy               # server(s)
 
 To upgrade the NixOS version for the local machine,
-change the version in `~/komputiloj/sources.d/nixpkgs/channel_url`,
+change `DEFAULT_NIXOS` in `~/komputiloj/komputiloj`,
 then run the above commands.
 
 To upgrade the NixOS version for our servers,
 change `network.nixpkgs` in `serviloj.nix` to the major version you want,
 then run the above.
-TODO switch serviloj over to the nixpkgs 'channel' as well,
-so local and remote machines are on the same major version.
 
 ## Private/non-config data
 

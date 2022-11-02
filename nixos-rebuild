@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-exec sudo ~/komputiloj/with-pinned_NIX_PATH nixos-rebuild "$@"

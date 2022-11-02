@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+determine_here() {
+	(
+		cd -- "$(dirname -- "$0")"
+		pwd -P
+	)
+}
+export KOMPUTILOJ_PATH=$(determine_here)
+printf 'Using KOMPUTILOJ_PATH=%q\n' "$KOMPUTILOJ_PATH" >&2
+
+DEFAULT_NIXOS=nixos_22_05 # the source we use as nixpkgs in nixos-rebuild
+
+do_update_sources() {
+	for source_dir in "$KOMPUTILOJ_PATH"/sources.d/*; do
+		if [[ -d "$source_dir" ]]; then
+		(
+			cd -- "$source_dir"
+			if [[ -x update ]]; then
+				printf "Updating source %s\n" "$source_dir" >&2
+				./update
+			else
+				printf "Skipping source without update script: %s\n" "$source_dir" >&2
+			fi
+		)
+		fi
+	done
+}
+
+do_nixos_rebuild() {
+	local nixpkgs_path
+
+	printf 'Using nixpkgs source %q\n' "$DEFAULT_NIXOS" >&2
+	nixpkgs_path=$(nix-instantiate --eval "$KOMPUTILOJ_PATH"/sources.nix -A "$DEFAULT_NIXOS".unpacked | egrep -o '[^"]+')
+	printf 'Using implicit current host configuration from /etc/nixos\n' >&2 # TODO just use a (host-specific) dir in KOMPUTILOJ_PATH directly
+	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path:nixos-config=/etc/nixos/configuration.nix"
+	printf 'Using nixos-rebuild from PATH\n' >&2
+	exec sudo nixos-rebuild "$@"
+}
+
+main() {
+	local cmd
+	
+	if [[ "$#" -eq 0 ]]; then
+		printf 'Usage: %q COMMAND\n' "$0" >&2
+		exit 1
+	fi
+
+	cmd="$1"
+	shift
+	case "$cmd" in
+		update-sources)
+			do_update_sources
+		;;
+		nixos-rebuild)
+			do_nixos_rebuild "$@"
+		;;
+		deploy)
+			exec -- "$KOMPUTILOJ_PATH"/serviloj/deploy "$@"
+		;;
+		nixops)
+			exec -- "$KOMPUTILOJ_PATH"/serviloj/command "$@"
+		;;
+		*)
+			printf 'Unknown command %q\n' "$cmd" >&2
+		;;
+	esac
+}
+
+main "$@"
