@@ -19,10 +19,10 @@ do_update_sources() {
 		(
 			cd -- "$source_dir"
 			if [[ -x update ]]; then
-				printf "Updating source %s\n" "$source_dir" >&2
+				printf 'Updating source %s\n' "$source_dir" >&2
 				./update
 			else
-				printf "Skipping source without update script: %s\n" "$source_dir" >&2
+				printf 'Skipping source without update script: %s\n' "$source_dir" >&2
 			fi
 		)
 		fi
@@ -38,6 +38,42 @@ do_nixos_rebuild() {
 	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path:nixos-config=/etc/nixos/configuration.nix"
 	printf 'Using nixos-rebuild from PATH\n' >&2
 	exec sudo nixos-rebuild "$@"
+}
+
+do_cleanup() {
+	local host
+
+	if [[ "$#" -ne 1 ]]; then
+		printf 'Usage: %q cleanup HOSTNAME\n' "$0" >&2
+		return 1
+	fi
+
+	host="$1"
+	if [[ "$host" = "$HOSTNAME" ]]; then
+		echo "Doing local nix garbage collection..."
+		sudo nix-collect-garbage
+		echo
+		echo "Garbage was collected. However,"
+		echo "there might be lingering old system generations:"
+		echo
+		sudo nix-env -p /nix/var/nix/profiles/system --list-generations
+		echo
+		echo "To delete:"
+		echo "    sudo nix-env -p /nix/var/nix/profiles/system --delete-generations NUMBER..."
+		echo "    sudo nix-collect-garbage"
+	else
+	case "$host" in
+		gently)
+			# TODO study https://nixos.wiki/wiki/Storage_optimization
+			# for an automated solution.
+			ssh root@gently.radstand.nl nix-collect-garbage -d
+		;;
+		*)
+			printf "Don't know how to clean up host %q.\n" "$host" >&2
+			return 1
+		;;
+	esac
+	fi
 }
 
 main() {
@@ -62,6 +98,9 @@ main() {
 		;;
 		nixops)
 			exec -- "$KOMPUTILOJ_PATH"/serviloj/command "$@"
+		;;
+		cleanup)
+			do_cleanup "$@"
 		;;
 		*)
 			printf 'Unknown command %q\n' "$cmd" >&2
