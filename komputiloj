@@ -69,7 +69,7 @@ do_nixos_rebuild() {
 	printf 'Using implicit current host configuration from /etc/nixos\n' >&2 # TODO just use a (host-specific) dir in KOMPUTILOJ_PATH directly
 	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path:nixos-config=/etc/nixos/configuration.nix"
 	printf 'Using nixos-rebuild from PATH\n' >&2
-	exec sudo nixos-rebuild "$@"
+	exec sudo -E nixos-rebuild "$@"
 }
 
 do_cleanup() {
