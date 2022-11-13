@@ -32,17 +32,25 @@ in {
 		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
 		
 		deployment.keys = {
+			# TODO somehow get rid of implicit dependency on wachtwoord in PATH;
+			# Maybe we should package komputiloj and make it depend on
+			# wachtwoord and nixops?
 			"luks-storage" = {
-				keyCommand = [ "wachtwoord" "get-exact" "secrets/luks-storage@hetzner" ];
+				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
 			};
 			"nextcloud-admin" = {
-				keyCommand = [ "wachtwoord" "get-exact" "secrets/admin@wolk.radstand.nl" ];
+				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/admin@wolk.radstand.nl" ];
 				user = "nextcloud";
 				group = "nextcloud";
 				permissions = "ug=r,o=";
 			};
 			"account-gorinchemindialoog" = {
+				destDir = "/run/keys/persist";
 				keyCommand = [ "wachtwoord" "hash" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
+			};
+			"account-gorinchemindialoog-bcrypt" = {
+				destDir = "/run/keys/persist";
+				keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
 			};
 		};
 		
@@ -105,6 +113,28 @@ in {
 					umount /mnt/storage
 				fi
 				cryptsetup close storage
+			'';
+		};
+		
+		systemd.services.make-spare-keys = {
+			# Makes copies of keys on our storage volume in case we need to
+			# restore them without having access to our deployment tooling.
+			# Only semi-secrets (such as hashed passwords) should be persisted this way.
+			# Restoring is manual at the moment: just copy the spare keys to /run/keys/persist
+			serviceConfig.Type = "simple";
+			onFailure = [ "failure-mailer@%n.service" ];
+			startAt = "*:5,20,35,55";
+			requisite = [ "mount-storage.service" ];
+			script = ''
+				SPAREDIR=/mnt/storage/live/komputiloj/spare-keys
+				if [[ ! -d "$SPAREDIR" ]]; then
+					# Don't use mkdir -p so we don't put spare-keys on the root
+					# fs in the (rare) case that the storage volume is not
+					# correctly mounted.
+					mkdir -m 0750 -- "$SPAREDIR"
+					chown root:keys -- "$SPAREDIR"
+				fi
+				cp -a /run/keys/persist/* -- "$SPAREDIR"
 			'';
 		};
 
@@ -252,7 +282,10 @@ in {
 
 		users = {
 			users.root = {
-				passwordFile = "/root/password"; # must be present on the machine
+				# Password file must be present and readable by the system
+				# during boot, without storage being mounted yet,
+				# otherwise we're locking ourselves out.
+				passwordFile = "/root/password";
 				openssh.authorizedKeys.keyFiles = [
 					../scarif/home/jeroen/.ssh/id_rsa.pub
 				];
@@ -295,7 +328,7 @@ in {
 				createHome = false;
 				home = "/home/gorinchemindialoog"; # must exist both inside and outside the sftp_only chroot
 				uid = 1001;
-				passwordFile = "/run/keys/account-gorinchemindialoog";
+				passwordFile = "/run/keys/persist/account-gorinchemindialoog";
 				extraGroups = [ "sftp_only" ];
 			};
 		};
@@ -445,7 +478,7 @@ in {
 			loginAccounts = {
 				"gorinchemindialoog@radstand.nl" = {
 					name = "gorinchemindialoog";
-					hashedPasswordFile = "/run/keys/account-gorinchemindialoog";
+					hashedPasswordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
 				};
 			};
 			forwards = util.mapNames (name : name + "@gorinchemindialoog.nl") gorinchemindialoog.forwards // {
