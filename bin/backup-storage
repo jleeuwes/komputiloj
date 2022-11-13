@@ -102,28 +102,27 @@ action_required=no
 printf "Here we go!\n" >&2
 
 printf "Retrieving list of latest snapsnots...\n" >&2
-list_file=$(mktemp)
-ssh "$USER_AT_HOST" btrbk --config=/etc/btrbk/storage.conf list latest --format=raw > "$list_file"
+list=$(ssh "$USER_AT_HOST" btrbk --config=/etc/btrbk/storage.conf list latest --format=raw)
 
 set -o noglob
 IFS=$'\n'
-for line in `cat -- "$list_file"`; do
+for line in $list; do
 	echo >&2
 
-	if ! printf "%s\n" "$line" | egrep '^format="latest"' > /dev/null; then
+	if ! printf "%s\n" "$line" | egrep '^format="latest".*'"snapshot_subvolume='" > /dev/null; then
 		printf "ACTION REQUIRED. Could not parse line: %q\n" "$line" >&2
 		printf "Is btrbk list latest broken?\n" >&2
 		action_required=yes
 		continue
 	fi
 
-	snapshot_path=${line##*snapshot_path=\"}
-	snapshot_path=${snapshot_path%%\"*}
+	snapshot_path=${line##*snapshot_subvolume=\'}
+	snapshot_path=${snapshot_path%%\'*}
 	snapshot_name=${snapshot_path##*/}
 	snapshot_name=${snapshot_name%%.*}
 	printf "%s\n" "$snapshot_name" >&2
 	printf "=====\n" >&2
-	printf "Based on line: %q\n" "$line" >&2
+	printf "Based on line: %s\n" "$line" >&2
 	
 	target_base="$BACKUP_TARGET"/"$snapshot_name"
 
@@ -163,8 +162,6 @@ for line in `cat -- "$list_file"`; do
 
 	rotate "$target_base"
 done
-
-rm -f -- "$list_file"
 
 echo >&2
 if [[ "$action_required" != no ]]; then
