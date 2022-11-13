@@ -48,6 +48,7 @@ in {
 		(self: super: {
 			git-annex = nixos_unstable.git-annex;
 			git-annex-remote-rclone = import (<komputiloj> + /packages/git-annex-remote-rclone.nix) super;
+			wachtwoord = self.callPackage (<komputiloj> + /packages/wachtwoord.nix) {};
 		})
 		(import (<komputiloj> + /packages/undesired-packages-overlay.nix))
 	];
@@ -152,6 +153,7 @@ in {
 		git-annex git-annex-remote-rclone rclone
 		sshpass
 		gnupg paperkey qrencode zbar pwgen
+		wachtwoord
 		inetutils # for ftp for the nas
 		openssl
 		nmap

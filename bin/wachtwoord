@@ -1,22 +1,29 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -Eeu
 set -o pipefail
 
 set -o noclobber
 
-# We rely on tools in PATH.
-# We should really make a package out of this.
 CMD_GPG=gpg2
-# CMD_HTPASSWD=$(nix-build --no-out-link --attr apacheHttpd '<nixpkgs>')/bin/htpasswd
+CMD_MKPASSWD=mkpasswd
+CMD_HTPASSWD=htpasswd # from apache httpd
+CMD_TR=tr # from coreutils
 
 # Identity to sign with and to always encrypt for:
 ME=jeroen@lwstn.eu
 
-# if ! type -P "$CMD_GPG" > /dev/null; then
-# 	echo "Ja, hallo, ik kan $CMD_GPG niet vinden." >&2
-# 	exit 1
-# fi
+checkpath() {
+	if ! type -P "$1" > /dev/null; then
+	 	printf 'Ik vind commando %q niet in $PATH (%q).\n' "$1" "$PATH" >&2
+		return 1
+	fi
+}
+
+checkpath $CMD_GPG
+checkpath $CMD_MKPASSWD
+checkpath $CMD_HTPASSWD
+checkpath $CMD_TR
 
 main() {
 	local command
@@ -40,6 +47,9 @@ main() {
 	hash)
 		# output passwords in /etc/shadow-like format
 		do_show hashed "$@"
+	;;
+	hash-with-bcrypt)
+		do_show hashed_bcrypt "$@"
 	;;
 	add|new)
 		file="$1"
@@ -83,13 +93,14 @@ main() {
 }
 
 do_show() {
-	local cmd="$1"
+	local method="$1"
 	shift
 	local success=0
 	local seen=0
 	local prefix=""
 	local content
 	local suppress_last_newline=no
+	local format
 	while [ $# -ge 1 ]; do
 		case "$1" in
 		-n)
@@ -114,9 +125,9 @@ do_show() {
 		set -- -
 	fi
 	if [ $# -gt 1 ]; then
-		cmd=show_"$cmd"_multi
+		format=multi
 	else
-		cmd=show_"$cmd"_single
+		format=single
 	fi
 	for file in "$@"; do
 		# We let gpg produce any errors for us and use && to make sure we continue with the other files in case of an error
@@ -126,7 +137,10 @@ do_show() {
 				# but it does make sure we never put empty lines on stdout.
 				printf '\n'
 			fi
-			"$cmd" "$file" "$content"
+			if [ $format = multi ]; then
+				printf '%s: ' "$file"
+			fi
+			show_"$method" "$content"
 			let ++success # ++ first because of weird exit code if expression is 0
 		}
 	done
@@ -138,25 +152,16 @@ do_show() {
 	fi
 }
 
-show_plain_single() {
-	printf "%s" "$2"
+show_plain() {
+	printf "%s" "$1"
 }
-show_plain_multi() {
-	printf "%s: %s" "$1" "$2"
+show_hashed() {
+	printf '%s' "$1" | $CMD_MKPASSWD --stdin --method=sha512crypt | $CMD_TR -d %'\n'
 }
-show_hashed_single() {
-	printf '%s' "$2" | mkpasswd --stdin --method=sha512crypt | tr -d %'\n'
-	# Alternative using Apache's htpasswd, which uses bcrypt which is more
-	# robust against offline brute-forcing, but does not seem to be supported
-	# for use in /etc/shadow
-	# printf '%s' "$2" | "$CMD_HTPASSWD" -niB "$1" | cut -d: -f2 | tr -d $'\n'
+show_hashed_bcrypt() {
+	# bcrypt is more robust against offline brute-forcing,
+	# but does not seem to be supported for use in /etc/shadow
+	printf '%s' "$1" | $CMD_HTPASSWD -niB username | cut -d: -f2 | $CMD_TR -d $'\n'
 }
-show_hashed_multi() {
-	printf "%s: " "$1"
-	printf '%s' "$2" | mkpasswd --stdin --method=sha512crypt | tr -d $'\n'
-	# Alternative using Apache's htpasswd (see above)
-	# printf '%s' "$2" | "$CMD_HTPASSWD" -niB "$1" | tr -d $'\n'
-}
-
 
 main "$@"
