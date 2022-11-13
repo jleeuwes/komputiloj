@@ -100,6 +100,18 @@ And set up the volumes as defined above:
 	btrfs subvolume create backups
 	btrfs subvolume create archives
 
+### Resizing
+
+To make the storage size bigger:
+
+1. Resize the volume through Hetzner's web interface.
+2. Reboot the server for LUKS to pick up the new size.
+3. Resend keys with `komputiloj nixops send-keys`.
+4. Wait until `/mnt/storage` is mounted.
+5. Resize the filesystem with `btrfs filesystem resize max /mnt/storage`.
+
+(Maybe we can replace steps 2 to 4 with a single remount step.)
+
 ## Install NixOS on a Hetzner VPS
 
 On Hetzner, create a virtual machine with the following settings:
