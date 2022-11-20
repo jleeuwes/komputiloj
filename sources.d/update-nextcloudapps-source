@@ -14,7 +14,7 @@ exec 3> default.nix
 
 cat >&3 <<-EOF
 	{
-	  unpacked = pkgs:
+	  value = pkgs:
 	  let fetchNextcloudApp = pkgs.fetchNextcloudApp;
 	  in {
 EOF

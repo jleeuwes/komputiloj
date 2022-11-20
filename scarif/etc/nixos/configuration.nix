@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 let
 	sources = import (<komputiloj> + /sources.nix);
-	nixos_unstable = import sources.unstable.unpacked {
+	nixos_unstable = sources.unstable.value {
 		config = config.nixpkgs.config;
 	};
 in {

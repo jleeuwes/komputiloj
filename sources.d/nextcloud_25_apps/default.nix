@@ -1,5 +1,5 @@
 {
-  unpacked = pkgs:
+  value = pkgs:
   let fetchNextcloudApp = pkgs.fetchNextcloudApp;
   in {
     calendar = import ./apps/calendar { inherit fetchNextcloudApp; };

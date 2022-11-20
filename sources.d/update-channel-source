@@ -16,10 +16,11 @@ current_sha=$(nix-prefetch-url --unpack "$current_url")
 # printf "%s" "$current_sha" > current_sha
 cat > default.nix <<-EOF
 	with builtins;
-	{
-	    unpacked = fetchTarball {
+	rec {
+	    nix_path = fetchTarball {
 	        url    = "$current_url";
 	        sha256 = "$current_sha";
 	    };
+	    value = import nix_path;
 	}
 EOF
