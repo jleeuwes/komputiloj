@@ -3,6 +3,7 @@ let
 	util               = import ../util.nix;
 	nixpkgs            = import sources.nixos_22_05.unpacked {};
 	mailserver         = import sources.mailserver_22_05.unpacked;
+	nextcloud_apps     = sources.nextcloud_25_apps.unpacked;
 	gorinchemindialoog = import ./gorinchemindialoog/serviloj.nix;
 in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
@@ -421,6 +422,10 @@ in {
 				dbtype = "sqlite"; # let's start simple
 				
 				overwriteProtocol = "https";
+			};
+
+			extraApps = let apps = nextcloud_apps pkgs; in {
+				inherit (apps) files_linkeditor;
 			};
 		};
 		
