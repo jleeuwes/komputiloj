@@ -293,7 +293,6 @@ in {
 
 			# Make sure users have the same uid on all our machines.
 			# Add users here that don't have a fixed uid in nixpkgs/nixos.
-			# also exist on the machine (actually, in our whole deployment), with a fixed uid.
 			# Warning: changing uids here after a user has been created has no effect!
 			# (I think - the note here was about containers.)
 			# You have to rm /var/lib/nixos/uid-map and userdel the user.
