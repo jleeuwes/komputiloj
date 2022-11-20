@@ -23,6 +23,14 @@ git_commit=$(determine_head)
 
 current_url=https://gitlab.com/"$gitlab_repo"/-/archive/"$git_commit"/"$gitlab_project"-"$git_commit".tar.gz
 current_sha=$(nix-prefetch-url --unpack "$current_url")
-printf "%s" "$current_url" > current_url
-printf "%s" "$current_sha" > current_sha
-
+# printf "%s" "$current_url" > current_url
+# printf "%s" "$current_sha" > current_sha
+cat > default.nix <<-EOF
+	with builtins;
+	{
+	    unpacked = fetchTarball {
+	        url    = "$current_url";
+	        sha256 = "$current_sha";
+	    };
+	}
+EOF

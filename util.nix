@@ -9,4 +9,6 @@ rec {
 	mapNames = (f: attrs: listToAttrs (map (a: {name = f a.name; value = a.value;}) (attrsToList attrs)));
 
 	filterAttrs = (f: attrs: listToAttrs (filter f (attrsToList attrs)));
+	
+	dirnames_in = dir: attrNames (filterAttrs (d: d.value == "directory") (readDir dir));
 }

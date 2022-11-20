@@ -19,14 +19,7 @@
 with builtins;
 with (import ./util.nix);
 let
-	source_dirs = attrNames (filterAttrs (d: d.value == "directory") (readDir ./sources.d));
-	source = (source_dir: rec {
-		current_url = readFile ./sources.d/${source_dir}/current_url;
-		current_sha = readFile ./sources.d/${source_dir}/current_sha;
-		unpacked = fetchTarball {
-			url = current_url;
-			sha256 = current_sha;
-		};
-	});
+	source_dirs = dirnames_in ./sources.d;
+	source = source_dir: import (./sources.d + "/${source_dir}");
 in
 listToAttrs (map (source_dir: {name = source_dir; value = source source_dir;}) source_dirs)
