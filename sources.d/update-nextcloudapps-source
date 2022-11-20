@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+# We assume the appstore API returns releases with the newest version first.
+# It did when writing this script.
+# You can check if this is still the case with:
+# curl https://apps.nextcloud.com/api/v1/platform/25.0.0/apps.json |jq '.[]|select(.releases[0].version < .releases[1].version)'
+
+set -Eeu -o pipefail
+
+nextcloud_version=$(cat nextcloud_version)
+curl https://apps.nextcloud.com/api/v1/platform/"$nextcloud_version"/apps.json > apps.json
+
+exec 3> default.nix
+
+cat >&3 <<-EOF
+	{
+	  unpacked = pkgs:
+	  let fetchNextcloudApp = pkgs.fetchNextcloudApp;
+	  in {
+EOF
+
+(
+	cd apps
+	for app in *; do
+		jq --arg app "$app" '.[]|select(.id == $app).releases|map(select(.isNightly|not))[0]' ../apps.json > "$app"/release.json
+		(
+			cd "$app"
+			current_version=$(jq -r .version release.json)
+			current_url=$(jq -r .download release.json)
+			current_sha=$(nix-prefetch-url --unpack "$current_url")
+			# printf "%s" "$current_url" > current_url
+			# printf "%s" "$current_sha" > current_sha
+			cat >&3 <<-EOF
+				    $app = import ./apps/$app { inherit fetchNextcloudApp; };
+			EOF
+			cat > default.nix <<-EOF
+				{fetchNextcloudApp}:
+				fetchNextcloudApp {
+				  name    = "$app";
+				  version = "$current_version";
+				  url     = "$current_url";
+				  sha256  = "$current_sha";
+				}
+			EOF
+		)
+	done
+)
+
+cat >&3 <<-EOF
+	  };
+	}
+EOF
+
+exec 3>&-
