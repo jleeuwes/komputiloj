@@ -92,6 +92,7 @@ do_nixops_something() {
 	local args_escaped=$(printf '%q ' "$@")
 	nix-shell \
 		-p 'with import (<komputiloj> + /sources.nix); nixops.value.default' \
+		-p 'callPackage (import (<komputiloj> + /packages/wachtwoord.nix)) {}' \
 		--run "$args_escaped"
 }
 
