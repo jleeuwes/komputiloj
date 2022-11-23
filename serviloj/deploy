@@ -2,8 +2,12 @@
 
 set -Eeu -o pipefail
 
+if [[ $# -ne 0 ]]; then
+	echo "No arguments please." >&2
+	exit 1
+fi
+
 cd -- "$(dirname -- "$0")"
-source ./_nixops_settings.sh
 
 # Okay, so, about the state.
 # We need to keep the state because it seems to be the only way

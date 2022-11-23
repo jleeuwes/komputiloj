@@ -31,10 +31,10 @@ main() {
 			do_nixos_rebuild "$@"
 		;;
 		deploy)
-			exec -- "$KOMPUTILOJ_PATH"/serviloj/deploy "$@"
+			do_deploy "$@"
 		;;
 		nixops)
-			exec -- "$KOMPUTILOJ_PATH"/serviloj/command "$@"
+			do_nixops "$@"
 		;;
 		cleanup)
 			do_cleanup "$@"
@@ -70,6 +70,29 @@ do_nixos_rebuild() {
 	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path:nixos-config=/etc/nixos/configuration.nix"
 	printf 'Using nixos-rebuild from PATH\n' >&2
 	exec sudo -E nixos-rebuild "$@"
+}
+
+do_deploy() {
+	do_nixops_something "$KOMPUTILOJ_PATH"/serviloj/deploy "$@"
+}
+
+do_nixops() {
+	do_nixops_something "$KOMPUTILOJ_PATH"/serviloj/command "$@"
+}
+
+do_nixops_something() {
+	local nixpkgs_path
+
+	printf 'Using nixpkgs source %q\n' "$DEFAULT_NIXOS" >&2
+	nixpkgs_path=$(nix-instantiate --eval "$KOMPUTILOJ_PATH"/sources.nix -A "$DEFAULT_NIXOS".nix_path | egrep -o '[^"]+')
+	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path"
+	export NIXOPS_CMD=nixops
+	export NIXOPS_STATE="$KOMPUTILOJ_PATH"/serviloj/state.nixops
+	export NIXOPS_DEPLOYMENT=serviloj
+	local args_escaped=$(printf '%q ' "$@")
+	nix-shell \
+		-p 'with import (<komputiloj> + /sources.nix); nixops.value.default' \
+		--run "$args_escaped"
 }
 
 do_cleanup() {
