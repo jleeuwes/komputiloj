@@ -5,6 +5,7 @@ let
 	mailserver         = sources.mailserver_22_05.value;
 	nextcloud_apps     = sources.nextcloud_25_apps.value;
 	gorinchemindialoog = import ./gorinchemindialoog/serviloj.nix;
+	inherit (nixpkgs.lib.strings) escapeShellArgs;
 in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
@@ -52,6 +53,18 @@ in {
 			"account-gorinchemindialoog-bcrypt" = {
 				destDir = "/run/keys/persist";
 				keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
+			};
+			"radicale-auth" = {
+				destDir = "/run/keys/persist";
+				keyCommand = [ "sh" "-c"
+					"wachtwoord hash-with-bcrypt ${escapeShellArgs [
+						"secrets/jeroen@knol.radstand.nl"
+						"secrets/sebbe@knol.radstand.nl"
+					]} | sed -E 's/^secrets\\/([^@]*)@[^:]*/\\1/'"
+				];
+				user = "radicale";
+				group = "radicale";
+				permissions = "ug=r,o=";
 			};
 		};
 		
@@ -320,6 +333,14 @@ in {
 			groups.vmail = {
 				gid = 70002;
 			};
+			users.radicale = {
+				uid = 70003;
+				group = "radicale";
+				extraGroups = [ "keys" ];
+			};
+			groups.radicale = {
+				gid = 70003;
+			};
 			groups.sftp_only = {
 				gid = 2001;
 			};
@@ -381,7 +402,19 @@ in {
 					forceSSL = true;
 					enableACME = true;
 					locations."/" = {
-						proxyPass = "http://localhost:3000";
+						proxyPass = "http://localhost:3000/";
+					};
+				};
+				"knol.radstand.nl" = {
+					forceSSL = true;
+					enableACME = true;
+					locations."/" = {
+						proxyPass = "http://localhost:5232/";
+						extraConfig = ''
+							proxy_set_header  X-Script-Name "";
+							proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+							proxy_pass_header Authorization;
+						'';
 					};
 				};
 				# TODO strict transport security (not critical for gorinchemindialoog)
@@ -498,6 +531,20 @@ in {
 			vmailUID = 70002;
 
 			certificateScheme = 3; # let's hope this uses the regular letsencrypt infrastructure of NixOS so it doesn't clash with nginx
+		};
+
+		services.radicale = {
+			enable = true;
+			settings = {
+				auth = {
+					type = "htpasswd";
+					htpasswd_filename = "/run/keys/persist/radicale-auth";
+					htpasswd_encryption = "bcrypt";
+				};
+				storage = {
+					filesystem_folder = "/mnt/storage/live/radicale/collections";
+				};
+			};
 		};
 
 		environment.systemPackages = with pkgs; [

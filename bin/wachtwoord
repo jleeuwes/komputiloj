@@ -138,7 +138,7 @@ do_show() {
 				printf '\n'
 			fi
 			if [ $format = multi ]; then
-				printf '%s: ' "$file"
+				printf '%s:' "$file"
 			fi
 			show_"$method" "$content"
 			let ++success # ++ first because of weird exit code if expression is 0
