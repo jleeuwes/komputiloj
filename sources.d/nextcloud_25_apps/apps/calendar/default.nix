@@ -1,7 +1,7 @@
 {fetchNextcloudApp}:
 fetchNextcloudApp {
   name    = "calendar";
-  version = "4.1.0-rc.1";
-  url     = "https://github.com/nextcloud-releases/calendar/releases/download/v4.1.0-rc1/calendar-v4.1.0-rc1.tar.gz";
-  sha256  = "1kpvdf7783bhify3ddmm7245xky8fakv6bdjhnv2j2f105nprfky";
+  version = "4.1.0";
+  url     = "https://github.com/nextcloud-releases/calendar/releases/download/v4.1.0/calendar-v4.1.0.tar.gz";
+  sha256  = "0f8a2vlz4mjbws46kdijxpggflrqnssf4prf288m5jm41c7fm61b";
 }

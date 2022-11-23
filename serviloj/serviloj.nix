@@ -425,7 +425,7 @@ in {
 			};
 
 			extraApps = let apps = nextcloud_apps pkgs; in {
-				inherit (apps) files_linkeditor;
+				inherit (apps) files_linkeditor calendar;
 			};
 		};
 		

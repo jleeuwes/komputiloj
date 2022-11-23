@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# We assume the appstore API returns releases with the newest version first.
-# It did when writing this script.
-# You can check if this is still the case with:
-# curl https://apps.nextcloud.com/api/v1/platform/25.0.0/apps.json |jq '.[]|select(.releases[0].version < .releases[1].version)'
-
 set -Eeu -o pipefail
 
 nextcloud_version=$(cat nextcloud_version)
@@ -19,10 +14,17 @@ cat >&3 <<-EOF
 	  in {
 EOF
 
+# Filter based on https://github.com/nextcloud/server/blob/db1c2a5375d5a21aaaf35615b247c0e0f33a815e/lib/private/App/AppStore/Fetcher/AppFetcher.php
+# Other than that, we assume the appstore API returns releases with the newest version first.
+# It did when writing this script.
+# You can check if this is still the case with:
+# curl https://apps.nextcloud.com/api/v1/platform/25.0.0/apps.json |jq '.[]|select(.releases[0].version < .releases[1].version)'
+JQ_RELEASE_FILTER='(.isNightly|not) and (.version|contains("-")|not)'
+
 (
 	cd apps
 	for app in *; do
-		jq --arg app "$app" '.[]|select(.id == $app).releases|map(select(.isNightly|not))[0]' ../apps.json > "$app"/release.json
+		jq --arg app "$app" '.[]|select(.id == $app).releases|map(select('"$JQ_RELEASE_FILTER"'))[0]' ../apps.json > "$app"/release.json
 		(
 			cd "$app"
 			current_version=$(jq -r .version release.json)
