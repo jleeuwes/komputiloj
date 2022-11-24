@@ -4,7 +4,7 @@ let
 	nixos_unstable = sources.unstable.value {
 		config = config.nixpkgs.config;
 	};
-	komputiloj_f = sources.komputiloj.value;
+	komputiloj = sources.komputiloj.value pkgs;
 in {
 	# # Add the --option extra-builtins-file to nix
 	# # using a magic spell from https://elvishjerricco.github.io/2018/06/24/secure-declarative-key-management.html
@@ -46,14 +46,9 @@ in {
 		];
 	};
 	nixpkgs.overlays = [
-		(self: super: {
-			# Add our own packages
-			komputiloj = komputiloj_f self;
-		})
-		(self: super: {
-			# Override existing packages
+		(import (<komputiloj> + /overlays/replacements.nix) {
 			git-annex = nixos_unstable.git-annex;
-			git-annex-remote-rclone = super.komputiloj.git-annex-remote-rclone;
+			git-annex-remote-rclone = komputiloj.git-annex-remote-rclone;
 		})
 		(import (<komputiloj> + /overlays/undesired-packages-overlay.nix))
 	];
