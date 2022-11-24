@@ -3,7 +3,7 @@ with (import ../util.nix);
 let
 	traceMe = msg: trace ((__curPos.file) + ": " + msg);
 	callOutPkgs = pkgs: x: traceMe ("Applying overrides to: " + toString (attrNames pkgs)) x;
-	apply = f: pkgs: callOutPkgs pkgs (mapAttrs (name: value: value.overrideAttrs f) pkgs);
+	apply = f: pkgs: /* callOutPkgs pkgs */ (mapAttrs (name: value: value.overrideAttrs f) pkgs);
 	
 	markInsecure = vulnDesc: pkg: {
 		meta = pkg.meta // {
