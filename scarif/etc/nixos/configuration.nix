@@ -4,6 +4,7 @@ let
 	nixos_unstable = sources.unstable.value {
 		config = config.nixpkgs.config;
 	};
+	komputiloj_f = sources.komputiloj.value;
 in {
 	# # Add the --option extra-builtins-file to nix
 	# # using a magic spell from https://elvishjerricco.github.io/2018/06/24/secure-declarative-key-management.html
@@ -46,11 +47,15 @@ in {
 	};
 	nixpkgs.overlays = [
 		(self: super: {
-			git-annex = nixos_unstable.git-annex;
-			git-annex-remote-rclone = import (<komputiloj> + /packages/git-annex-remote-rclone.nix) super;
-			wachtwoord = self.callPackage (<komputiloj> + /packages/wachtwoord.nix) {};
+			# Add our own packages
+			komputiloj = komputiloj_f self;
 		})
-		(import (<komputiloj> + /packages/undesired-packages-overlay.nix))
+		(self: super: {
+			# Override existing packages
+			git-annex = nixos_unstable.git-annex;
+			git-annex-remote-rclone = super.komputiloj.git-annex-remote-rclone;
+		})
+		(import (<komputiloj> + /overlays/undesired-packages-overlay.nix))
 	];
 
 	imports =
@@ -153,7 +158,7 @@ in {
 		git-annex git-annex-remote-rclone rclone
 		sshpass
 		gnupg paperkey qrencode zbar pwgen
-		wachtwoord
+		komputiloj.wachtwoord
 		inetutils # for ftp for the nas
 		openssl
 		nmap

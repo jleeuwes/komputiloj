@@ -26,7 +26,7 @@ in {
 		];
 
 		nixpkgs.overlays = [
-			(import (../packages/undesired-packages-overlay.nix))
+			(import (../overlays/undesired-packages-overlay.nix))
 		];
 
 		deployment.targetHost = "gently.radstand.nl";
@@ -34,9 +34,6 @@ in {
 		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
 		
 		deployment.keys = {
-			# TODO somehow get rid of implicit dependency on wachtwoord in PATH;
-			# Maybe we should package komputiloj and make it depend on
-			# wachtwoord and nixops?
 			"luks-storage" = {
 				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
 			};

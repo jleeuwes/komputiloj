@@ -9,7 +9,7 @@ stdenv.mkDerivation rec {
 	unpackPhase = ":";
 	installPhase = ''
 		mkdir -p $out/bin
-		cp ${../bin/wachtwoord} $out/bin/wachtwoord
+		cp ${./wachtwoord} $out/bin/wachtwoord
 		chmod +x $out/bin/wachtwoord
 		# https://github.com/deepfire/nixos-wiki/blob/master/Nix%20Runtime%20Environment%20Wrapper.page
 		wrapProgram $out/bin/wachtwoord \
