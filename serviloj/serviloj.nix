@@ -5,6 +5,7 @@ let
 	mailserver         = sources.mailserver_22_05.value;
 	nextcloud_apps     = sources.nextcloud_25_apps.value;
 	gorinchemindialoog = sources.gorinchemindialoog.value;
+	privata            = sources.komputiloj-privata.value;
 	inherit (nixpkgs.lib.strings) escapeShellArgs;
 in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
@@ -54,10 +55,10 @@ in {
 			"radicale-auth" = {
 				destDir = "/run/keys/persist";
 				keyCommand = [ "sh" "-c"
-					"wachtwoord hash-with-bcrypt ${escapeShellArgs [
-						"secrets/jeroen@knol.radstand.nl"
-						"secrets/sebbe@knol.radstand.nl"
-					]} | sed -E 's/^secrets\\/([^@]*)@[^:]*/\\1/'"
+					"wachtwoord hash-with-bcrypt ${escapeShellArgs
+						(map (username: "secrets/${username}@knol.radstand.nl")
+							privata.radicale.users
+					)} | sed -E 's/^secrets\\/([^@]*)@[^:]*/\\1/'"
 				];
 				user = "radicale";
 				group = "radicale";
