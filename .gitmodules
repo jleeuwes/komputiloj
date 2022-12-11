@@ -1,0 +1,5 @@
+[submodule "sources.d/gorinchemindialoog/submodule"]
+	path = sources.d/gorinchemindialoog/submodule
+	url = gitea@thee.radstand.nl:gorinchemindialoog/infra.git
+	branch = main
+	update = rebase

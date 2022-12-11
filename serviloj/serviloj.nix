@@ -4,7 +4,7 @@ let
 	nixpkgs            = sources.nixos_22_05.value {};
 	mailserver         = sources.mailserver_22_05.value;
 	nextcloud_apps     = sources.nextcloud_25_apps.value;
-	gorinchemindialoog = import ./gorinchemindialoog/serviloj.nix;
+	gorinchemindialoog = sources.gorinchemindialoog.value;
 	inherit (nixpkgs.lib.strings) escapeShellArgs;
 in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix

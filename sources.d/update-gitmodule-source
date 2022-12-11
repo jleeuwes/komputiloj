@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#
+# To create a submodule source:
+#
+# $ mkdir sources.d/project
+# $ git submodule add -b main gitea@thee.radstand.nl:some/project.git sources.d/project/submodule
+# Edit the .gitmodules file and add `update = rebase` to the new module.
+# $ cd sources.d/project/submodule
+# $ git checkout main  # without this and update=rebase, each update will put the submodule into detached HEAD state
+# $ cd ..
+# $ ln -s ../update-gitmodule-source update
+# $ ./update
+#
+# Then git add a bunch of stuff.
+
+set -Eeu -o pipefail
+
+git submodule update --remote submodule
+
+cat > default.nix <<-EOF
+	rec {
+	    nix_path = ./submodule;
+	    value = import nix_path;
+	}
+EOF
