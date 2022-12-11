@@ -39,6 +39,9 @@ main() {
 		cleanup)
 			do_cleanup "$@"
 		;;
+		backup)
+			do_backup "$@"
+		;;
 		*)
 			printf 'Unknown command %q\n' "$cmd" >&2
 		;;
@@ -130,6 +133,15 @@ do_cleanup() {
 		;;
 	esac
 	fi
+}
+
+do_backup() {
+	if [[ "$#" -ne 0 ]]; then
+		printf 'Usage: %q backup\n' "$0" >&2
+		return 1
+	fi
+
+	exec sudo -E "$KOMPUTILOJ_PATH"/bin/backup-storage
 }
 
 main "$@"
