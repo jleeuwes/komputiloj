@@ -5,7 +5,7 @@
 #
 # LIMITATION: we sync ownership and permissions, but not extended file attributes!
 # I think rsync can do this, but we'd have to think about how this interferes
-# with out use of the immutability flag!
+# with our use of the immutability flag!
 # Ideally, we would put each backup on a read-only btrfs subvolume and protect
 # them that way instead of with an immutable flag on each file.
 
