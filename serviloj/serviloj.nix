@@ -73,180 +73,184 @@ in {
 		# Our deploy script stores this state on gently now to keep the correct stateVersion.
 		# system.stateVersion = lib.mkForce "20.09";
 
-		# TODO shouldn't 'storage-mounted' be a target?
-		systemd.services.mount-storage = {
-			serviceConfig = {
-				Type = "oneshot";
-				RemainAfterExit = true;
-			};
-			# onFailure = [ "failure-mailer@%n.service" ]; # not useful; postfix depends on this service
-			wants = [ "luks-storage-key.service" ];
-			after    = [ "luks-storage-key.service" ];
-			wantedBy = [ "multi-user.target" ];
-			requiredBy = [
-				"nextcloud-cron.service"
-				"nextcloud-setup.service"
-				"nextcloud-update-plugins.service"
-				"phpfpm-nextcloud.service"
-				"gitea.service"
-				"btrbk-storage.service"
-				"postfix.service"
-				"dovecot2.service"
-			];
-			before = [
-				"nextcloud-cron.service"
-				"nextcloud-setup.service"
-				"nextcloud-update-plugins.service"
-				"phpfpm-nextcloud.service"
-				"gitea.service"
-				"btrbk-storage.service"
-				"postfix.service"
-				"dovecot2.service"
-			];
-			path = [ pkgs.cryptsetup pkgs.utillinux pkgs.unixtools.mount pkgs.unixtools.umount ];
-			script = ''
-				if mountpoint -q /mnt/storage; then
-					echo "Storage already mounted. Done here."
-					exit 0
-				fi
-				if [ -b /dev/mapper/storage ]; then
-					echo "LUKS mapping already opened."
-				else
-					echo "Opening LUKS mapping..."
-					cryptsetup open UUID=6c8d5be7-ae46-4e51-a270-fd5bdce46f3b storage --type luks --key-file /run/keys/luks-storage
-				fi
-				echo "Mounting..."
-				mkdir -p /mnt/storage
-				mount /dev/mapper/storage /mnt/storage
-				echo "Done here."
-			'';
-			preStop = ''
-				if mountpoint -q /mnt/storage; then
-					umount /mnt/storage
-				fi
-				cryptsetup close storage
-			'';
-		};
-		
-		systemd.services.make-spare-keys = {
-			# Makes copies of keys on our storage volume in case we need to
-			# restore them without having access to our deployment tooling.
-			# Only semi-secrets (such as hashed passwords) should be persisted this way.
-			# Restoring is manual at the moment: just copy the spare keys to /run/keys/persist
-			serviceConfig.Type = "simple";
-			onFailure = [ "failure-mailer@%n.service" ];
-			startAt = "*:5,20,35,55";
-			requisite = [ "mount-storage.service" ];
-			script = ''
-				SPAREDIR=/mnt/storage/live/komputiloj/spare-keys
-				if [[ ! -d "$SPAREDIR" ]]; then
-					# Don't use mkdir -p so we don't put spare-keys on the root
-					# fs in the (rare) case that the storage volume is not
-					# correctly mounted.
-					mkdir -m 0750 -- "$SPAREDIR"
-					chown root:keys -- "$SPAREDIR"
-				fi
-				cp -a /run/keys/persist/* -- "$SPAREDIR"
-			'';
-		};
-
-		systemd.services.dagelijks-rapport = {
-			serviceConfig.Type = "simple";
-			onFailure = [ "failure-mailer@%n.service" ];
-			startAt = "03:00 Europe/Amsterdam"; # avoid 02:00-03:00 because of DST ambiguity
-			script = ''
-				vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
-				schijven=$(df -h | fgrep -v tmp)
-				gebruik=$(find / -mindepth 1 -maxdepth 1 -a -not -name mnt | xargs du -hs | sort -hr)
-				${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] overzicht voor $vandaag" jeroen@lwstn.eu <<-EOF
-					Hoi,
-
-					Zo staat het met de schijfruimte:
-
-					$schijven
-
-					En dit is de grootte per dir in / (zonder mnt):
-
-					$gebruik
-
-					Groetjes!
-				EOF
-			'';
-		};
-		systemd.services.check-disk-usage = {
-			serviceConfig.Type = "simple";
-			onFailure = [ "failure-mailer@%n.service" ];
-			startAt = "*:0,15,30,45";
-			script = ''
-				if problems=$(df -h | egrep '(100|9[0-9])%'); then
-					${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] bijna vol!' jeroen@lwstn.eu <<-EOF
-						Hoi,
-
-						De volgende schijven zijn bijna vol:
-
-						$problems
-
-						Succes ermee!
-					EOF
-				fi
-			'';
-		};
-		systemd.services.setup-persistent-homedirs = {
-			serviceConfig.Type = "oneshot";
-			onFailure = [ "failure-mailer@%n.service" ];
-			wantedBy = [ "multi-user.target" ];
-			script = ''
-				ln -sfT /mnt/storage/live/home/gorinchemindialoog /home/gorinchemindialoog
-			'';
-		};
-		systemd.services.gorinchemindialoog-autocommit = {
-			serviceConfig = {
-				Type = "simple";
-				User = "gorinchemindialoog";
-			};
-			onFailure = [ "failure-mailer@%n.service" ];
-			startAt = "04:00";
-			requisite = [ "mount-storage.service" ];
-			path = [ pkgs.gitMinimal pkgs.openssh ];
-			script = ''
-				# The git working tree with the actual website files:
-				export GIT_WORK_TREE=/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live
-				# The git administration dir (normally .git):
-				export GIT_DIR=/mnt/storage/live/home/gorinchemindialoog/website.git
-
-				git add --all
-				stamp=$(LANG=nl_NL.UTF-8 TZ=Europe/Amsterdam date)
-				if git diff --staged --quiet --exit-code; then
-					echo Nothing to commit.
-				else
-					git commit -m "Autocommit $stamp"
-				fi
-				git push
-			'';
-			# One-time setup (as gorinchemindialoog, with storage mounted and prepare-chroots done):
-			# 1. Run: ssh-keygen
-			# 2. Add the SSH key to gidbot on thee.radstand.nl
-			# 3. Export the environment variables in the script above.
-			# 4. Run: mkdir -p $GIT_WORK_TREE && git init && git remote add gitea@thee.radstand.nl:gorinchemindialoog/website.git && git fetch origin && git checkout main
-			# 5. Run: git config --global user.email gorinchemindialoog@radstand.nl ; git config --global user.name 'Gorinchem in Dialoog'
-		};
-
-		systemd.services."failure-mailer@" = {
-			serviceConfig.Type = "simple";
-			scriptArgs = "%I";
-			script = ''
-				unit="$1"
-				${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] probleem met $unit" jeroen@lwstn.eu <<-EOF
-					Hoi,
-
-					Ja, dus $unit heeft een ongelukje gehad:
-
-					$(systemctl status -- $unit)
-
-					Succes ermee!
-				EOF
+		systemd = {
+			services = {
+				# TODO shouldn't 'storage-mounted' be a target?
+				mount-storage = {
+					serviceConfig = {
+						Type = "oneshot";
+						RemainAfterExit = true;
+					};
+					# onFailure = [ "failure-mailer@%n.service" ]; # not useful; postfix depends on this service
+					wants = [ "luks-storage-key.service" ];
+					after    = [ "luks-storage-key.service" ];
+					wantedBy = [ "multi-user.target" ];
+					requiredBy = [
+						"nextcloud-cron.service"
+						"nextcloud-setup.service"
+						"nextcloud-update-plugins.service"
+						"phpfpm-nextcloud.service"
+						"gitea.service"
+						"btrbk-storage.service"
+						"postfix.service"
+						"dovecot2.service"
+					];
+					before = [
+						"nextcloud-cron.service"
+						"nextcloud-setup.service"
+						"nextcloud-update-plugins.service"
+						"phpfpm-nextcloud.service"
+						"gitea.service"
+						"btrbk-storage.service"
+						"postfix.service"
+						"dovecot2.service"
+					];
+					path = [ pkgs.cryptsetup pkgs.utillinux pkgs.unixtools.mount pkgs.unixtools.umount ];
+					script = ''
+						if mountpoint -q /mnt/storage; then
+							echo "Storage already mounted. Done here."
+							exit 0
+						fi
+						if [ -b /dev/mapper/storage ]; then
+							echo "LUKS mapping already opened."
+						else
+							echo "Opening LUKS mapping..."
+							cryptsetup open UUID=6c8d5be7-ae46-4e51-a270-fd5bdce46f3b storage --type luks --key-file /run/keys/luks-storage
+						fi
+						echo "Mounting..."
+						mkdir -p /mnt/storage
+						mount /dev/mapper/storage /mnt/storage
+						echo "Done here."
+					'';
+					preStop = ''
+						if mountpoint -q /mnt/storage; then
+							umount /mnt/storage
+						fi
+						cryptsetup close storage
+					'';
+				};
 				
-			'';
+				make-spare-keys = {
+					# Makes copies of keys on our storage volume in case we need to
+					# restore them without having access to our deployment tooling.
+					# Only semi-secrets (such as hashed passwords) should be persisted this way.
+					# Restoring is manual at the moment: just copy the spare keys to /run/keys/persist
+					serviceConfig.Type = "simple";
+					onFailure = [ "failure-mailer@%n.service" ];
+					startAt = "*:5,20,35,55";
+					requisite = [ "mount-storage.service" ];
+					script = ''
+						SPAREDIR=/mnt/storage/live/komputiloj/spare-keys
+						if [[ ! -d "$SPAREDIR" ]]; then
+							# Don't use mkdir -p so we don't put spare-keys on the root
+							# fs in the (rare) case that the storage volume is not
+							# correctly mounted.
+							mkdir -m 0750 -- "$SPAREDIR"
+							chown root:keys -- "$SPAREDIR"
+						fi
+						cp -a /run/keys/persist/* -- "$SPAREDIR"
+					'';
+				};
+
+				dagelijks-rapport = {
+					serviceConfig.Type = "simple";
+					onFailure = [ "failure-mailer@%n.service" ];
+					startAt = "03:00 Europe/Amsterdam"; # avoid 02:00-03:00 because of DST ambiguity
+					script = ''
+						vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
+						schijven=$(df -h | fgrep -v tmp)
+						gebruik=$(find / -mindepth 1 -maxdepth 1 -a -not -name mnt | xargs du -hs | sort -hr)
+						${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] overzicht voor $vandaag" jeroen@lwstn.eu <<-EOF
+							Hoi,
+
+							Zo staat het met de schijfruimte:
+
+							$schijven
+
+							En dit is de grootte per dir in / (zonder mnt):
+
+							$gebruik
+
+							Groetjes!
+						EOF
+					'';
+				};
+				check-disk-usage = {
+					serviceConfig.Type = "simple";
+					onFailure = [ "failure-mailer@%n.service" ];
+					startAt = "*:0,15,30,45";
+					script = ''
+						if problems=$(df -h | egrep '(100|9[0-9])%'); then
+							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] bijna vol!' jeroen@lwstn.eu <<-EOF
+								Hoi,
+
+								De volgende schijven zijn bijna vol:
+
+								$problems
+
+								Succes ermee!
+							EOF
+						fi
+					'';
+				};
+				setup-persistent-homedirs = {
+					serviceConfig.Type = "oneshot";
+					onFailure = [ "failure-mailer@%n.service" ];
+					wantedBy = [ "multi-user.target" ];
+					script = ''
+						ln -sfT /mnt/storage/live/home/gorinchemindialoog /home/gorinchemindialoog
+					'';
+				};
+				gorinchemindialoog-autocommit = {
+					serviceConfig = {
+						Type = "simple";
+						User = "gorinchemindialoog";
+					};
+					onFailure = [ "failure-mailer@%n.service" ];
+					startAt = "04:00";
+					requisite = [ "mount-storage.service" ];
+					path = [ pkgs.gitMinimal pkgs.openssh ];
+					script = ''
+						# The git working tree with the actual website files:
+						export GIT_WORK_TREE=/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live
+						# The git administration dir (normally .git):
+						export GIT_DIR=/mnt/storage/live/home/gorinchemindialoog/website.git
+
+						git add --all
+						stamp=$(LANG=nl_NL.UTF-8 TZ=Europe/Amsterdam date)
+						if git diff --staged --quiet --exit-code; then
+							echo Nothing to commit.
+						else
+							git commit -m "Autocommit $stamp"
+						fi
+						git push
+					'';
+					# One-time setup (as gorinchemindialoog, with storage mounted and prepare-chroots done):
+					# 1. Run: ssh-keygen
+					# 2. Add the SSH key to gidbot on thee.radstand.nl
+					# 3. Export the environment variables in the script above.
+					# 4. Run: mkdir -p $GIT_WORK_TREE && git init && git remote add gitea@thee.radstand.nl:gorinchemindialoog/website.git && git fetch origin && git checkout main
+					# 5. Run: git config --global user.email gorinchemindialoog@radstand.nl ; git config --global user.name 'Gorinchem in Dialoog'
+				};
+
+				"failure-mailer@" = {
+					serviceConfig.Type = "simple";
+					scriptArgs = "%I";
+					script = ''
+						unit="$1"
+						${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] probleem met $unit" jeroen@lwstn.eu <<-EOF
+							Hoi,
+
+							Ja, dus $unit heeft een ongelukje gehad:
+
+							$(systemctl status -- $unit)
+
+							Succes ermee!
+						EOF
+						
+					'';
+				};
+			};
 		};
 		
 		services.btrbk = {

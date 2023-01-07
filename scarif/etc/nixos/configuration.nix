@@ -82,13 +82,18 @@ in {
 	# 		options = [ "nosuid" "nodev" "mode=01777" "size=100M" ];/swap
 	# };
 
-	networking.hostName = "scarif";
-	networking.wireless = {
-		enable = true;  # Enables wireless support via wpa_supplicant.
-		interfaces = [ "wlp4s0" ];
-	# Netwerken staan in /etc/wpa_supplicant.conf vanwege passphrases
+	networking = {
+		hostName = "scarif";
+		wireless = {
+			enable = true;  # Enables wireless support via wpa_supplicant.
+			interfaces = [ "wlp4s0" ];
+			# Netwerken staan in /etc/wpa_supplicant.conf vanwege passphrases
+		};
+		nameservers = [ "1.1.1.1" "8.8.8.8" ];
+		hosts = {
+			# "ip.ad.dr.es" = [ "domain.name" ];
+		};
 	};
-	networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
 	# Select internationalisation properties.
 	console = {
