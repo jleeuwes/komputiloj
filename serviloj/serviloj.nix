@@ -20,7 +20,21 @@ in {
 	# - ...
 	#
 	
-	gently2 = { config, nodes, lib, pkgs, ... }: {
+	gently2 = { config, nodes, lib, pkgs, ... }:
+	let
+		privata-gently = privata.gently {
+			pkgs = pkgs;
+			cmds = {
+				ssh = "${pkgs.openssh}/bin/ssh";
+				mail = "${pkgs.mailutils}/bin/mail -aFrom:systeem$radstand.nl";
+			};
+			make-systemd-service = s@{requires ? [], after ? [], onFailure ? [], ...}: s // {
+				requires = requires ++ [ "mount-storage.service" ];
+				after    = after ++ [ "mount-storage.service" ];
+				onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+			};
+		};
+	in {
 		imports = [
 			./modules/hetzner_vps.nix
 			mailserver
@@ -74,7 +88,7 @@ in {
 		# system.stateVersion = lib.mkForce "20.09";
 
 		systemd = {
-			services = {
+			services = util.mapNames (name: "privata-" + name) (privata-gently.systemd-services) // {
 				# TODO shouldn't 'storage-mounted' be a target?
 				mount-storage = {
 					serviceConfig = {
@@ -280,7 +294,7 @@ in {
 
 		services.openssh = {
 			enable = true;
-			knownHosts = {
+			knownHosts = privata.knownHosts // {
 				"thee.radstand.nl" = {
 					# Needed for gorinchemindialoog autocommit.
 					# I guess this key is regenerated on gitea install, so we'll have to update this if rebuilding.
