@@ -26,7 +26,12 @@ in {
 			pkgs = pkgs;
 			cmds = {
 				ssh = "${pkgs.openssh}/bin/ssh";
+				scp = "${pkgs.openssh}/bin/scp";
 				mail = "${pkgs.mailutils}/bin/mail -aFrom:systeem$radstand.nl";
+				tar = "${pkgs.gnutar}/bin/tar";
+				jq = "${pkgs.jq}/bin/jq";
+				sha512sum = "${pkgs.coreutils}/bin/sha512sum";
+				grep = "${pkgs.gnugrep}/bin/grep";
 			};
 			make-systemd-service = s@{requires ? [], after ? [], onFailure ? [], ...}: s // {
 				requires = requires ++ [ "mount-storage.service" ];
@@ -142,6 +147,10 @@ in {
 						fi
 						cryptsetup close storage
 					'';
+				};
+
+				btrbk-storage = {
+					onFailure = [ "failure-mailer@%n.service" ];
 				};
 				
 				make-spare-keys = {
@@ -277,8 +286,9 @@ in {
 						preserve_day_of_week = "monday";
 						preserve_hour_of_day = "0";
 						volume."/mnt/storage" = {
-							snapshot_dir = "snapshots";
-							subvolume."live/*" = {};
+							subvolume."live/*" = {
+								snapshot_dir = "snapshots";
+							};
 						};
 					};
 					onCalendar = "hourly";
@@ -357,6 +367,13 @@ in {
 			groups.radicale = {
 				gid = 70003;
 			};
+			users."70004" = privata.users."70004" // {
+				uid = 70004;
+				isSystemUser = true;
+				createHome = true;
+				homeMode = "700";
+			};
+			groups."70004" = privata.groups."70004" // { gid = 70004; };
 			groups.sftp_only = {
 				gid = 2001;
 			};
