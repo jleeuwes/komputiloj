@@ -30,6 +30,11 @@ We have these subvolumes:
 	- `live/komputiloj` holds data pertaining to komputiloj as a whole.
 	  At the moment only the NixOps state file is kept here,
 	  but we could also use it, for instance, for logs that we want to really keep.
+- `work` holds temporary data.
+  Put stuff here instead of in e.g. `/tmp` to make sure it is not stored
+  unencrypted.
+  Put stuff here instead of under `live` if it does not need to be snapshot and
+  backed up.
 - `backups` holds backup data from other systems
 - `snapshots` holds read-only snapshots of volumes under `live`
 - `archives` holds read-only subvolumes that are not in active use
