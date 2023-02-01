@@ -1,3 +1,4 @@
+with builtins;
 let
 	sources            = import ../sources.nix;
 	util               = import ../util.nix;
@@ -22,6 +23,11 @@ in {
 	
 	gently2 = { config, nodes, lib, pkgs, ... }:
 	let
+		make-systemd-service = s@{requires ? [], after ? [], onFailure ? [], ...}: s // {
+			requires = requires ++ [ "mount-storage.service" ];
+			after    = after ++ [ "mount-storage.service" ];
+			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+		};
 		privata-gently = privata.gently {
 			pkgs = pkgs;
 			cmds = {
@@ -32,11 +38,6 @@ in {
 				jq = "${pkgs.jq}/bin/jq";
 				sha512sum = "${pkgs.coreutils}/bin/sha512sum";
 				grep = "${pkgs.gnugrep}/bin/grep";
-			};
-			make-systemd-service = s@{requires ? [], after ? [], onFailure ? [], ...}: s // {
-				requires = requires ++ [ "mount-storage.service" ];
-				after    = after ++ [ "mount-storage.service" ];
-				onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
 			};
 		};
 	in {
@@ -93,7 +94,18 @@ in {
 		# system.stateVersion = lib.mkForce "20.09";
 
 		systemd = {
-			services = util.mapNames (name: "privata-" + name) (privata-gently.systemd-services) // {
+			services
+				= listToAttrs [{
+					name = "privata-" + privata-gently.services."70004".name;
+					value = make-systemd-service {
+						serviceConfig = {
+							Type = "simple";
+							User = privata.users."70004".name;
+						};
+						startAt = "03:00 Europe/Amsterdam";
+						script = privata-gently.services."70004".script;
+					};
+				}] // {
 				# TODO shouldn't 'storage-mounted' be a target?
 				mount-storage = {
 					serviceConfig = {
@@ -367,13 +379,19 @@ in {
 			groups.radicale = {
 				gid = 70003;
 			};
-			users."70004" = privata.users."70004" // {
+			users."70004" = {
+				name = privata.users."70004".name;
+				group = privata.users."70004".group;
 				uid = 70004;
 				isSystemUser = true;
+				home = "/mnt/storage/live/home/${privata.users."70004".name}";
 				createHome = true;
 				homeMode = "700";
 			};
-			groups."70004" = privata.groups."70004" // { gid = 70004; };
+			groups."70004" = {
+				name = privata.groups."70004".name;
+				gid = 70004;
+			};
 			groups.sftp_only = {
 				gid = 2001;
 			};
