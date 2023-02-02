@@ -23,11 +23,32 @@ in {
 	
 	gently2 = { config, nodes, lib, pkgs, ... }:
 	let
-		make-systemd-service = s@{requires ? [], after ? [], onFailure ? [], ...}: s // {
+		makeJob = s@{onFailure ? [], ...}: s // {
+			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+			startAt = if s ? startAt then checkStart s.startAt else [];
+		};
+		makeJobWithStorage = s@{requisite ? [], after ? [], onFailure ? [], ...}: s // {
+			# If the requisite service is not running, this service fails.
+			requisite = requisite ++ [ "mount-storage.service" ];
+			after    = after ++ [ "mount-storage.service" ];
+			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+			startAt = if s ? startAt then checkStart s.startAt else [];
+		};
+		makeService = s@{onFailure ? [], ...}: s // {
+			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+			startAt = if s ? startAt then checkStart s.startAt else [];
+		};
+		makeServiceWithStorage = s@{requires ? [], after ? [], onFailure ? [], ...}: s // {
+			# If the required service is not running, this service will try to start it.
 			requires = requires ++ [ "mount-storage.service" ];
 			after    = after ++ [ "mount-storage.service" ];
 			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+			startAt = if s ? startAt then checkStart s.startAt else [];
 		};
+		checkStart = time:
+			if match ".*(02:[0-9][0-9]|03:00).*Europe/Amsterdam.*" time != null
+			then trace "WARNING: Time spec ${time} will behave weirdly during DST transitions!" time
+			else time;
 		privata-gently = privata.gently {
 			pkgs = pkgs;
 			cmds = {
@@ -97,12 +118,12 @@ in {
 			services
 				= listToAttrs [{
 					name = "privata-" + privata-gently.services."70004".name;
-					value = make-systemd-service {
+					value = makeJobWithStorage {
 						serviceConfig = {
 							Type = "simple";
 							User = privata.users."70004".name;
 						};
-						startAt = "03:00 Europe/Amsterdam";
+						startAt = "03:01 Europe/Amsterdam";
 						script = privata-gently.services."70004".script;
 					};
 				}] // {
@@ -122,7 +143,7 @@ in {
 						"nextcloud-update-plugins.service"
 						"phpfpm-nextcloud.service"
 						"gitea.service"
-						"btrbk-storage.service"
+						"btrbk-storage.service" # TODO make requisite
 						"postfix.service"
 						"dovecot2.service"
 					];
@@ -165,15 +186,13 @@ in {
 					onFailure = [ "failure-mailer@%n.service" ];
 				};
 				
-				make-spare-keys = {
+				make-spare-keys = makeJobWithStorage {
 					# Makes copies of keys on our storage volume in case we need to
 					# restore them without having access to our deployment tooling.
 					# Only semi-secrets (such as hashed passwords) should be persisted this way.
 					# Restoring is manual at the moment: just copy the spare keys to /run/keys/persist
 					serviceConfig.Type = "simple";
-					onFailure = [ "failure-mailer@%n.service" ];
 					startAt = "*:5,20,35,55";
-					requisite = [ "mount-storage.service" ];
 					script = ''
 						SPAREDIR=/mnt/storage/live/komputiloj/spare-keys
 						if [[ ! -d "$SPAREDIR" ]]; then
@@ -187,10 +206,9 @@ in {
 					'';
 				};
 
-				dagelijks-rapport = {
+				dagelijks-rapport = makeJob {
 					serviceConfig.Type = "simple";
-					onFailure = [ "failure-mailer@%n.service" ];
-					startAt = "03:00 Europe/Amsterdam"; # avoid 02:00-03:00 because of DST ambiguity
+					startAt = "05:00 Europe/Amsterdam";
 					script = ''
 						vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
 						schijven=$(df -h | fgrep -v tmp)
@@ -210,9 +228,8 @@ in {
 						EOF
 					'';
 				};
-				check-disk-usage = {
+				check-disk-usage = makeJob {
 					serviceConfig.Type = "simple";
-					onFailure = [ "failure-mailer@%n.service" ];
 					startAt = "*:0,15,30,45";
 					script = ''
 						if problems=$(df -h | egrep '(100|9[0-9])%'); then
@@ -228,22 +245,19 @@ in {
 						fi
 					'';
 				};
-				setup-persistent-homedirs = {
+				setup-persistent-homedirs = makeService {
 					serviceConfig.Type = "oneshot";
-					onFailure = [ "failure-mailer@%n.service" ];
 					wantedBy = [ "multi-user.target" ];
 					script = ''
 						ln -sfT /mnt/storage/live/home/gorinchemindialoog /home/gorinchemindialoog
 					'';
 				};
-				gorinchemindialoog-autocommit = {
+				gorinchemindialoog-autocommit = makeJobWithStorage {
 					serviceConfig = {
 						Type = "simple";
 						User = "gorinchemindialoog";
 					};
-					onFailure = [ "failure-mailer@%n.service" ];
-					startAt = "04:00";
-					requisite = [ "mount-storage.service" ];
+					startAt = "04:00 Europe/Amsterdam";
 					path = [ pkgs.gitMinimal pkgs.openssh ];
 					script = ''
 						# The git working tree with the actual website files:
