@@ -484,11 +484,15 @@ in {
 				};
 				# TODO strict transport security (not critical for gorinchemindialoog)
 				# TODO compare access logs
-				"www2.gorinchemindialoog.nl" = {
+				"www.gorinchemindialoog.nl" = {
+					forceSSL = true;
+					enableACME = true;
+					globalRedirect = "gorinchemindialoog.nl";
+				};
+				"gorinchemindialoog.nl" = {
 					forceSSL = true;
 					enableACME = true;
 					root = "/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live";
-					# TODO redirect www to non-www: globalRedirect = "gorinchemindialoog.nl";
 					extraConfig = ''
 						disable_symlinks if_not_owner;
 						add_header Cache-Control "no-cache";
