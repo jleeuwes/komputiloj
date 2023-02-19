@@ -23,6 +23,7 @@ in {
 	
 	gently2 = { config, nodes, lib, pkgs, ... }:
 	let
+		komputiloj = sources.komputiloj.value pkgs;
 		makeJob = s@{onFailure ? [], ...}: s // {
 			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
 			startAt = if s ? startAt then checkStart s.startAt else [];
@@ -389,6 +390,9 @@ in {
 				uid = 70003;
 				group = "radicale";
 				extraGroups = [ "keys" ];
+				isSystemUser = true;
+				home = "/mnt/storage/live/home/radicale";
+				createHome = false;
 			};
 			groups.radicale = {
 				gid = 70003;
@@ -399,8 +403,7 @@ in {
 				uid = 70004;
 				isSystemUser = true;
 				home = "/mnt/storage/live/home/${privata.users."70004".name}";
-				createHome = true;
-				homeMode = "700";
+				createHome = false;
 			};
 			groups."70004" = {
 				name = privata.groups."70004".name;
@@ -438,6 +441,7 @@ in {
 					25  # SMTP
 					465 # SMTP submission over TLS
 					587 # SMTP submission
+					5232 # Support old radicale URL
 				];
 			};
 		};
@@ -474,7 +478,43 @@ in {
 					forceSSL = true;
 					enableACME = true;
 					locations."/" = {
-						proxyPass = "http://localhost:5232/";
+						proxyPass = "http://localhost:5231/";
+						extraConfig = ''
+							proxy_set_header  X-Script-Name "";
+							proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+							proxy_pass_header Authorization;
+						'';
+					};
+				};
+				"radicale.radstand.nl" = {
+					# Compatibility with the old radicale on https://radicale.radstand.nl:5232
+					# We listen with SSL on port 5232 and proxy this to radicale.
+					# We also listen on port 80 without SSL for Let's Encrypt challenges.
+					listen = [{
+						addr = "0.0.0.0";
+						port = 80;
+					} {
+						addr = "[::0]";
+						port = 80;
+					} {
+						addr = "0.0.0.0";
+						port = 5232;
+						ssl = true;
+					} {
+						addr = "[::0]";
+						port = 5232;
+						ssl = true;
+					}];
+					enableACME = true;
+					# We need to configure some things manually when we have `listen` blocks:
+					extraConfig = ''
+						ssl_certificate /var/lib/acme/radicale.radstand.nl/fullchain.pem;
+						ssl_certificate_key /var/lib/acme/radicale.radstand.nl/key.pem;
+						ssl_trusted_certificate /var/lib/acme/radicale.radstand.nl/chain.pem;
+					'';
+					# forceSSL = true; # TODO try this
+					locations."/" = {
+						proxyPass = "http://localhost:5231/";
 						extraConfig = ''
 							proxy_set_header  X-Script-Name "";
 							proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -605,6 +645,9 @@ in {
 		services.radicale = {
 			enable = true;
 			settings = {
+				server = {
+					hosts = "0.0.0.0:5231"; # nginx should use ipv4 internally
+				};
 				auth = {
 					type = "htpasswd";
 					htpasswd_filename = "/run/keys/persist/radicale-auth";
@@ -612,6 +655,8 @@ in {
 				};
 				storage = {
 					filesystem_folder = "/mnt/storage/live/radicale/collections";
+					# Warning: this hook cannot handle usernames containing ' or \
+					hook = "${komputiloj.radicale-commit-hook}/bin/hook '%(user)s'";
 				};
 			};
 		};
