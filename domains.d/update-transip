@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+domain=$(basename -- "$PWD")
+
+payload=$(cat -- ./records | \
+	# remove comment lines:
+	grep -Ev '^;' | \
+ 	# remove empty lines:
+ 	grep -Ev '^[[:space:]]*$' | \
+ 	# normalize tabs:
+ 	sed -E 's/\t+/\t/g' | \
+ 	# make jsons:
+ 	jq -Rc 'split("\t") | { name: .[0], expire: .[1], type: .[3], content: .[4] }' | \
+ 	# join json:
+ 	jq --slurp -c '{dnsEntries: .}')
+
+curl -X PUT \
+	-H "Content-Type: application/json" \
+	--config <(
+		printf -- '-H "Authorization: Bearer %s"\n' "$TRANSIP_TOKEN"
+	) \
+	--fail \
+	-d "$payload" \
+	https://api.transip.nl/v6/domains/"$domain"/dns
+
+printf "%s OK :)\n" "$domain"

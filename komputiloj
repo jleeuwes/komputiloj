@@ -33,6 +33,9 @@ main() {
 		deploy)
 			do_deploy "$@"
 		;;
+		update-domains)
+			do_update_domains "$@"
+		;;
 		nixops)
 			do_nixops "$@"
 		;;
@@ -77,6 +80,26 @@ do_nixos_rebuild() {
 
 do_deploy() {
 	do_nixops_something "$KOMPUTILOJ_PATH"/serviloj/deploy "$@"
+}
+
+do_update_domains() {
+	# TODO Take wachtwoord from sources like in do_nixops_something.
+	# TODO It's weird dto reference serviloj here.
+	export TRANSIP_TOKEN=$(wachtwoord cat -n \
+		"$KOMPUTILOJ_PATH"/serviloj/secrets/token@api.transip.nl)
+	for domain_dir in "$KOMPUTILOJ_PATH"/domains.d/*; do
+		if [[ -d "$domain_dir" ]]; then
+		(
+			cd -- "$domain_dir"
+			if [[ -x update ]]; then
+				printf 'Updating domain %s\n' "$domain_dir" >&2
+				./update
+			else
+				printf 'Skipping domain without update script: %s\n' "$source_dir" >&2
+			fi
+		)
+		fi
+	done
 }
 
 do_nixops() {
