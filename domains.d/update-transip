@@ -9,10 +9,8 @@ payload=$(cat -- ./records | \
 	grep -Ev '^;' | \
  	# remove empty lines:
  	grep -Ev '^[[:space:]]*$' | \
- 	# normalize tabs:
- 	sed -E 's/\t+/\t/g' | \
  	# make jsons:
- 	jq -Rc 'split("\t") | { name: .[0], expire: .[1], type: .[3], content: .[4] }' | \
+ 	jq -Rc 'split("\t+"; "") | { name: .[0], expire: .[1], type: .[3], content: .[4] }' | \
  	# join json:
  	jq --slurp -c '{dnsEntries: .}')
 

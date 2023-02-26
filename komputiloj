@@ -84,9 +84,11 @@ do_deploy() {
 
 do_update_domains() {
 	# TODO Take wachtwoord from sources like in do_nixops_something.
-	# TODO It's weird dto reference serviloj here.
+	# TODO It's weird to reference serviloj here.
 	export TRANSIP_TOKEN=$(wachtwoord cat -n \
 		"$KOMPUTILOJ_PATH"/serviloj/secrets/token@api.transip.nl)
+	export VERSIO_USER=jeroen@lwstn.eu:$(wachtwoord cat -n \
+		"$KOMPUTILOJ_PATH"/serviloj/secrets/jeroen@lwstn.eu@versio.nl)
 	for domain_dir in "$KOMPUTILOJ_PATH"/domains.d/*; do
 		if [[ -d "$domain_dir" ]]; then
 		(
@@ -95,7 +97,7 @@ do_update_domains() {
 				printf 'Updating domain %s\n' "$domain_dir" >&2
 				./update
 			else
-				printf 'Skipping domain without update script: %s\n' "$source_dir" >&2
+				printf 'Skipping domain without update script: %s\n' "$domain_dir" >&2
 			fi
 		)
 		fi
