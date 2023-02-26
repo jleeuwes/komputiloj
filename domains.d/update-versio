@@ -14,20 +14,13 @@ payload=$(cat -- ./records | \
  	# remove empty lines:
  	grep -Ev '^[[:space:]]*$' | \
  	# make jsons:
- 	jq -Rc 'split("\t+"; "") | { name: .[0], ttl: .[1] | tonumber, type: .[3],
-		value: (.[4] | sub("^[0-9]+ +"; "")),
-		prio: (.[4] | [scan("^[0-9]+ ")][0] // "0" | tonumber) }' | \
+ 	jq -Rc 'split("\t+"; "") | { name: .[0], ttl: .[1] | tonumber, type: .[3] }
+		+ if .[3] == "MX"
+		  then (.[4] | split(" +"; "") | { prio: .[0] | tonumber, value: .[1] })
+		  else { prio: 0, value: .[4] }
+		  end' | \
  	# join json:
  	jq --slurp -c '{dns_records: .}')
-
-# curl -X GET \
-# 	-H "Content-Type: application/json" \
-# 	--config <(
-# 		printf -- '--user "%s"\n' "$VERSIO_USER"
-# 	) \
-# 	--fail \
-# 	"$api_base"/domains/"$domain"'?show_dns_records=true'
-# echo
 
 curl -X POST \
 	-H "Content-Type: application/json" \
@@ -38,5 +31,3 @@ curl -X POST \
 	-d "$payload" \
 	"$api_base"/domains/"$domain"/update
 echo
-
-printf "%s OK :)\n" "$domain"

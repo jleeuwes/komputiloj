@@ -22,5 +22,3 @@ curl -X PUT \
 	--fail \
 	-d "$payload" \
 	https://api.transip.nl/v6/domains/"$domain"/dns
-
-printf "%s OK :)\n" "$domain"

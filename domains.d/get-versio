@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+# NOTE: the testapi url as specified on https://www.versio.nl/RESTapidoc/ gives a 404.
+# api_base=https://www2.versio.nl/testapi/v1
+api_base=https://www2.versio.nl/api/v1
+
+domain=$(basename -- "$PWD")
+
+curl -X GET \
+	--config <(
+		printf -- '--user "%s"\n' "$VERSIO_USER"
+	) \
+	--fail \
+	"$api_base"/domains/"$domain"'?show_dns_records=true'
+echo

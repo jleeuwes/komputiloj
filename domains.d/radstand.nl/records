@@ -1,0 +1,22 @@
+@	3600	IN	CAA	0 issue "letsencrypt.org"
+@	3600	IN	CAA	0 iodef "mailto:root@radstand.nl"
+@	3600	IN	MX	10 mail2.radstand.nl.
+@	3600	IN	A	164.138.27.107
+
+wilder	3600	IN	A	164.138.27.107
+gently	3600	IN	A	157.90.156.122
+gently2	3600	IN	A	157.90.156.122
+
+mail	3600	IN	A	164.138.27.107
+mail2	3600	IN	A	157.90.156.122
+
+www	3600	IN	CNAME	wilder.radstand.nl.
+knol	3600	IN	CNAME	gently.radstand.nl.
+radicale	3600	IN	CNAME	gently.radstand.nl.
+wolk	3600	IN	CNAME	gently.radstand.nl.
+thee	3600	IN	CNAME	gently.radstand.nl.
+meel	3600	IN	CNAME	gently.radstand.nl.
+
+
+testdomein	3600	IN	MX	10 mail2.radstand.nl.
+

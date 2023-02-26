@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+domain=$(basename -- "$PWD")
+
+curl -X GET \
+	--config <(
+		printf -- '-H "Authorization: Bearer %s"\n' "$TRANSIP_TOKEN"
+	) \
+	--fail \
+	https://api.transip.nl/v6/domains/"$domain"/dns
