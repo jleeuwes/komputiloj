@@ -542,6 +542,21 @@ in {
 						error_page 404 /404.html;
 					'';
 				};
+				"www.radstand.nl" = {
+					forceSSL = true;
+					enableACME = true;
+					globalRedirect = "radstand.nl";
+				};
+				"radstand.nl" = {
+					forceSSL = true;
+					enableACME = true;
+					root = "/mnt/storage/live/http-hodgepodge/radstand.nl";
+					extraConfig = ''
+						disable_symlinks if_not_owner from=$document_root/dump;
+						add_header Cache-Control "no-cache";
+						index index.html;
+					'';
+				};
 			};
 		};
 
