@@ -7,7 +7,7 @@ wilder	3600	IN	A	164.138.27.107
 gently	3600	IN	A	157.90.156.122
 gently2	3600	IN	A	157.90.156.122
 
-mail	3600	IN	A	164.138.27.107
+mail	3600	IN	A	157.90.156.122
 mail2	3600	IN	A	157.90.156.122
 
 www	3600	IN	CNAME	wilder.radstand.nl.

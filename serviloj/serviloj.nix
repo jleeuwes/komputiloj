@@ -628,8 +628,9 @@ in {
 				};
 			};
 			forwards = util.mapNames (name : name + "@gorinchemindialoog.nl") gorinchemindialoog.forwards // {
-				# catch-all:
-				"@radstand.nl" = "jeroen@lwstn.eu";
+				# catch-all: (let op: dit stuurt ALLES door, niet alleen
+				# onbekende accounts):
+				# "@radstand.nl" = "jeroen@lwstn.eu";
 			};
 
 			indexDir = "/var/mail-indexes";
