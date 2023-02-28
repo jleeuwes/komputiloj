@@ -461,8 +461,12 @@ in {
 			recommendedOptimisation = true;
 			recommendedProxySettings = true;
 			recommendedTlsSettings = true;
-
+			
 			virtualHosts = {
+				# TODO requests without SNI get gorinchemindialoog.nl (I think);
+				# this is nice for gorinchemindialoog.nl but looks a bit arbitrary. Should we do something about this?
+				# TODO Run https://www.ssllabs.com/ssltest/index.html
+
 				"wolk.radstand.nl" = {
 					forceSSL = true;
 					enableACME = true;
@@ -522,7 +526,6 @@ in {
 						'';
 					};
 				};
-				# TODO strict transport security (not critical for gorinchemindialoog)
 				# TODO compare access logs
 				"www.gorinchemindialoog.nl" = {
 					forceSSL = true;
@@ -536,6 +539,7 @@ in {
 					extraConfig = ''
 						disable_symlinks if_not_owner;
 						add_header Cache-Control "no-cache";
+						error_page 404 /404.html;
 					'';
 				};
 			};
