@@ -466,6 +466,9 @@ in {
 				# TODO requests without SNI get gorinchemindialoog.nl (I think);
 				# this is nice for gorinchemindialoog.nl but looks a bit arbitrary. Should we do something about this?
 				# TODO Run https://www.ssllabs.com/ssltest/index.html
+				# NOTE forceSSL does not add HTST. If you do add HTST, be
+				# careful with the default server, otherwise every subdomain
+				# might end up with HTST enabled.
 
 				"wolk.radstand.nl" = {
 					forceSSL = true;
@@ -528,7 +531,7 @@ in {
 				};
 				# TODO compare access logs
 				"www.gorinchemindialoog.nl" = {
-					forceSSL = true;
+					addSSL = true;
 					enableACME = true;
 					globalRedirect = "gorinchemindialoog.nl";
 				};
@@ -543,7 +546,7 @@ in {
 					'';
 				};
 				"www.radstand.nl" = {
-					forceSSL = true;
+					addSSL = true;
 					enableACME = true;
 					globalRedirect = "radstand.nl";
 				};
@@ -556,6 +559,7 @@ in {
 						add_header Cache-Control "no-cache";
 						index index.html;
 					'';
+					default = true;
 				};
 			};
 		};
