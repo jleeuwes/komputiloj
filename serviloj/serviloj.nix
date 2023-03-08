@@ -50,18 +50,6 @@ in {
 			if match ".*(02:[0-9][0-9]|03:00).*Europe/Amsterdam.*" time != null
 			then trace "WARNING: Time spec ${time} will behave weirdly during DST transitions!" time
 			else time;
-		privata-gently = privata.gently {
-			pkgs = pkgs;
-			cmds = {
-				ssh = "${pkgs.openssh}/bin/ssh";
-				scp = "${pkgs.openssh}/bin/scp";
-				mail = "${pkgs.mailutils}/bin/mail -aFrom:systeem$radstand.nl";
-				tar = "${pkgs.gnutar}/bin/tar";
-				jq = "${pkgs.jq}/bin/jq";
-				sha512sum = "${pkgs.coreutils}/bin/sha512sum";
-				grep = "${pkgs.gnugrep}/bin/grep";
-			};
-		};
 	in {
 		imports = [
 			./modules/hetzner_vps.nix
@@ -118,14 +106,15 @@ in {
 		systemd = {
 			services
 				= listToAttrs [{
-					name = "privata-" + privata-gently.services."70004".name;
+					name = "privata-" + privata.gently.services."70004".name;
 					value = makeJobWithStorage {
 						serviceConfig = {
 							Type = "simple";
 							User = privata.users."70004".name;
 						};
 						startAt = "03:01 Europe/Amsterdam";
-						script = privata-gently.services."70004".script;
+						path = with pkgs; [ openssh mailutils gnutar jq coreutils gnugrep ];
+						script = privata.gently.services."70004".script;
 					};
 				}] // {
 				# TODO shouldn't 'storage-mounted' be a target?
