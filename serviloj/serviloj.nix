@@ -623,6 +623,9 @@ in {
 					# PROTOCOL = "sendmail";    # ...these two we need
 					# SENDMAIL_PATH = "${pkgs.system-sendmail}/bin/sendmail";
 				};
+				service = {
+					ENABLE_NOTIFY_MAIL = true;
+				};
 				other = {
 					SHOW_FOOTER_VERSION = false;
 				};
