@@ -635,8 +635,8 @@ in {
 			# at https://nixos-mailserver.readthedocs.io/en/latest/options.html
 			localDnsResolver = false;
 	
-			# TODO get rid of nginx welcome page on mail2.radstand.nl
-			fqdn = "mail2.radstand.nl";
+			# TODO get rid of nginx welcome page on mail.radstand.nl
+			fqdn = "mail.radstand.nl";
 			sendingFqdn = "gently.radstand.nl";
 			domains = [ "gorinchemindialoog.nl" "radstand.nl" ];
 
