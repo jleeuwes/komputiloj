@@ -685,6 +685,26 @@ in {
 			mailutils
 			gitMinimal
 			gitAndTools.git-annex
+
+			# This makes the gitea CLI available
+			# TODO put this somewhere else
+			# (TODO add it to the gitea module someday)
+			(pkgs.writeShellApplication {
+				name = "gitea";
+				runtimeInputs = [ gitea ];
+				text = ''
+					if [[ $# -eq 0 ]]; then
+						echo "gitea without arguments would run the web app." >&2
+						echo "It's highly unlikely that you want to run the web app this way." >&2
+						echo "Please give a command." >&2
+						exit 1
+					fi
+
+					export GITEA_CUSTOM=/mnt/storage/live/gitea/rootdir/custom
+					# TODO we probably also need to set GITEA_WORK_DIR
+					sudo --preserve-env=GITEA_CUSTOM -u gitea gitea "$@"
+				'';
+			})
 		];
 	};
 }
