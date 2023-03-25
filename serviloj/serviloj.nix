@@ -637,8 +637,8 @@ in {
 			domains = [ "gorinchemindialoog.nl" "radstand.nl" ];
 
 			loginAccounts = {
-				"gorinchemindialoog@radstand.nl" = {
-					name = "gorinchemindialoog";
+				"info@gorinchemindialoog.nl" = {
+					# name = "gorinchemindialoog"; # not sure what this does
 					hashedPasswordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
 				};
 			};
