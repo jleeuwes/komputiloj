@@ -106,7 +106,7 @@ in {
 		systemd = {
 			services
 				= listToAttrs [{
-					name = "privata-" + privata.gently.services."70004".name;
+					name = "privata-" + privata.gently.services."70004-backup".name;
 					value = makeJobWithStorage {
 						serviceConfig = {
 							Type = "simple";
@@ -114,7 +114,7 @@ in {
 						};
 						startAt = "03:01 Europe/Amsterdam";
 						path = with pkgs; [ openssh mailutils gnutar jq coreutils gnugrep ];
-						script = privata.gently.services."70004".script;
+						script = privata.gently.services."70004-backup".script;
 					};
 				}] // {
 				# TODO shouldn't 'storage-mounted' be a target?
