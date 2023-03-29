@@ -18,6 +18,7 @@ set -Eeu -o pipefail
 git submodule update --remote submodule
 
 cat > default.nix <<-EOF
+	# GENERATED
 	rec {
 	    nix_path = ./submodule;
 	    value = import nix_path;

@@ -1,14 +1,14 @@
 with builtins;
 let
 	sources            = import ../sources.nix;
-	util               = import ../util.nix;
+	utilecoj           = import ../utilecoj.nix;
 	nixpkgs            = sources.nixos_22_05.value {};
 	mailserver         = sources.mailserver_22_05.value;
 	nextcloud_apps     = sources.nextcloud_25_apps.value;
 	gorinchemindialoog = sources.gorinchemindialoog.value;
-	privata            = sources.komputiloj-privata.value;
+	privata            = sources.komputiloj-privata.value { inherit utilecoj; };
 	inherit (nixpkgs.lib.strings) escapeShellArgs;
-in {
+in with utilecoj; {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
 	network.description = "Our humble all-encompassing serviloj deployment";
@@ -23,7 +23,7 @@ in {
 	
 	gently2 = { config, nodes, lib, pkgs, ... }:
 	let
-		komputiloj = sources.komputiloj.value pkgs;
+		komputiloj = sources.komputiloj.value { inherit pkgs utilecoj; };
 		makeJob = s@{onFailure ? [], ...}: s // {
 			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
 			startAt = if s ? startAt then checkStart s.startAt else [];
@@ -148,7 +148,7 @@ in {
 						"dovecot2.service"
 					];
 					path = [ pkgs.cryptsetup pkgs.utillinux pkgs.unixtools.mount pkgs.unixtools.umount ];
-					script = ''
+					script = stripTabs ''
 						if mountpoint -q /mnt/storage; then
 							echo "Storage already mounted. Done here."
 							exit 0
@@ -164,7 +164,7 @@ in {
 						mount /dev/mapper/storage /mnt/storage
 						echo "Done here."
 					'';
-					preStop = ''
+					preStop = stripTabs ''
 						if mountpoint -q /mnt/storage; then
 							umount /mnt/storage
 						fi
@@ -183,7 +183,7 @@ in {
 					# Restoring is manual at the moment: just copy the spare keys to /run/keys/persist
 					serviceConfig.Type = "simple";
 					startAt = "*:5,20,35,55";
-					script = ''
+					script = stripTabs ''
 						SPAREDIR=/mnt/storage/live/komputiloj/spare-keys
 						if [[ ! -d "$SPAREDIR" ]]; then
 							# Don't use mkdir -p so we don't put spare-keys on the root
@@ -199,7 +199,7 @@ in {
 				dagelijks-rapport = makeJob {
 					serviceConfig.Type = "simple";
 					startAt = "05:00 Europe/Amsterdam";
-					script = ''
+					script = stripTabs ''
 						vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
 						schijven=$(df -h | fgrep -v tmp)
 						gebruik=$(find / -mindepth 1 -maxdepth 1 -a -not -name mnt | xargs du -hs | sort -hr)
@@ -221,7 +221,7 @@ in {
 				check-disk-usage = makeJob {
 					serviceConfig.Type = "simple";
 					startAt = "*:0,15,30,45";
-					script = ''
+					script = stripTabs ''
 						if problems=$(df -h | egrep '(100|9[0-9])%'); then
 							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] bijna vol!' jeroen@lwstn.eu <<-EOF
 								Hoi,
@@ -238,7 +238,7 @@ in {
 				setup-persistent-homedirs = makeService {
 					serviceConfig.Type = "oneshot";
 					wantedBy = [ "multi-user.target" ];
-					script = ''
+					script = stripTabs ''
 						ln -sfT /mnt/storage/live/home/gorinchemindialoog /home/gorinchemindialoog
 					'';
 				};
@@ -249,7 +249,7 @@ in {
 					};
 					startAt = "04:00 Europe/Amsterdam";
 					path = [ pkgs.gitMinimal pkgs.openssh ];
-					script = ''
+					script = stripTabs ''
 						# The git working tree with the actual website files:
 						export GIT_WORK_TREE=/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live
 						# The git administration dir (normally .git):
@@ -275,7 +275,7 @@ in {
 				"failure-mailer@" = {
 					serviceConfig.Type = "simple";
 					scriptArgs = "%I";
-					script = ''
+					script = stripTabs ''
 						unit=$(printf '%s\n' "$1" | sed -E 's/\//-/g') # for some reason, - becomes /, so we need to translate back
 						${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] probleem met $unit" jeroen@lwstn.eu <<-EOF
 							Hoi,
@@ -327,7 +327,7 @@ in {
 					publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHmMPh91t1reE1ddLcFYyddQs0hx4v41KcaNBS2UVnEA";
 				};
 			};
-			extraConfig = ''
+			extraConfig = stripTabs ''
 				Match Group sftp_only
 					ChrootDirectory /mnt/storage/live/sftp/%u
 					ForceCommand internal-sftp
@@ -475,7 +475,7 @@ in {
 					enableACME = true;
 					locations."/" = {
 						proxyPass = "http://localhost:5231/";
-						extraConfig = ''
+						extraConfig = stripTabs ''
 							proxy_set_header  X-Script-Name "";
 							proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
 							proxy_pass_header Authorization;
@@ -503,7 +503,7 @@ in {
 					}];
 					enableACME = true;
 					# We need to configure some things manually when we have `listen` blocks:
-					extraConfig = ''
+					extraConfig = stripTabs ''
 						ssl_certificate /var/lib/acme/radicale.radstand.nl/fullchain.pem;
 						ssl_certificate_key /var/lib/acme/radicale.radstand.nl/key.pem;
 						ssl_trusted_certificate /var/lib/acme/radicale.radstand.nl/chain.pem;
@@ -511,7 +511,7 @@ in {
 					# forceSSL = true; # TODO try this
 					locations."/" = {
 						proxyPass = "http://localhost:5231/";
-						extraConfig = ''
+						extraConfig = stripTabs ''
 							proxy_set_header  X-Script-Name "";
 							proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
 							proxy_pass_header Authorization;
@@ -528,7 +528,7 @@ in {
 					forceSSL = true;
 					enableACME = true;
 					root = "/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live";
-					extraConfig = ''
+					extraConfig = stripTabs ''
 						disable_symlinks if_not_owner;
 						add_header Cache-Control "no-cache";
 						error_page 404 /404.html;
@@ -543,7 +543,7 @@ in {
 					forceSSL = true;
 					enableACME = true;
 					root = "/mnt/storage/live/http-hodgepodge/radstand.nl";
-					extraConfig = ''
+					extraConfig = stripTabs ''
 						disable_symlinks if_not_owner from=$document_root/dump;
 						add_header Cache-Control "no-cache";
 						index index.html;
@@ -642,7 +642,7 @@ in {
 					hashedPasswordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
 				};
 			};
-			forwards = util.mapNames (name : name + "@gorinchemindialoog.nl") gorinchemindialoog.forwards // {
+			forwards = mapNames (name : name + "@gorinchemindialoog.nl") gorinchemindialoog.forwards // {
 				# catch-all: (let op: dit stuurt ALLES door, niet alleen
 				# onbekende accounts):
 				# "@radstand.nl" = "jeroen@lwstn.eu";
@@ -692,7 +692,7 @@ in {
 			(pkgs.writeShellApplication {
 				name = "gitea";
 				runtimeInputs = [ gitea ];
-				text = ''
+				text = stripTabs ''
 					if [[ $# -eq 0 ]]; then
 						echo "gitea without arguments would run the web app." >&2
 						echo "It's highly unlikely that you want to run the web app this way." >&2

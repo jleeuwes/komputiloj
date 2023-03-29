@@ -17,7 +17,7 @@
 # TODO: we might need to do some trickery to make sure the actively used sources are not gc'ed:
 # https://discourse.nixos.org/t/pinned-nixpkgs-keeps-getting-garbage-collected/12912/6
 with builtins;
-with (import ./util.nix);
+with (import ./utilecoj.nix);
 let
 	source_dirs = dirnames_in ./sources.d;
 	source = source_dir: import (./sources.d + "/${source_dir}");

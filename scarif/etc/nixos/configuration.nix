@@ -1,10 +1,11 @@
 { config, pkgs, lib, ... }:
 let
+	utilecoj = import (<komputiloj> + /utilecoj.nix);
 	sources = import (<komputiloj> + /sources.nix);
 	nixos_unstable = sources.unstable.value {
 		config = config.nixpkgs.config;
 	};
-	komputiloj = sources.komputiloj.value pkgs;
+	komputiloj = sources.komputiloj.value { inherit utilecoj pkgs; };
 in {
 	# # Add the --option extra-builtins-file to nix
 	# # using a magic spell from https://elvishjerricco.github.io/2018/06/24/secure-declarative-key-management.html
