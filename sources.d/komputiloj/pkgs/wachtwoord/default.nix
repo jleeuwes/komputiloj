@@ -1,13 +1,17 @@
-{ lib, stdenv, makeWrapper, gnupg, apacheHttpd, mkpasswd, coreutils }:
+{ utilecoj, lib, stdenv, makeWrapper, gnupg, apacheHttpd, mkpasswd, coreutils, ...}:
+with utilecoj;
+
 stdenv.mkDerivation rec {
 	pname = "wachtwoord";
 	version = "0.1";
-
+	
 	buildInputs = [ gnupg apacheHttpd mkpasswd ];
 	nativeBuildInputs = [ makeWrapper ];
 
 	unpackPhase = ":";
-	installPhase = ''
+	
+	explicit_dep_because_stripTabs_confuses_nix = ./wachtwoord;
+	installPhase = stripTabs ''
 		mkdir -p $out/bin
 		cp ${./wachtwoord} $out/bin/wachtwoord
 		chmod +x $out/bin/wachtwoord

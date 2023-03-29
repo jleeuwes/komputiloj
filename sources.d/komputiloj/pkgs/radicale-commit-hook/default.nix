@@ -1,4 +1,6 @@
-{ lib, stdenv, makeWrapper, git, openssh, mailutils, coreutils }:
+{ utilecoj, lib, stdenv, makeWrapper, git, openssh, mailutils, coreutils, ... }:
+with utilecoj;
+
 stdenv.mkDerivation rec {
 	pname = "radicale-commit-hook";
 	version = "0.1";
@@ -7,7 +9,8 @@ stdenv.mkDerivation rec {
 	nativeBuildInputs = [ makeWrapper ];
 
 	unpackPhase = ":";
-	installPhase = ''
+	explicit_dep_because_stripTabs_confuses_nix = ./hook;
+	installPhase = stripTabs ''
 		mkdir -p $out/bin
 		cp ${./hook} $out/bin/hook
 		chmod +x $out/bin/hook

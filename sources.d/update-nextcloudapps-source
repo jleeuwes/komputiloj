@@ -8,6 +8,7 @@ curl https://apps.nextcloud.com/api/v1/platform/"$nextcloud_version"/apps.json >
 exec 3> default.nix
 
 cat >&3 <<-EOF
+	# GENERATED
 	{
 	  value = pkgs:
 	  let fetchNextcloudApp = pkgs.fetchNextcloudApp;
@@ -36,6 +37,7 @@ JQ_RELEASE_FILTER='(.isNightly|not) and (.version|contains("-")|not)'
 				    $app = import ./apps/$app { inherit fetchNextcloudApp; };
 			EOF
 			cat > default.nix <<-EOF
+				# GENERATED
 				{fetchNextcloudApp}:
 				fetchNextcloudApp {
 				  name    = "$app";

@@ -26,6 +26,7 @@ current_sha=$(nix-prefetch-url --unpack "$current_url")
 # printf "%s" "$current_url" > current_url
 # printf "%s" "$current_sha" > current_sha
 cat > default.nix <<-EOF
+	# GENERATED
 	with builtins;
 	rec {
 	    nix_path = fetchTarball {
