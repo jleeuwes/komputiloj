@@ -74,10 +74,6 @@ in with utilecoj; {
 				group = "nextcloud";
 				permissions = "ug=r,o=";
 			};
-			"account-gorinchemindialoog" = {
-				destDir = "/run/keys/persist";
-				keyCommand = [ "wachtwoord" "hash" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
-			};
 			"account-gorinchemindialoog-bcrypt" = {
 				destDir = "/run/keys/persist";
 				keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
@@ -406,7 +402,7 @@ in with utilecoj; {
 				createHome = false;
 				home = "/home/gorinchemindialoog"; # must exist both inside and outside the sftp_only chroot
 				uid = 1001;
-				passwordFile = "/run/keys/persist/account-gorinchemindialoog";
+				passwordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
 				extraGroups = [ "sftp_only" ];
 			};
 		};
