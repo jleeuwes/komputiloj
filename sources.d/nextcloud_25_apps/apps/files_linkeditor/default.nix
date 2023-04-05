@@ -1,3 +1,4 @@
+# GENERATED
 {fetchNextcloudApp}:
 fetchNextcloudApp {
   name    = "files_linkeditor";
