@@ -1,3 +1,4 @@
+# GENERATED
 with builtins;
 rec {
     nix_path = fetchTarball {

@@ -1,3 +1,4 @@
+# GENERATED
 {
   value = pkgs:
   let fetchNextcloudApp = pkgs.fetchNextcloudApp;

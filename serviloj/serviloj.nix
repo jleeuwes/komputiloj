@@ -54,6 +54,7 @@ in with utilecoj; {
 		imports = [
 			./modules/hetzner_vps.nix
 			mailserver
+			../modules/user-keygen.nix
 		];
 
 		nixpkgs.overlays = [
@@ -382,6 +383,7 @@ in with utilecoj; {
 				isSystemUser = true;
 				home = "/mnt/storage/live/home/radicale";
 				createHome = false;
+				openssh.keygen.enabled = true;
 			};
 			groups.radicale = {
 				gid = 70003;
@@ -393,6 +395,7 @@ in with utilecoj; {
 				isSystemUser = true;
 				home = "/mnt/storage/live/home/${privata.users."70004".name}";
 				createHome = false;
+				openssh.keygen.enabled = true;
 			};
 			groups."70004" = {
 				name = privata.groups."70004".name;
