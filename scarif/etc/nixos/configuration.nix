@@ -184,12 +184,14 @@ in {
 		dejsonlz4 # for reading firefox jsonlz4 files
 		remarshal # for yaml2json etc
 		jq # json manipulation
-		# unstable.android-studio
 		jetbrains.idea-community
 		openjdk11 maven visualvm
 		love_11
 		arduino
 		haskellPackages.ghc
+		
+		# unstable.android-studio
+		apktool dex2jar
 
 		# LaTeX and PDF:
 		# (Not sure if rubber uses the chosen texlive distribution)
