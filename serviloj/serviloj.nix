@@ -132,6 +132,7 @@ in with utilecoj; {
 						"btrbk-storage.service" # TODO make requisite
 						"postfix.service"
 						"dovecot2.service"
+						"radicale.service"
 					];
 					before = [
 						"nextcloud-cron.service"
@@ -142,6 +143,7 @@ in with utilecoj; {
 						"btrbk-storage.service"
 						"postfix.service"
 						"dovecot2.service"
+						"radicale.service"
 					];
 					path = [ pkgs.cryptsetup pkgs.utillinux pkgs.unixtools.mount pkgs.unixtools.umount ];
 					script = stripTabs ''
