@@ -20,3 +20,4 @@ sz() {
 # (preferably configure largefiles correctly)
 alias ga="git annex add --force-small"
 
+alias lpr-bw="lpr -o CololModel=Gray -o print-color-mode=monochrome"
