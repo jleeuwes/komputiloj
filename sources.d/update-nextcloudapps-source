@@ -30,7 +30,7 @@ JQ_RELEASE_FILTER='(.isNightly|not) and (.version|contains("-")|not)'
 			cd "$app"
 			current_version=$(jq -r .version release.json)
 			current_url=$(jq -r .download release.json)
-			current_sha=$(nix-prefetch-url "$current_url")
+			current_sha=$(nix-prefetch-url --unpack "$current_url")
 			# printf "%s" "$current_url" > current_url
 			# printf "%s" "$current_sha" > current_sha
 			cat >&3 <<-EOF
@@ -40,8 +40,8 @@ JQ_RELEASE_FILTER='(.isNightly|not) and (.version|contains("-")|not)'
 				# GENERATED
 				{fetchNextcloudApp}:
 				fetchNextcloudApp {
-				  name    = "$app";
-				  version = "$current_version";
+				  # name    = "$app";
+				  # version = "$current_version";
 				  url     = "$current_url";
 				  sha256  = "$current_sha";
 				}

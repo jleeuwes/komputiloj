@@ -2,8 +2,8 @@ with builtins;
 let
 	sources            = import ../sources.nix;
 	utilecoj           = import ../utilecoj.nix;
-	nixpkgs            = sources.nixos_22_05.value {};
-	mailserver         = sources.mailserver_22_05.value;
+	nixpkgs            = sources.nixos_22_11.value {};
+	mailserver         = sources.mailserver_22_11.value;
 	nextcloud_apps     = sources.nextcloud_25_apps.value;
 	gorinchemindialoog = sources.gorinchemindialoog.value;
 	privata            = sources.komputiloj-privata.value { inherit utilecoj; };
@@ -569,6 +569,8 @@ in with utilecoj; {
 
 			maxUploadSize = "512M";
 
+			enableBrokenCiphersForSSE = false; # https://github.com/NixOS/nixpkgs/pull/198470
+
 			config = {
 				adminuser = "admin";
 				adminpassFile = "/run/keys/nextcloud-admin";
@@ -590,14 +592,9 @@ in with utilecoj; {
 
 			rootUrl = "https://thee.radstand.nl/";
 			domain = "thee.radstand.nl";
-			cookieSecure = true;
-
-			log.level = "Info";
 
 			# NOTE: after changing the stateDir, regenerate gitea's authorized_keys file through the admin webinterface.
 			stateDir = "/mnt/storage/live/gitea/rootdir";
-
-			disableRegistration = true;
 
 			# mailerPasswordFile = ...;
 			settings = {
@@ -613,7 +610,14 @@ in with utilecoj; {
 					# SENDMAIL_PATH = "${pkgs.system-sendmail}/bin/sendmail";
 				};
 				service = {
+					DISABLE_REGISTRATION = true;
 					ENABLE_NOTIFY_MAIL = true;
+				};
+				log = {
+					LEVEL = "Info";
+				};
+				session = {
+					COOKIE_SECURE = true;
 				};
 				other = {
 					SHOW_FOOTER_VERSION = false;

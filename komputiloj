@@ -11,7 +11,7 @@ determine_here() {
 export KOMPUTILOJ_PATH=$(determine_here)
 printf 'Using KOMPUTILOJ_PATH=%q\n' "$KOMPUTILOJ_PATH" >&2
 
-DEFAULT_NIXOS=nixos_22_05 # the source we use as nixpkgs in nixos-rebuild
+DEFAULT_NIXOS=nixos_22_11 # the source we use as nixpkgs in nixos-rebuild
 
 main() {
 	local cmd
