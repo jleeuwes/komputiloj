@@ -3,7 +3,7 @@ syntax enable
 " For some reason the background seems a tint too dark
 " and some keywords get a lighter background.
 " It looks odd and not like in the screenshots, so
-" TODO I thing I should investigate
+" TODO I think I should investigate
 colorscheme solarized
 
 :set ignorecase
@@ -20,6 +20,9 @@ colorscheme solarized
 " Haskell wants spaces and I want less indentation:
 autocmd FileType haskell setlocal expandtab tabstop=2 shiftwidth=2 softtabstop=2
 autocmd FileType cabal setlocal expandtab tabstop=2 shiftwidth=2 softtabstop=2
+
+" Nix wants spaces unfortunately:
+autocmd FileType nix setlocal expandtab
 
 " visualize tabs and trailing spaces:
 :set list
