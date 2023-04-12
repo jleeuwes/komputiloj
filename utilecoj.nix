@@ -10,7 +10,16 @@ rec {
 
 	filterAttrs = (f: attrs: listToAttrs (filter f (attrsToList attrs)));
 	
-	dirnames_in = dir: attrNames (filterAttrs (d: d.value == "directory") (readDir dir));
+	dirnamesIn = dir: attrNames (filterAttrs (d: d.value == "directory") (readDir dir));
+	# deprecated snake case alias:
+    dirnames_in = dirnamesIn;
+
+    importDir = path: let
+        sourceDirs = dirnamesIn path;
+        source = sourceDir: import (path + "/${sourceDir}");
+        importedPairs = map (sourceDir: {name = sourceDir; value = source sourceDir;}) sourceDirs;
+    in
+        listToAttrs importedPairs;
 
 	lines = input:
 		filter (element: typeOf element == "string")

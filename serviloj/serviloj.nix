@@ -1,6 +1,7 @@
 with builtins;
 let
-	sources            = import ../sources.nix;
+	komputiloj         = import ../.;
+	sources            = komputiloj.sources;
 	utilecoj           = import ../utilecoj.nix;
 	nixpkgs            = sources.nixos_22_11.value {};
 	mailserver         = sources.mailserver_22_11.value;
@@ -23,7 +24,11 @@ in with utilecoj; {
 	
 	gently2 = { config, nodes, lib, pkgs, ... }:
 	let
-		komputiloj = sources.komputiloj.value { inherit pkgs utilecoj; };
+		# It seems a bit convoluted now to have a komputiloj source inside
+		# something called komputiloj; TODO maybe have a pkgs attribute in the
+		# top-level komputiloj attrset?
+		komputilojPkgs = sources.komputiloj.value { inherit pkgs utilecoj; };
+
 		makeJob = s@{onFailure ? [], ...}: s // {
 			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
 			startAt = if s ? startAt then checkStart s.startAt else [];
@@ -374,7 +379,7 @@ in with utilecoj; {
 				gid = 70002;
 			};
 			users.radicale = {
-				uid = 70003;
+				uid = komputiloj.users.radicale.linux.uid;
 				group = "radicale";
 				extraGroups = [ "keys" ];
 				isSystemUser = true;
@@ -382,7 +387,7 @@ in with utilecoj; {
 				createHome = false;
 			};
 			groups.radicale = {
-				gid = 70003;
+				gid = komputiloj.users.radicale.linux.uid;
 			};
 			users."70004" = {
 				name = privata.users."70004".name;
@@ -674,7 +679,7 @@ in with utilecoj; {
 				storage = {
 					filesystem_folder = "/mnt/storage/live/radicale/collections";
 					# Warning: this hook cannot handle usernames containing ' or \
-					hook = "${komputiloj.radicale-commit-hook}/bin/hook '%(user)s'";
+					hook = "${komputilojPkgs.radicale-commit-hook}/bin/hook '%(user)s'";
 				};
 			};
 		};

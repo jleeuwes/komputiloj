@@ -16,6 +16,7 @@
 #
 # TODO: we might need to do some trickery to make sure the actively used sources are not gc'ed:
 # https://discourse.nixos.org/t/pinned-nixpkgs-keeps-getting-garbage-collected/12912/6
+# TODO: use importDirs from utilecoj
 with builtins;
 with (import ./utilecoj.nix);
 let

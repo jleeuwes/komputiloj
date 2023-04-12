@@ -11,7 +11,8 @@ determine_here() {
 export KOMPUTILOJ_PATH=$(determine_here)
 printf 'Using KOMPUTILOJ_PATH=%q\n' "$KOMPUTILOJ_PATH" >&2
 
-DEFAULT_NIXOS=nixos_22_11 # the source we use as nixpkgs in nixos-rebuild
+# Determine the source we use as nixpkgs in nixos-rebuild etcetera:
+DEFAULT_NIXOS=$(nix-instantiate --eval . -A default_nixos | egrep -o '[^"]+')
 
 main() {
 	local cmd
@@ -32,6 +33,9 @@ main() {
 		;;
 		deploy)
 			do_deploy "$@"
+		;;
+		activate-apps)
+			do_activate_apps "$@"
 		;;
 		update-domains)
 			do_update_domains "$@"
@@ -80,10 +84,11 @@ do_nixos_rebuild() {
 
 do_deploy() {
 	do_nixops_something "$KOMPUTILOJ_PATH"/serviloj/deploy "$@"
+	echo "TODO now activate-apps?" >&2
 }
 
 do_update_domains() {
-	# TODO Take wachtwoord from sources like in do_nixops_something.
+	# TODO Take wachtwoord program from sources like in do_nixops_something.
 	# TODO It's weird to reference serviloj here.
 	export TRANSIP_TOKEN=$(wachtwoord cat -n \
 		"$KOMPUTILOJ_PATH"/serviloj/secrets/token@api.transip.nl)
@@ -125,6 +130,18 @@ do_nixops_something() {
 		    with komputiloj.value { inherit pkgs utilecoj; };
 		    wachtwoord' \
 		--run "$args_escaped"
+}
+
+do_activate_apps() {
+	# TODO Take wachtwoord program from sources like in do_nixops_something.
+	# TODO It's weird to reference serviloj here.
+	export THEE_USER=jeroen
+	export THEE_PASSWORD=$(wachtwoord cat -n \
+		"$KOMPUTILOJ_PATH"/serviloj/secrets/jeroen@thee.radstand.nl)
+	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH"
+	nix-build --no-out-link . -A apps.thee.activate.pkg
+	activate_cmd=$(nix-instantiate --eval . -A apps.thee.activate.cmd | egrep -o '[^"]+')
+	"$activate_cmd"
 }
 
 do_cleanup() {
