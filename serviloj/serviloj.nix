@@ -408,7 +408,7 @@ in with utilecoj; {
 				isNormalUser = true;
 				createHome = false;
 				home = "/home/gorinchemindialoog"; # must exist both inside and outside the sftp_only chroot
-				uid = 1001;
+				uid = komputiloj.users.gorinchemindialoog.linux.uid;
 				passwordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
 				extraGroups = [ "sftp_only" ];
 			};

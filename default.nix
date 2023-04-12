@@ -1,7 +1,7 @@
 # TODO this file should become the anchor point for all komputiloj operations
 with builtins;
 let
-    users = import ./users.d;
+    users = sources.gorinchemindialoog.value.users // import ./users.d;
     sources = import ./sources.nix; # TODO move to ./sources.d/default.nix
     default_nixos = "nixos_22_11"; # defines default nixos used by all of komputiloj
     default_nixos_source = getAttr default_nixos sources;
