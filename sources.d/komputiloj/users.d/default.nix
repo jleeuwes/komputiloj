@@ -1,2 +1,3 @@
-with import ../utilecoj.nix;
+{ utilecoj }:
+with utilecoj;
 importDir ./humans // importDir ./robots

@@ -128,7 +128,7 @@ do_nixops_something() {
 		-p 'with import (<komputiloj> + /sources.nix);
 		    let utilecoj = import (<komputiloj> + /utilecoj.nix); in
 		    with komputiloj.value { inherit pkgs utilecoj; };
-		    wachtwoord' \
+		    pkgs.wachtwoord' \
 		--run "$args_escaped"
 }
 

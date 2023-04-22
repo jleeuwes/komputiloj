@@ -7,7 +7,7 @@ let
 	mailserver         = sources.mailserver_22_11.value;
 	nextcloud_apps     = sources.nextcloud_25_apps.value;
 	gorinchemindialoog = sources.gorinchemindialoog.value;
-	privata            = sources.komputiloj-privata.value { inherit utilecoj; };
+	hello              = sources.hello-infra.value;
 	inherit (nixpkgs.lib.strings) escapeShellArgs;
 in with utilecoj; {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
@@ -27,28 +27,26 @@ in with utilecoj; {
 		# It seems a bit convoluted now to have a komputiloj source inside
 		# something called komputiloj; TODO maybe have a pkgs attribute in the
 		# top-level komputiloj attrset?
-		komputilojPkgs = sources.komputiloj.value { inherit pkgs utilecoj; };
+		komputilojPkgs = (sources.komputiloj.value { inherit pkgs utilecoj; }).pkgs;
 
-		makeJob = s@{onFailure ? [], ...}: s // {
-			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+		makeJob = s: s // {
+			mailOnFailure = true;
 			startAt = if s ? startAt then checkStart s.startAt else [];
 		};
-		makeJobWithStorage = s@{requisite ? [], after ? [], onFailure ? [], ...}: s // {
-			# If the requisite service is not running, this service fails.
-			requisite = requisite ++ [ "mount-storage.service" ];
-			after    = after ++ [ "mount-storage.service" ];
-			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+		makeJobWithStorage = s@{requisite ? [], after ? [], ...}: s // {
+			# If the volume is not mounted, this service fails.
+			needsStorageVolume = "requisite";
+			mailOnFailure = true;
 			startAt = if s ? startAt then checkStart s.startAt else [];
 		};
-		makeService = s@{onFailure ? [], ...}: s // {
-			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+		makeService = s: s // {
+			mailOnFailure = true;
 			startAt = if s ? startAt then checkStart s.startAt else [];
 		};
-		makeServiceWithStorage = s@{requires ? [], after ? [], onFailure ? [], ...}: s // {
-			# If the required service is not running, this service will try to start it.
-			requires = requires ++ [ "mount-storage.service" ];
-			after    = after ++ [ "mount-storage.service" ];
-			onFailure = onFailure ++ [ "failure-mailer@%n.service" ];
+		makeServiceWithStorage = s@{requires ? [], after ? [], ...}: s // {
+			# If the volume is not mounted, this service will try to mount it.
+			needsStorageVolume = "requires";
+			mailOnFailure = true;
 			startAt = if s ? startAt then checkStart s.startAt else [];
 		};
 		checkStart = time:
@@ -57,8 +55,13 @@ in with utilecoj; {
 			else time;
 	in {
 		imports = [
+			# TODO take all modules from merged top-level komputiloj?
 			./modules/hetzner_vps.nix
+			../modules/systemd-failure-mailer.nix
+			../modules/storage-volume.nix
 			mailserver
+			hello.modules."70004-backup"
+			hello.modules."70004-known-host"
 		];
 
 		nixpkgs.overlays = [
@@ -88,7 +91,7 @@ in with utilecoj; {
 				keyCommand = [ "sh" "-c"
 					"wachtwoord hash-with-bcrypt ${escapeShellArgs
 						(map (username: "secrets/${username}@knol.radstand.nl")
-							privata.radicale.users
+							hello.radicale.users
 					)} | sed -E 's/^secrets\\/([^@]*)@[^:]*/\\1/'"
 				];
 				user = "radicale";
@@ -105,78 +108,11 @@ in with utilecoj; {
 		# system.stateVersion = lib.mkForce "20.09";
 
 		systemd = {
-			services
-				= listToAttrs [{
-					name = "privata-" + privata.gently.services."70004-backup".name;
-					value = makeJobWithStorage {
-						serviceConfig = {
-							Type = "simple";
-							User = privata.users."70004".name;
-						};
-						startAt = "03:01 Europe/Amsterdam";
-						path = with pkgs; [ openssh mailutils gnutar jq coreutils gnugrep ];
-						script = privata.gently.services."70004-backup".script;
-					};
-				}] // {
+			services = {
 				# TODO shouldn't 'storage-mounted' be a target?
-				mount-storage = {
-					serviceConfig = {
-						Type = "oneshot";
-						RemainAfterExit = true;
-					};
-					# onFailure = [ "failure-mailer@%n.service" ]; # not useful; postfix depends on this service
-					wants = [ "luks-storage-key.service" ];
-					after    = [ "luks-storage-key.service" ];
-					wantedBy = [ "multi-user.target" ];
-					requiredBy = [
-						"nextcloud-cron.service"
-						"nextcloud-setup.service"
-						"nextcloud-update-plugins.service"
-						"phpfpm-nextcloud.service"
-						"gitea.service"
-						"btrbk-storage.service" # TODO make requisite
-						"postfix.service"
-						"dovecot2.service"
-						"radicale.service"
-					];
-					before = [
-						"nextcloud-cron.service"
-						"nextcloud-setup.service"
-						"nextcloud-update-plugins.service"
-						"phpfpm-nextcloud.service"
-						"gitea.service"
-						"btrbk-storage.service"
-						"postfix.service"
-						"dovecot2.service"
-						"radicale.service"
-					];
-					path = [ pkgs.cryptsetup pkgs.utillinux pkgs.unixtools.mount pkgs.unixtools.umount ];
-					script = stripTabs ''
-						if mountpoint -q /mnt/storage; then
-							echo "Storage already mounted. Done here."
-							exit 0
-						fi
-						if [ -b /dev/mapper/storage ]; then
-							echo "LUKS mapping already opened."
-						else
-							echo "Opening LUKS mapping..."
-							cryptsetup open UUID=6c8d5be7-ae46-4e51-a270-fd5bdce46f3b storage --type luks --key-file /run/keys/luks-storage
-						fi
-						echo "Mounting..."
-						mkdir -p /mnt/storage
-						mount /dev/mapper/storage /mnt/storage
-						echo "Done here."
-					'';
-					preStop = stripTabs ''
-						if mountpoint -q /mnt/storage; then
-							umount /mnt/storage
-						fi
-						cryptsetup close storage
-					'';
-				};
 
 				btrbk-storage = {
-					onFailure = [ "failure-mailer@%n.service" ];
+					mailOnFailure = true;
 				};
 				
 				make-spare-keys = makeJobWithStorage {
@@ -275,23 +211,6 @@ in with utilecoj; {
 					# 5. Run: git config --global user.email gorinchemindialoog@radstand.nl ; git config --global user.name 'Gorinchem in Dialoog'
 				};
 
-				"failure-mailer@" = {
-					serviceConfig.Type = "simple";
-					scriptArgs = "%I";
-					script = stripTabs ''
-						unit=$(printf '%s\n' "$1" | sed -E 's/\//-/g') # for some reason, - becomes /, so we need to translate back
-						${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] probleem met $unit" jeroen@lwstn.eu <<-EOF
-							Hoi,
-
-							Ja, dus $unit heeft een ongelukje gehad:
-
-							$(systemctl status -- $unit)
-
-							Succes ermee!
-						EOF
-						
-					'';
-				};
 			};
 		};
 		
@@ -323,13 +242,6 @@ in with utilecoj; {
 
 		services.openssh = {
 			enable = true;
-			knownHosts = privata.knownHosts // {
-				"thee.radstand.nl" = {
-					# Needed for gorinchemindialoog autocommit.
-					# I guess this key is regenerated on gitea install, so we'll have to update this if rebuilding.
-					publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHmMPh91t1reE1ddLcFYyddQs0hx4v41KcaNBS2UVnEA";
-				};
-			};
 			extraConfig = stripTabs ''
 				Match Group sftp_only
 					ChrootDirectory /mnt/storage/live/sftp/%u
@@ -337,6 +249,15 @@ in with utilecoj; {
 					AllowTcpForwarding no
 					X11Forwarding no
 			'';
+		};
+		programs.ssh = {
+			knownHosts = {
+				"thee.radstand.nl" = {
+					# Needed for gorinchemindialoog autocommit.
+					# I guess this key is regenerated on gitea install, so we'll have to update this if rebuilding.
+					publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHmMPh91t1reE1ddLcFYyddQs0hx4v41KcaNBS2UVnEA";
+				};
+			};
 		};
 
 		users = {
@@ -390,16 +311,16 @@ in with utilecoj; {
 				gid = komputiloj.users.radicale.linux.uid;
 			};
 			users."70004" = {
-				name = privata.users."70004".name;
-				group = privata.users."70004".group;
-				uid = 70004;
+				name = komputiloj.users."70004".name;
+				group = komputiloj.users."70004".name;
+				uid = komputiloj.users."70004".linux.uid;
 				isSystemUser = true;
-				home = "/mnt/storage/live/home/${privata.users."70004".name}";
+				home = "/mnt/storage/live/home/${komputiloj.users."70004".name}";
 				createHome = false;
 			};
 			groups."70004" = {
-				name = privata.groups."70004".name;
-				gid = 70004;
+				name = komputiloj.users."70004".name;
+				gid = komputiloj.users."70004".linux.uid;
 			};
 			groups.sftp_only = {
 				gid = 2001;
