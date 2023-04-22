@@ -94,6 +94,7 @@ do_update_domains() {
 		"$KOMPUTILOJ_PATH"/serviloj/secrets/token@api.transip.nl)
 	export VERSIO_USER=jeroen@lwstn.eu:$(wachtwoord cat -n \
 		"$KOMPUTILOJ_PATH"/serviloj/secrets/jeroen@lwstn.eu@versio.nl)
+	# TODO put domains in top-level default.nix
 	for domain_dir in "$KOMPUTILOJ_PATH"/domains.d/*; do
 		if [[ -d "$domain_dir" ]]; then
 		(

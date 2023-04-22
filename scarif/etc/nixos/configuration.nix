@@ -49,7 +49,7 @@ in {
 	nixpkgs.overlays = [
 		(import (<komputiloj> + /overlays/replacements.nix) {
 			git-annex = nixos_unstable.git-annex;
-			git-annex-remote-rclone = komputiloj.git-annex-remote-rclone;
+			git-annex-remote-rclone = komputiloj.pkgs.git-annex-remote-rclone;
 		})
 		(import (<komputiloj> + /overlays/undesired-packages-overlay.nix))
 	];
@@ -159,7 +159,7 @@ in {
 		git-annex git-annex-remote-rclone rclone
 		sshpass
 		gnupg paperkey qrencode zbar pwgen
-		komputiloj.wachtwoord
+		komputiloj.pkgs.wachtwoord
 		inetutils # for ftp for the nas
 		openssl
 		nmap
@@ -397,16 +397,18 @@ ctl.pulse {
 
 	# Define a user account. Don't forget to set a password with ‘passwd’.
 	users.extraUsers.jeroen = {
-		uid = 1000;
+		uid = komputiloj.users.jeroen.linux.uid;
 		isNormalUser = true;
-		description = "Jeroen Leeuwestein";
+		description = komputiloj.users.jeroen.fullName;
 		extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video" "audio"
 			"lp" # for scanning with Canon
 		];
 	};
 	users.extraUsers.speel = {
 		# A dedicated user account to play untrusted game binaries.
-		uid = 1001;
+		uid = 1001; # clashes with gorinchemindialoog.
+		            # Fortunately, it's unlikely that we will have speel on our
+		            # servers or gorinchemindialoog on this laptop.
 		isNormalUser = true;
 		description = "Speel Spelletjes";
 		extraGroups = [ "video" "audio" ];
