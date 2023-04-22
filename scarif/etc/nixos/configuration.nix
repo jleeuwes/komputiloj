@@ -32,6 +32,7 @@ in {
 		# - https://nixos.org/nixpkgs/manual/#sec-allow-unfree
 		allowUnfreePredicate = pkg:
 			builtins.elem (lib.getName pkg) [
+				"steam-run"
 				"steam-original"
 				"android-studio"
 				"symbola" # non-commercial, no modifications,

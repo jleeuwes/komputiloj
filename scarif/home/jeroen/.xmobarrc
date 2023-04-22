@@ -1,9 +1,8 @@
-Config { font = "xft:DejaVu Sans Mono:size=11"
+Config { font = "DejaVu Sans Mono 11"
        , bgColor = "black"
        , fgColor = "white"
        , position = Top
        , alpha = 255
-       , textOffset = 19
        , commands =
           [ Run DateZone "%a %-e %B [%V] %Y %H:%M<fc=#404040>:%S</fc>" "nl_NL.UTF8" "" "date" 1
           , Run BatteryN ["BAT0"] ["-L","10","-H","49",
