@@ -50,8 +50,14 @@ in
 				# keygenUsers=( ${strings.escapeShellArgs keygenUsers} )
 				for keygenUser in ${strings.escapeShellArgs keygenUsers}; do
 					echo "TODO $keygenUser"
-					# ${pkgs.util-linux}/bin/runuser -u "$keygenUser" \
-					# 	${pkgs.openssh}/bin/ssh-keygen -N ""
+					# keygenUserGid=$(getent passwd -- "$keygenUser" | cut -d: -f4)
+					# keygenUserHome=$(getent passwd -- "$keygenUser" | cut -d: -f6)
+					# TODO specify rsa (otherwise
+					# ${pkgs.util-linux}/bin/setpriv --reuid="$keygenUser" \
+					# 	--regid="$keygenUserGid" --init-groups \
+					# 	--inh-caps=-all \
+					# 	--reset-env \
+					# 	${pkgs.openssh}/bin/ssh-keygen -t rsa -f "$keygenUserHome"/.ssh/id_rsa.pub -N "" < /dev/null
 				done
 			'';
 		};
