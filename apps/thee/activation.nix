@@ -30,11 +30,19 @@ let
         prohibit_login = true;
         visibility = "private";
     };
+
+    user2gitea_keys = user: attrValues (mapAttrs key2gitea (user.ssh.publicKeys or {}));
+    key2gitea = name: key: toJSON {
+        key = key;
+        title = "komputiloj_managed:${name}";
+        read_only = false;
+    };
     
     userlist = attrValues users;
     declared_users   = map (user: user.name) userlist;
     users_to_enable  = filter (user: user.apps.thee.enable or false) userlist;
     users_to_disable = filter (user: !(user.apps.thee.enable or false)) userlist;
+    keys_per_user    = listToAttrs (map (user: { name = user.name; value = user2gitea_keys user; }) userlist);
 
     enabled_user_drv = user: symlinkJoin {
         name = user.name;
@@ -67,6 +75,7 @@ let
             set -u
             do_curl_basic() {
                 curl \
+                    --no-progress-meter \
                     -H "Content-Type: application/json" \
                     --config <(
                         printf -- '--user %q\n' "$THEE_USER:$THEE_PASSWORD"
@@ -74,6 +83,7 @@ let
             }
             do_curl_bearer() {
                 curl \
+                    --no-progress-meter \
                     -H "Content-Type: application/json" \
                     --config <(
                         printf -- '-H "Authorization: token %q"\n' "$THEE_TOKEN"
@@ -101,14 +111,33 @@ let
                 user_processed[$u]=0
                 existing_users+=( "$u" )
             done < <(
-                do_curl_bearer "${api_base}/admin/users" | jq -c '.[]|.login'
+                do_curl_bearer --fail "${api_base}/admin/users?limit=50" | jq -c '.[]|.login'
             )
+
+            # We currently completely ignore paging.
+            # If the number of users gets bigger than MAX_RESPONSE_ITEMS
+            # (see https://docs.gitea.io/en-us/administration/config-cheat-sheet/#api-api)
+            # we will SILENTLY miss any further pages.
+            # Here are some checks to catch that,
+            # assuming default values for MAX_RESPONSE_ITEMS and DEFAULT_PAGING_NUM
+            # TODO We should use something like https://github.com/Langenfeld/py-gitea
+            if [[ ${"\${#existing_users[@]}"} -ge 30 ]]; then
+                echo >&2
+                echo "! DANGER!!!" >&2
+                echo "! We are getting close to the maximum number of users supported by this script." >&2
+                echo >&2
+            elif [[ ${"\${#existing_users[@]}"} -ge 50 ]]; then
+                echo "! ABORT!!!" >&2
+                echo "! We have reached the maximum number of users supported by this script." >&2
+                exit 1
+            fi
 
             enable_user() {
                 local user
                 local infodir
                 user="$1"
                 infodir="$2"
+                echo >&2
                 if [[ ${"\${user_exists[$user]}"} -eq 1 ]]; then
                     echo "User $user exists, should enable -> UPDATE" >&2
                     do_curl_bearer --fail -X PATCH \
@@ -133,6 +162,7 @@ let
                 local infodir
                 user="$1"
                 infodir="$2"
+                echo >&2
                 if [[ ${"\${user_exists[$user]}"} -eq 1 ]]; then
                     echo "User $user exists, should disable -> UPDATE" >&2
                     do_curl_bearer --fail -X PATCH \
@@ -142,6 +172,51 @@ let
                     echo "User $user does not exist, should disable -> NO-OP" >&2
                 fi
                 user_processed[$user]=1
+            }
+            
+            delete_user_keys() {
+                local user
+                user="$1"
+                local key_title
+                local key_id
+                local key_json
+                while IFS= read -r key_json; do
+                    key_title=$(printf '%s' "$key_json" | jq -r .title)
+                    key_id=$(printf '%s' "$key_json" | jq -r .id)
+                    if [[ "$key_title" = komputiloj_managed:* ]]; then
+                        echo "Deleting managed key for user $user: $key_title" >&2
+                        do_curl_bearer --fail -X DELETE \
+                            "${api_base}/admin/users/$user/keys/$key_id"
+                    else
+                        echo "Ignoring non-managed key for user $user: $key_title" >&2
+                    fi
+                done < <(
+                    do_curl_bearer --fail "${api_base}/users/$user/keys?limit=50" | jq -c '.[]'
+                )
+            }
+            add_user_keys() {
+                local user
+                local json
+                user="$1"
+                shift
+                while [[ $# -gt 0 ]]; do
+                    json="$1"
+                    shift
+                    
+                    echo -n "Adding key for user $user: " >&2
+                    printf '%s' "$json" | jq -r .title >&2
+                    do_curl_bearer --fail -X POST \
+                        "${api_base}/admin/users/$user/keys" \
+                        --data-raw "$json"
+                done
+            }
+            update_user_keys() {
+                # Naive implementation: delete all managed keys, then re-add.
+                # Of course this means that there is a short window in which the user loses access.
+                echo >&2
+                echo "Updating keys for user $1" >&2
+                delete_user_keys "$1"
+                add_user_keys "$@"
             }
             
             ${unlines (map
@@ -156,6 +231,10 @@ let
                     echo "User $user exists but is not declared -> NO-OP" >&2
                 fi
             done
+
+            ${unlines (attrValues (mapAttrs
+                (name: value: "update_user_keys ${escapeShellArg name} ${escapeShellArgs value}")
+                keys_per_user))}
         '';
     };
 in script_drv
