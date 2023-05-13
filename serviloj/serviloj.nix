@@ -61,6 +61,7 @@ in with utilecoj; {
 			../modules/storage-volume.nix
 			mailserver
 			hello.modules."70004-backup"
+			hello.modules."70004-autocommit"
 			hello.modules."70004-known-host"
 		];
 
