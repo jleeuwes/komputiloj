@@ -162,7 +162,17 @@ in with utilecoj; {
 					serviceConfig.Type = "simple";
 					startAt = "*:0,15,30,45";
 					script = stripTabs ''
-						if problems=$(df -h | egrep '(100|9[0-9])%'); then
+						if problems=$(df -h | fgrep '100%'); then
+							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] vol!' jeroen@lwstn.eu <<-EOF
+								Hoi,
+
+								De volgende schijven zijn vol:
+
+								$problems
+
+								Succes ermee!
+							EOF
+						elif problems=$(df -h | egrep '9[0-9]%'); then
 							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] bijna vol!' jeroen@lwstn.eu <<-EOF
 								Hoi,
 
