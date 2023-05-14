@@ -271,6 +271,18 @@ in with utilecoj; {
 			};
 		};
 
+		programs.git = {
+			enable = true;
+			config = {
+				# Limit memory usage of git client (used for autocommit tasks).
+				# See https://discourse.gitea.io/t/remote-aborting-due-to-possible-repository-corruption/6617
+				# and https://www.reddit.com/r/Gitea/comments/tb0ns6/errors_on_push/
+				# and https://git-scm.com/docs/git-config
+				pack.threads = 1;
+				pack.windowMemory = "100m";
+			};
+		};
+
 		users = {
 			users.root = {
 				# Password file must be present and readable by the system
