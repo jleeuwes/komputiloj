@@ -6,8 +6,10 @@ newline_color=#40a0f0
 space_color=#40a0f0
 ellipsis_color=#40a0f0
 separator_color=#40a0f0
-primary_length=30
-clipboard_length=30
+primary_length=20
+clipboard_length=20
+
+# TODO limit the total length instead of each length
 
 primary_selection=$(timeout -k 0.01 0.1 xsel -t 50 --primary |
 	egrep -o "^.{0,$primary_length}.?")
@@ -19,8 +21,8 @@ else
 fi
 
 clipboard_selection=$(timeout -k 0.01 0.1 xsel -t 50 --clipboard | egrep -o '^.{0,31}')
-if [[ ${#clipboard_selection} -gt 30 ]]; then
-	clipboard_selection=${clipboard_selection:0:30}
+if [[ ${#clipboard_selection} -gt $clipboard_length ]]; then
+	clipboard_selection=${clipboard_selection:0:$clipboard_length}
 	clipboard_suffix="<fc=$ellipsis_color>…</fc>"
 else
 	clipboard_suffix=
