@@ -162,6 +162,7 @@ in with utilecoj; {
 				check-disk-usage = makeJob {
 					serviceConfig.Type = "simple";
 					startAt = "*:0,15,30,45";
+					path = [ pkgs.btrfs-progs ];
 					script = stripTabs ''
 						if problems=$(df -h | fgrep '100%'); then
 							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] vol!' jeroen@lwstn.eu <<-EOF
@@ -180,6 +181,22 @@ in with utilecoj; {
 								De volgende schijven zijn bijna vol:
 
 								$problems
+
+								Succes ermee!
+							EOF
+						fi
+						if problems=$(btrfs fi usage /mnt/storage | egrep 'Meta.*([789][0-9]|100)(\.[0-9]+)?%'); then
+							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] BTRFS-metadata raakt vol!' jeroen@lwstn.eu <<-EOF
+								Hoi,
+
+								Potentiële problemen op BTRFS:
+
+								$problems
+
+								Suggestie: btrfs balance start -dusage=NUM /mnt/storage
+								Begin met NUM=0 en ga steeds hoger tot er iets
+								gebeurt en btrfs fi usage omlaag gaat.
+								Meer info hier: https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Problem_FAQ.html#I_get_.22No_space_left_on_device.22_errors.2C_but_df_says_I.27ve_got_lots_of_space
 
 								Succes ermee!
 							EOF
