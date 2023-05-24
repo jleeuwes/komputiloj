@@ -567,6 +567,12 @@ in with utilecoj; {
 				session = {
 					COOKIE_SECURE = true;
 				};
+				"cron.git_gc_repos" = {
+					ENABLED = true;
+					SCHEDULE = "@every 72h";
+					TIMEOUT = "15m";
+					NOTICE_ON_SUCCESS = true;
+				};
 				other = {
 					SHOW_FOOTER_VERSION = false;
 				};
