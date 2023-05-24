@@ -62,6 +62,7 @@ in with utilecoj; {
 			mailserver
 			hello.modules."70004-backup"
 			hello.modules."70004-autocommit"
+			hello.modules."70004-ingest-data"
 			hello.modules."70004-known-host"
 		];
 
