@@ -173,7 +173,7 @@ in with utilecoj; {
 
 								Succes ermee!
 							EOF
-						elif problems=$(df -h | egrep '9[0-9]%'); then
+						elif problems=$(df -h | egrep '9[5-9]%'); then
 							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] bijna vol!' jeroen@lwstn.eu <<-EOF
 								Hoi,
 
