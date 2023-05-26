@@ -185,7 +185,7 @@ in with utilecoj; {
 								Succes ermee!
 							EOF
 						fi
-						if problems=$(btrfs fi usage /mnt/storage | egrep 'Meta.*([789][0-9]|100)(\.[0-9]+)?%'); then
+						if problems=$(btrfs fi usage /mnt/storage | sed -E 's/\.[0-9]+//g' | egrep 'Meta.*([789][0-9]|100)%'); then
 							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] BTRFS-metadata raakt vol!' jeroen@lwstn.eu <<-EOF
 								Hoi,
 
