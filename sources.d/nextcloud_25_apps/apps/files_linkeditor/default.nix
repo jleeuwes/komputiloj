@@ -2,7 +2,7 @@
 {fetchNextcloudApp}:
 fetchNextcloudApp {
   # name    = "files_linkeditor";
-  # version = "1.1.13";
-  url     = "https://github.com/te-online/nextcloud-app-releases/raw/main/files_linkeditor/v1.1.13/files_linkeditor.tar.gz";
-  sha256  = "1s8b906kadm543aqn9iq8q3j7v78bakyxb6bdydcvc2292cwqnnp";
+  # version = "1.1.14";
+  url     = "https://github.com/te-online/nextcloud-app-releases/raw/main/files_linkeditor/v1.1.14/files_linkeditor.tar.gz";
+  sha256  = "1jgjvb6dmhmvvj5ya03ya0fszlc09yys2ayb3m1lsxv3g8xj5khv";
 }
