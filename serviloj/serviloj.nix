@@ -28,6 +28,7 @@ in with utilecoj; {
 		# something called komputiloj; TODO maybe have a pkgs attribute in the
 		# top-level komputiloj attrset?
 		komputilojPkgs = (sources.komputiloj.value { inherit pkgs utilecoj; }).pkgs;
+		helloParts = hello.parts { inherit pkgs; };
 
 		makeJob = s: s // {
 			mailOnFailure = true;
@@ -508,6 +509,10 @@ in with utilecoj; {
 					forceSSL = true;
 					enableACME = true;
 					root = "/mnt/storage/live/http-hodgepodge/radstand.nl";
+					locations = {
+						"${helloParts.nginxLocations.liedjes.location}" =
+							helloParts.nginxLocations.liedjes.config;
+					};
 					extraConfig = stripTabs ''
 						disable_symlinks if_not_owner from=$document_root/dump;
 						add_header Cache-Control "no-cache";
