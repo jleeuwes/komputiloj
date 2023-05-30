@@ -6,11 +6,18 @@ let
     default_nixos = "nixos_22_11"; # defines default nixos used by all of komputiloj
     default_nixos_source = getAttr default_nixos sources;
     default_nixpkgs = default_nixos_source.value {};
-    capsules = {
-        komputiloj = sources.komputiloj.value {
-            inherit utilecoj;
-            nixpkgs = default_nixpkgs;
+    komputiloj_capsule = {
+        users = import ./users.d { inherit utilecoj; };
+        packages = let
+            callPackage = pkg: default_nixpkgs.callPackage pkg { inherit utilecoj; };
+        in {
+            wachtwoord = callPackage ./pkgs/wachtwoord;
+            git-annex-remote-rclone = callPackage ./pkgs/git-annex-remote-rclone;
+            radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook;
         };
+    };
+    capsules = {
+        komputiloj = komputiloj_capsule;
         hello-infra = sources.hello-infra.value {
             nixpkgs = default_nixpkgs;
         };

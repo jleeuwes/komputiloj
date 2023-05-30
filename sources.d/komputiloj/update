@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-echo "(This source is for package definitions in the komputiloj repo itself."
-echo "It is up-to-date by definition.)"
