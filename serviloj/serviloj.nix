@@ -145,20 +145,26 @@ in with utilecoj; {
 				dagelijks-rapport = makeJob {
 					serviceConfig.Type = "simple";
 					startAt = "05:00 Europe/Amsterdam";
+					path = [ pkgs.btrfs-progs ];
 					script = stripTabs ''
 						vandaag=$(LANG=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
 						schijven=$(df -h | fgrep -v tmp)
+						btrfs=$(btrfs filesystem usage /mnt/storage)
 						gebruik=$(find / -mindepth 1 -maxdepth 1 -a -not -name mnt | xargs du -hs | sort -hr)
 						${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] overzicht voor $vandaag" jeroen@lwstn.eu <<-EOF
 							Hoi,
 
-							Zo staat het met de schijfruimte:
+							Zo staat het met de schijfruimte volgens df:
 
 							$schijven
 
-							En dit is de grootte per dir in / (zonder mnt):
+							Dit is de grootte per dir in / (zonder mnt):
 
 							$gebruik
+
+							Zo staat het met de schijfruimte volgens btrfs:
+
+							$btrfs
 
 							Groetjes!
 						EOF
