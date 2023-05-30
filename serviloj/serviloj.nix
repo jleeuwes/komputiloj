@@ -1,13 +1,15 @@
 with builtins;
 let
-	komputiloj         = import ../.;
-	sources            = komputiloj.sources;
+	topLevel           = import ../.;
+	sources            = topLevel.sources;
+	capsules           = topLevel.capsules;
 	utilecoj           = import ../utilecoj.nix;
 	nixpkgs            = sources.nixos_22_11.value {};
 	mailserver         = sources.mailserver_22_11.value;
 	nextcloud_apps     = sources.nextcloud_25_apps.value;
-	gorinchemindialoog = sources.gorinchemindialoog.value;
-	hello              = sources.hello-infra.value;
+	komputiloj         = capsules.komputiloj;
+	gorinchemindialoog = capsules.gorinchemindialoog;
+	hello              = capsules.hello-infra;
 	inherit (nixpkgs.lib.strings) escapeShellArgs;
 in with utilecoj; {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
@@ -24,12 +26,6 @@ in with utilecoj; {
 	
 	gently2 = { config, nodes, lib, pkgs, ... }:
 	let
-		# It seems a bit convoluted now to have a komputiloj source inside
-		# something called komputiloj; TODO maybe have a pkgs attribute in the
-		# top-level komputiloj attrset?
-		komputilojPkgs = (sources.komputiloj.value { inherit pkgs utilecoj; }).pkgs;
-		helloParts = hello.parts { inherit pkgs; };
-
 		makeJob = s: s // {
 			mailOnFailure = true;
 			startAt = if s ? startAt then checkStart s.startAt else [];
@@ -353,16 +349,16 @@ in with utilecoj; {
 				gid = komputiloj.users.radicale.linux.uid;
 			};
 			users."70004" = {
-				name = komputiloj.users."70004".name;
-				group = komputiloj.users."70004".name;
-				uid = komputiloj.users."70004".linux.uid;
+				name = hello.users."70004".name;
+				group = hello.users."70004".name;
+				uid = hello.users."70004".linux.uid;
 				isSystemUser = true;
-				home = "/mnt/storage/live/home/${komputiloj.users."70004".name}";
+				home = "/mnt/storage/live/home/${hello.users."70004".name}";
 				createHome = false;
 			};
 			groups."70004" = {
-				name = komputiloj.users."70004".name;
-				gid = komputiloj.users."70004".linux.uid;
+				name = hello.users."70004".name;
+				gid = hello.users."70004".linux.uid;
 			};
 			groups.sftp_only = {
 				gid = 2001;
@@ -371,7 +367,7 @@ in with utilecoj; {
 				isNormalUser = true;
 				createHome = false;
 				home = "/home/gorinchemindialoog"; # must exist both inside and outside the sftp_only chroot
-				uid = komputiloj.users.gorinchemindialoog.linux.uid;
+				uid = gorinchemindialoog.users.gorinchemindialoog.linux.uid;
 				passwordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
 				extraGroups = [ "sftp_only" ];
 			};
@@ -510,8 +506,8 @@ in with utilecoj; {
 					enableACME = true;
 					root = "/mnt/storage/live/http-hodgepodge/radstand.nl";
 					locations = {
-						"${helloParts.nginxLocations.liedjes.location}" =
-							helloParts.nginxLocations.liedjes.config;
+						"${hello.nginxLocations.liedjes.location}" =
+							hello.nginxLocations.liedjes.config;
 					};
 					extraConfig = stripTabs ''
 						disable_symlinks if_not_owner from=$document_root/dump;
@@ -652,7 +648,7 @@ in with utilecoj; {
 				storage = {
 					filesystem_folder = "/mnt/storage/live/radicale/collections";
 					# Warning: this hook cannot handle usernames containing ' or \
-					hook = "${komputilojPkgs.radicale-commit-hook}/bin/hook '%(user)s'";
+					hook = "${komputiloj.packages.radicale-commit-hook}/bin/hook '%(user)s'";
 				};
 			};
 		};

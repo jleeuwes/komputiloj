@@ -45,6 +45,64 @@ To upgrade the NixOS version for our servers,
 change `network.nixpkgs` in `serviloj.nix` to the major version you want,
 then run the above.
 
+## Concepts
+
+There's a lot of ad-hoc stuff, but there are some concepts forming:
+
+### Sources
+
+A _source_ is some Nix value obtained from someplace else.
+On the filesystem it consists of:
+
+- a `default.nix` containing an attrset with a `value` attribute
+  and an optional `nix_path` attribute.
+  The latter is useful if we want to use the source in our `NIX_PATH`.
+- an `update` script that checks for a newer version of the thing we're
+  sourcing and generates a new `default.nix` file.
+- depending on the type of `update` script,
+  some more files that define the sourced thing.
+
+Sources seem similar to the dependency declaration and lock file of Nix flakes.
+We might one day switch to flakes.
+
+### Capsules
+
+A _capsule_ provides different types of Nix- or komputiloj-related _objects_
+(Nix values), like NixOS modules or komputiloj users.
+
+A capsule can exist in one of two forms:
+
+1. an attribute set with objects grouped by category.
+2. a function taking other capsules and returning such an attribute set.
+
+Capsules seem similar to the input/output part of Nix flakes.
+We might one day switch to flakes.
+I try to keep my capsules in line with my understanding of flakes.
+That way I can pick the benefits of the flakes concept that I want,
+without fully committing yet, while also making it potentially easy to switch later.
+
+### Globules
+
+Instead of defining and composing capsules,
+I can also imagine a system of NixOS-module-like objects
+but on the level of a whole komputiloj network.
+We could define a structure for the whole komputiloj network (NixOps network
+plus apps stuff) as a Nix value,
+plus declare options that can output parts of that structure,
+just like NixOS modules.
+
+The module system in Nixpkgs is generic enough to do this.
+As an example, I think <https://blog.jmgilman.com/writing-a-flake-library/> is
+also using the module system outside of NixOS, but I haven't looked at it
+in-depth.
+
+For now, I am not taking this route,
+because I already dislike debugging all the fix point magic of the NixOS module
+system. I think the capsules route is more easily understandable and requires
+less magic. It is more conducive to a 'follow the code' way of understanding
+in which you can easily find and pop open the definition of some
+variable/function/expression.
+
 ## Private/non-config data
 
 Private and non-config data is stored in [datumoj](file:///home/jeroen/datumoj).

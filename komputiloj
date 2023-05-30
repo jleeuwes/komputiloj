@@ -126,10 +126,8 @@ do_nixops_something() {
 	local args_escaped=$(printf '%q ' "$@")
 	nix-shell \
 		-p 'with import (<komputiloj> + /sources.nix); nixops.value.default' \
-		-p 'with import (<komputiloj> + /sources.nix);
-		    let utilecoj = import (<komputiloj> + /utilecoj.nix); in
-		    with komputiloj.value { inherit pkgs utilecoj; };
-		    pkgs.wachtwoord' \
+		-p 'with import <komputiloj>;
+		    capsules.komputiloj.packages.wachtwoord' \
 		--run "$args_escaped"
 }
 
