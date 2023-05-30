@@ -105,6 +105,14 @@ in with utilecoj; {
 		# Instead, nixops determines the stateVersion at first deploy based on the NixOS version it encounters.
 		# Our deploy script stores this state on gently now to keep the correct stateVersion.
 		# system.stateVersion = lib.mkForce "20.09";
+		
+		i18n = {
+			supportedLocales = [
+				"C.UTF-8/UTF-8"
+				"en_US.UTF-8/UTF-8"
+				"nl_NL.UTF-8/UTF-8"
+			];
+		};
 
 		systemd = {
 			services = {
@@ -138,7 +146,7 @@ in with utilecoj; {
 					serviceConfig.Type = "simple";
 					startAt = "05:00 Europe/Amsterdam";
 					script = stripTabs ''
-						vandaag=$(LC_TIME=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
+						vandaag=$(LANG=nl_NL.UTF8 date '+%Y-%m-%d (%a)')
 						schijven=$(df -h | fgrep -v tmp)
 						gebruik=$(find / -mindepth 1 -maxdepth 1 -a -not -name mnt | xargs du -hs | sort -hr)
 						${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] overzicht voor $vandaag" jeroen@lwstn.eu <<-EOF
