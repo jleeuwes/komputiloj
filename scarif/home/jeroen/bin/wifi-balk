@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -Eeu
+set -o pipefail
+
+wn=$((echo '*' ; wpa_cli list_networks | egrep ^[0-9] | cut -f2 ) | dmenu "$@")
+
+if [[ "$wn" = '*' ]]; then
+	wpa_cli reconfigure
+else
+	number=$(wpa_cli list_networks | fgrep -- "$wn" | cut -f1)
+	wpa_cli select_network "$number"
+fi

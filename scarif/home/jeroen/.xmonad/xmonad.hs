@@ -49,6 +49,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm, xK_p),                      runDmenu "dmenu_run")
     , ((modm, xK_w),                      runDmenu "wachtwoord-balk")
     , ((modm, xK_s),                      runDmenu "beeld-balk")
+    , ((0, xK_F8),                     runDmenu "wifi-balk")
+    --     ^ ideally xF86XK_WLAN, but that is hardwired somewhere to toggle WIFI on/off
     
     -- close focused window
     , ((modm .|. shiftMask, xK_c     ), kill)
