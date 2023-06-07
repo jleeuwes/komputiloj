@@ -7,7 +7,7 @@ let
     default_nixos_source = getAttr default_nixos sources;
     default_nixpkgs = default_nixos_source.value {};
     komputiloj_capsule = {
-        users = import ./users.d { inherit boltons; };
+        users = importDir ./users.d;
         packages = let
             callPackage = pkg: default_nixpkgs.callPackage pkg { inherit boltons; };
         in {
@@ -15,10 +15,8 @@ let
             git-annex-remote-rclone = callPackage ./pkgs/git-annex-remote-rclone;
             radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook;
         };
-        overlays = mapAttrs (name: value: value { inherit boltons; }) {
-            replacements = import ./overlays/replacements.nix;
-            undesired-packages-overlay = import ./overlays/undesired-packages-overlay.nix;
-        };
+        overlays = mapAttrs (name: value: value { inherit boltons; })
+                   (importDir ./overlays.d);
     };
     capsules = {
         komputiloj = komputiloj_capsule;
