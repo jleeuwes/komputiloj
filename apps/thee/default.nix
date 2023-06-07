@@ -1,9 +1,8 @@
-{ users, pkgs }:
-with import ../../utilecoj.nix;
-with builtins;
+{ boltons, users, nixpkgs, ... }:
+with boltons;
 {
     activate = rec {
-        pkg = pkgs.callPackage ./activation.nix { inherit users; };
+        pkg = nixpkgs.callPackage ./activation.nix { inherit boltons users; };
         cmd = "${pkg}/bin/activate";
     };
 }

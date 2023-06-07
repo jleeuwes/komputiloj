@@ -75,7 +75,7 @@ do_nixos_rebuild() {
 	local nixpkgs_path
 
 	printf 'Using nixpkgs source %q\n' "$DEFAULT_NIXOS" >&2
-	nixpkgs_path=$(nix-instantiate --eval "$KOMPUTILOJ_PATH"/sources.nix -A "$DEFAULT_NIXOS".nix_path | egrep -o '[^"]+')
+	nixpkgs_path=$(nix-instantiate --eval "$KOMPUTILOJ_PATH" -A sources."$DEFAULT_NIXOS".nix_path | egrep -o '[^"]+')
 	printf 'Using implicit current host configuration from /etc/nixos\n' >&2 # TODO just use a (host-specific) dir in KOMPUTILOJ_PATH directly
 	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path:nixos-config=/etc/nixos/configuration.nix"
 	printf 'Using nixos-rebuild from PATH\n' >&2
@@ -118,16 +118,17 @@ do_nixops_something() {
 	local nixpkgs_path
 
 	printf 'Using nixpkgs source %q\n' "$DEFAULT_NIXOS" >&2
-	nixpkgs_path=$(nix-instantiate --eval "$KOMPUTILOJ_PATH"/sources.nix -A "$DEFAULT_NIXOS".nix_path | egrep -o '[^"]+')
+	nixpkgs_path=$(nix-instantiate --eval "$KOMPUTILOJ_PATH" -A sources."$DEFAULT_NIXOS".nix_path | egrep -o '[^"]+')
 	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path"
 	export NIXOPS_CMD=nixops
 	export NIXOPS_STATE="$KOMPUTILOJ_PATH"/serviloj/state.nixops
 	export NIXOPS_DEPLOYMENT=serviloj
 	local args_escaped=$(printf '%q ' "$@")
 	nix-shell \
-		-p 'with import (<komputiloj> + /sources.nix); nixops.value.default' \
-		-p 'with import <komputiloj>;
-		    capsules.komputiloj.packages.wachtwoord' \
+		-E 'with import <nixpkgs> {}; with import <komputiloj>; mkShell { buildInputs = [
+			sources.nixops.value.default
+			capsules.komputiloj.packages.wachtwoord
+		]; }' \
 		--run "$args_escaped"
 }
 

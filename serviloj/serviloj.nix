@@ -1,9 +1,9 @@
 with builtins;
 let
 	topLevel           = import ../.;
+	boltons            = topLevel.boltons;
 	sources            = topLevel.sources;
 	capsules           = topLevel.capsules;
-	utilecoj           = import ../utilecoj.nix;
 	nixpkgs            = sources.nixos_22_11.value {};
 	mailserver         = sources.mailserver_22_11.value;
 	nextcloud_apps     = sources.nextcloud_25_apps.value;
@@ -11,7 +11,7 @@ let
 	gorinchemindialoog = capsules.gorinchemindialoog;
 	hello              = capsules.hello-infra;
 	inherit (nixpkgs.lib.strings) escapeShellArgs;
-in with utilecoj; {
+in with boltons; {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
 	network.description = "Our humble all-encompassing serviloj deployment";
@@ -64,7 +64,7 @@ in with utilecoj; {
 		];
 
 		nixpkgs.overlays = [
-			(import (../overlays/undesired-packages-overlay.nix))
+			komputiloj.overlays.undesired-packages-overlay
 		];
 
 		deployment.targetHost = "gently.radstand.nl";

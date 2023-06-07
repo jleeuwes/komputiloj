@@ -1,5 +1,5 @@
-with builtins;
-with (import ../utilecoj.nix);
+{ boltons }:
+with boltons;
 let
 	traceMe = msg: trace ((__curPos.file) + ": " + msg);
 	callOutPkgs = pkgs: x: traceMe ("Applying overrides to: " + toString (attrNames pkgs)) x;

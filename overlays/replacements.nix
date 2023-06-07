@@ -1,4 +1,5 @@
-with builtins;
+{ boltons }:
+with boltons;
 replacements: self: super:
 let
 	traceMe = msg: trace ((__curPos.file) + ": " + msg);

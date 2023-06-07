@@ -1,6 +1,5 @@
-{ lib, writeShellApplication, writeTextDir, symlinkJoin, jq, pwgen, users, ... }:
-with import ../../utilecoj.nix;
-with builtins;
+{ boltons, lib, writeShellApplication, writeTextDir, symlinkJoin, jq, pwgen, users, ... }:
+with boltons;
 with lib.strings;
 let
     url_base = "https://thee.radstand.nl";

@@ -1,6 +1,5 @@
 { config, pkgs, lib, ... }:
 let
-	utilecoj = import (<komputiloj> + /utilecoj.nix);
 	topLevel = import <komputiloj>;
 	sources = topLevel.sources;
 	capsules = topLevel.capsules;
@@ -50,11 +49,11 @@ in {
 		];
 	};
 	nixpkgs.overlays = [
-		(import (<komputiloj> + /overlays/replacements.nix) {
+		(capsules.komputiloj.overlays.replacements {
 			git-annex = nixos_unstable.git-annex;
 			git-annex-remote-rclone = komputiloj.packages.git-annex-remote-rclone;
 		})
-		(import (<komputiloj> + /overlays/undesired-packages-overlay.nix))
+		capsules.komputiloj.overlays.undesired-packages-overlay
 	];
 
 	imports =

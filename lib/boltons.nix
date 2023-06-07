@@ -1,5 +1,6 @@
+# boltons: utilities and stuff missing from builtins.
 with builtins;
-rec {
+builtins // rec {
 	# mapNames = (f: attrs:
 	# 	listToAttrs (map (key: {name = f key; value = getAttr key attrs;}) (attrNames attrs))
 	# );

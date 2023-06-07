@@ -52,6 +52,7 @@ There's a lot of ad-hoc stuff, but there are some concepts forming:
 ### Sources
 
 A _source_ is some Nix value obtained from someplace else.
+We use it instead of channels to pin our whole system.
 On the filesystem it consists of:
 
 - a `default.nix` containing an attrset with a `value` attribute
@@ -64,6 +65,28 @@ On the filesystem it consists of:
 
 Sources seem similar to the dependency declaration and lock file of Nix flakes.
 We might one day switch to flakes.
+
+#### The `nixpkgs` source
+
+One source, which must be named `nixpkgs`, is special:
+`nixos-rebuild` is hardcoded to load `<nixpkgs/nixos>`, which in turn loads our
+`configuration.nix`,
+so by the time `configuration.nix` is evaluated, the 'main' `nixpkgs` is already chosen.
+We work around this with some scripting that bootstraps a minimal `NIX_PATH`
+from the `nixpkgs` entry in this file.
+See the `komputiloj` script.
+
+#### See also
+
+Some resources that might come in handy and/or inspired this stuff:
+
+- https://github.com/NixOS/nixpkgs/issues/62832
+- https://github.com/NixOS/nixpkgs/issues/35411#issuecomment-368172579
+- https://nixos.wiki/wiki/How_to_fetch_Nixpkgs_with_an_empty_NIX_PATH
+- https://nix.dev/reference/pinning-nixpkgs
+
+TODO: we might need to do some trickery to make sure the actively used sources are not gc'ed:
+https://discourse.nixos.org/t/pinned-nixpkgs-keeps-getting-garbage-collected/12912/6
 
 ### Capsules
 
