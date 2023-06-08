@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+me=$(readlink -f -- "$0")
+here="$(dirname -- "$me")"
+cd -- "$here"
+
+mkdir unstable
+cd unstable
+echo https://channels.nixos.org/nixos-unstable > channel_url
+../update-channel-source
+
+echo
+cat default.nix
+echo
+echo "Done. Now give the new unstable folder a good name."
+

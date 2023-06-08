@@ -3,9 +3,7 @@ let
 	topLevel = import <komputiloj>;
 	sources = topLevel.sources;
 	capsules = topLevel.capsules;
-	nixos_unstable = sources.unstable.value {
-		config = config.nixpkgs.config;
-	};
+	nixpkgsFuture = capsules.nixpkgsFuture;
 	komputiloj = capsules.komputiloj;
 in {
 	# # Add the --option extra-builtins-file to nix
@@ -49,11 +47,7 @@ in {
 		];
 	};
 	nixpkgs.overlays = [
-		(capsules.komputiloj.overlays.replacements {
-			git-annex = nixos_unstable.git-annex;
-			git-annex-remote-rclone = komputiloj.packages.git-annex-remote-rclone;
-		})
-		capsules.komputiloj.overlays.undesired-packages-overlay
+		komputiloj.overlays.undesired-packages
 	];
 
 	imports =
@@ -158,7 +152,7 @@ in {
 		gitFull vim file subversionClient pciutils pmount squashfsTools
 		parted gparted
 		wget rtorrent
-		git-annex git-annex-remote-rclone rclone
+		nixpkgsFuture.packages.git-annex nixpkgsFuture.packages.git-annex-remote-rclone rclone
 		sshpass
 		gnupg paperkey qrencode zbar pwgen
 		komputiloj.packages.wachtwoord

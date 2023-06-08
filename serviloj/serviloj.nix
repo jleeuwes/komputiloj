@@ -64,7 +64,7 @@ in with boltons; {
 		];
 
 		nixpkgs.overlays = [
-			komputiloj.overlays.undesired-packages-overlay
+			komputiloj.overlays.undesired-packages
 		];
 
 		deployment.targetHost = "gently.radstand.nl";

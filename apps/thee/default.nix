@@ -1,8 +1,11 @@
-{ boltons, users, nixpkgs, ... }:
+{ boltons, capsules, ... }:
 with boltons;
 {
     activate = rec {
-        pkg = nixpkgs.callPackage ./activation.nix { inherit boltons users; };
+        pkg = capsules.nixpkgsCurrent.callPackage ./activation.nix {
+            inherit boltons;
+            users = capsules.all.users;
+        };
         cmd = "${pkg}/bin/activate";
     };
 }

@@ -7,6 +7,9 @@ builtins // rec {
     mapNames = (f: attrs: listToAttrs (map (a: {name = f a.name; value = a.value;}) (attrsToList attrs)));
 
     filterAttrs = (f: attrs: listToAttrs (filter f (attrsToList attrs)));
+    
+    # Merges a list of attrsets with //
+    mergeAttrs = foldl' (a: b: a // b) {};
 
     # Make an attrset containing an attribute for each .nix file and each
     # directory in the given path.
