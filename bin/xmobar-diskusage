@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -Eu -o pipefail
+
+percentage=$(df / | egrep -o '[0-9]+%')
+
+warning_color=#ffa000
+alert_color=#ff0000
+inverse_color=#000000
+normal_color=#a0a0a0
+
+blink=$(expr $(date +%s) % 2)
+
+case "$percentage" in
+	99%|100%)
+		if [[ $blink -eq 0 ]]; then
+			printf '<fc=%s,%s>!%s</fc>\n' "$inverse_color" "$alert_color" "$percentage"
+		else
+			printf '<fc=%s>!%s</fc>\n' "$alert_color" "$percentage"
+		fi
+	;;
+	97%|98%)
+		if [[ $blink -eq 0 ]]; then
+			printf '<fc=%s>!%s</fc>\n' "$warning_color" "$percentage"
+		else
+			printf '<fc=%s> %s</fc>\n' "$warning_color" "$percentage"
+		fi
+	;;
+	*)
+		printf '<fc=%s>%s</fc>\n' "$normal_color" "$percentage"
+	;;
+esac
+
