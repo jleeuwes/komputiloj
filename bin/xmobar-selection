@@ -29,9 +29,17 @@ else
 fi
 
 # NOTE: best to always show which selection is which
-# separator=
+# IMPORTANT: always use a character with a textual representation.
+# \Ufe0e triggers the textual representation (instead of the graphical one),
+# but this depends on font etcetera.
+# A textual emoji will get the correct color, making it possible to distinguish
+# between the emoji occuring *in* the selection and the emoji separating the
+# selection.
+# 🖊 = 1f58a
+# 📝︎ = 1f4dd
+separator=$(printf '\U1f4dd\Ufe0e')
 # if [[ ${#primary_selection} -gt 0 && ${#clipboard_selection} -gt 0 ]]; then
-	separator="<fc=$separator_color>/</fc>"
+	separator="<fc=$separator_color>$separator</fc>"
 # fi
 
 function massage_output() {

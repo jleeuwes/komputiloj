@@ -8,17 +8,17 @@ Config { font = "DejaVu Sans Mono 11"
           , Run BatteryN ["BAT0"] ["-L","10","-H","49",
             "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
             "-t","<fc=#a0a0a0><timeleft></fc><fc=white><acstatus></fc><left>",
-            "--", "-f", "AC/online", "-O", "⊕", "-o", "⊖", "-i", "⊙"
+            "--", "-f", "AC/online", "-O", "🔌", "-o", "🔋", "-i", "-"
             ] 10 "BAT0"
           , Run BatteryN ["BAT1"] ["-L","10","-H","49",
             "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
             "-t","<fc=#a0a0a0><timeleft></fc><fc=white><acstatus></fc><left>",
-            "--", "-f", "AC/online", "-O", "⊕", "-o", "⊖", "-i", "⊙"
+            "--", "-f", "AC/online", "-O", "🔌", "-o", "🔋", "-i", "-"
             ] 10 "BAT1"
           , Run Wireless "wlp4s0" [
               "-L","49","-H","89",
               "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
-              "-t", "<fc=#a0e0f0><essid></fc>≈<quality>"] 10
+              "-t", "<fc=#a0e0f0><essid></fc>🛜<quality>"] 10
           , Run DiskU [("/", "<usedp>")] [
               "-L","95","-H","99",
               "-l","#66ff66", "-n","#ffe040", "-h","#ff6666"
