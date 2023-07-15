@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -Eu -o pipefail
+
+high=49
+low=10
+high_color=#66ff66
+mid_color=#ffe040
+low_color=#ff6666
+
+alert_color=#ff0000
+inverse_color=#000000
+
+power_plug=$(printf '\U1f50c')
+battery_empty=$(printf '\U1faab')
+battery_full=$(printf '\U1f50b')
+
+blink=$(expr $(date +%s) % 2)
+
+show_plug() {
+	local online
+	online=$(cat /sys/class/power_supply/AC/online)
+	if [[ "$online" -eq 1 ]]; then
+		printf '%s' "$power_plug"
+	else
+		printf '  '
+	fi
+}
+
+show_battery() {
+	local bat
+	local percentage
+	local icon
+	local color
+	bat="$1"
+	percentage=$(cat /sys/class/power_supply/"$bat"/capacity)
+	if [[ "$percentage" -gt "$high" ]]; then
+		icon="$battery_full"
+		color="$high_color"
+	elif [[ "$percentage" -gt "$low" ]]; then
+		icon="$battery_full"
+		color="$mid_color"
+	else
+		icon="$battery_empty"
+		if [[ "$blink" -eq 0 ]]; then
+			color="$low_color"
+		else
+			color="$inverse_color,$alert_color"
+		fi
+	fi
+	printf '<fc=%s>%s%s%%</fc>' "$color" "$icon" "$percentage"
+}
+
+show_plug
+show_battery BAT1
+show_battery BAT0
+printf '\n'
