@@ -3,20 +3,20 @@
 gpg=$(gpg-connect-agent 'keyinfo --no-ask 48D11D2F4E0E8CF9BC917E7F2CD4CC092ED98DC7 Err Pmt Des' /bye | awk '{print $7}')
 ssh=$(gpg-connect-agent 'keyinfo --no-ask 69382006961639E86A64CD16AFCDBCE65227229A Err Pmt Des' /bye | awk '{print $7}')
 
-# Make sure to include \xfe0e after the emoji.
-# The graphical versions are too similar in the font we use in xmobar.
-locked="🔒︎"
-unlocked="🔓︎"
+key=$(printf '\U1f511')
+
+printf %s "$key"
 
 if [ "$ssh" = 1 ]; then
-	printf '%s' "$unlocked"
+	printf S
 else
-	printf '%s' "$locked"
+	printf -
 fi
 
 if [ "$gpg" = 1 ]; then
-	printf '%s' "$unlocked"
+	printf G
 else
-	printf '%s' "$locked"
+	printf -
 fi
 
+printf '\n'
