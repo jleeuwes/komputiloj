@@ -2,14 +2,16 @@
 
 set -Eu -o pipefail
 
-percentage=$(df / | egrep -o '[0-9]+%')
-
+icon=$(printf '\U1f4e6')
 warning_color=#ffa000
 alert_color=#ff0000
 inverse_color=#000000
 normal_color=#a0a0a0
 
 blink=$(expr $(date +%s) % 2)
+percentage=$(df / | egrep -o '[0-9]+%')
+
+printf %s "$icon"
 
 case "$percentage" in
 	99%|100%)

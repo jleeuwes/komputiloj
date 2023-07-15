@@ -12,10 +12,10 @@ Config { font = "DejaVu Sans Mono 11"
               "-t", "<fc=#a0e0f0><essid></fc>🛜<quality>"] 10
           , Run Com "/home/jeroen/bin/xmobar-diskusage" [] "disku" 5
           , Run Com "/home/jeroen/bin/xmobar-selection" [] "xsel" 10
-          , Run Com "/home/jeroen/bin/visual-agent-status" [] "keys" 10
+          , Run Com "/home/jeroen/bin/xmobar-agentstatus" [] "keys" 10
           , Run StdinReader
           ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " %StdinReader% }{ <fc=#a0a0a0>%xsel%</fc> %wlp4s0wi% <fc=#e0e070>%keys%</fc> %power% 📦%disku% %date%"
+       , template = " %StdinReader% }{ <fc=#a0a0a0>%xsel%</fc> %wlp4s0wi% <fc=#e0e070>%keys%</fc> %power% %disku% %date%"
        }
