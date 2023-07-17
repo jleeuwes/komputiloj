@@ -17,10 +17,10 @@ battery_full=$(printf '\U1f50b')
 
 blink=$(expr $(date +%s) % 2)
 
+plugged=$(cat /sys/class/power_supply/AC/online)
+
 show_plug() {
-	local online
-	online=$(cat /sys/class/power_supply/AC/online)
-	if [[ "$online" -eq 1 ]]; then
+	if [[ "$plugged" -eq 1 ]]; then
 		printf '%s' "$power_plug"
 	else
 		printf '  '
@@ -42,7 +42,7 @@ show_battery() {
 		color="$mid_color"
 	else
 		icon="$battery_empty"
-		if [[ "$blink" -eq 0 ]]; then
+		if [[ "$plugged" -eq 1 || "$blink" -eq 0 ]]; then
 			color="$low_color"
 		else
 			color="$inverse_color,$alert_color"
