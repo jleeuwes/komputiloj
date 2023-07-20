@@ -4,8 +4,8 @@ let
 	boltons            = topLevel.boltons;
 	sources            = topLevel.sources;
 	capsules           = topLevel.capsules;
-	nixpkgs            = sources.nixos_22_11.value {};
-	mailserver         = sources.mailserver_22_11.value;
+	nixpkgs            = sources.nixos_23_05.value {};
+	mailserver         = sources.mailserver_23_05.value;
 	nextcloud_apps     = sources.nextcloud_25_apps.value;
 	komputiloj         = capsules.komputiloj;
 	gorinchemindialoog = capsules.gorinchemindialoog;

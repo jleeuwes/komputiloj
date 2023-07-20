@@ -3,7 +3,7 @@ let boltons = import ./lib/boltons.nix;
 in with boltons;
 let
     sources = importDir ./sources.d;
-    default_nixos = "nixos_22_11"; # defines default nixos used by all of komputiloj
+    default_nixos = "nixos_23_05"; # defines default nixos used by all of komputiloj
     default_nixos_source = getAttr default_nixos sources;
     komputiloj_capsule = {
         users = importDir ./users.d;

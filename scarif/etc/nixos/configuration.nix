@@ -187,7 +187,7 @@ in {
 		haskellPackages.ghc
 		
 		# unstable.android-studio
-		apktool dex2jar
+		# apktool dex1jar
 
 		# LaTeX and PDF:
 		# (Not sure if rubber uses the chosen texlive distribution)
