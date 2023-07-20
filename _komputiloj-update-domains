@@ -1,0 +1,22 @@
+# TODO it's weird to refer to serviloj here; put secrets higher
+# TODO put domains in top-level default.nix
+export TRANSIP_USER=jeroenleeuwestein
+export TRANSIP_PRIVKEY=$(wachtwoord cat -n \
+	"$KOMPUTILOJ_PATH"/serviloj/secrets/privkey@api.transip.nl)
+export VERSIO_USER=jeroen@lwstn.eu:$(wachtwoord cat -n \
+	"$KOMPUTILOJ_PATH"/serviloj/secrets/jeroen@lwstn.eu@versio.nl)
+
+for domain_dir in "$KOMPUTILOJ_PATH"/domains.d/*; do
+	if [[ -d "$domain_dir" ]]; then
+	(
+		cd -- "$domain_dir"
+		if [[ -x update ]]; then
+			printf 'Updating domain %s\n' "$domain_dir" >&2
+			./update
+		else
+			printf 'Skipping domain without update script: %s\n' "$domain_dir" >&2
+		fi
+	)
+	fi
+done
+
