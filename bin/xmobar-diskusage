@@ -9,27 +9,28 @@ inverse_color=#000000
 normal_color=#a0a0a0
 
 blink=$(expr $(date +%s) % 2)
-percentage=$(df / | egrep -o '[0-9]+%')
+percentage=$(df / | awk '{print $5}' | tail -n1)
+free=$(df -h / | awk '{print $4}' | tail -n1)
 
 printf %s "$icon"
 
 case "$percentage" in
 	99%|100%)
 		if [[ $blink -eq 0 ]]; then
-			printf '<fc=%s,%s>!%s</fc>\n' "$inverse_color" "$alert_color" "$percentage"
+			printf '<fc=%s,%s>!%s</fc>\n' "$inverse_color" "$alert_color" "$free"
 		else
-			printf '<fc=%s>!%s</fc>\n' "$alert_color" "$percentage"
+			printf '<fc=%s>!%s</fc>\n' "$alert_color" "$free"
 		fi
 	;;
 	97%|98%)
 		if [[ $blink -eq 0 ]]; then
-			printf '<fc=%s>!%s</fc>\n' "$warning_color" "$percentage"
+			printf '<fc=%s>!%s</fc>\n' "$warning_color" "$free"
 		else
-			printf '<fc=%s> %s</fc>\n' "$warning_color" "$percentage"
+			printf '<fc=%s> %s</fc>\n' "$warning_color" "$free"
 		fi
 	;;
 	*)
-		printf '<fc=%s>%s</fc>\n' "$normal_color" "$percentage"
+		printf '<fc=%s>%s</fc>\n' "$normal_color" "$free"
 	;;
 esac
 
