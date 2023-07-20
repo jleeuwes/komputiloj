@@ -3,7 +3,7 @@
 { ... }: {
 	config = {
 		users.mutableUsers = false;
-		boot.cleanTmpDir = true;
+		boot.tmp.cleanOnBoot = true;
 		networking.usePredictableInterfaceNames = true;
 	};
 }

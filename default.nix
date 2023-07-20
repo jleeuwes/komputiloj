@@ -59,7 +59,6 @@ let
             # take packages directly from one perpetually updated unstable
             # source, we will never catch up.
             packages = {
-                git-annex = override nixpkgsCurrent.packages.git-annex (sources.unstable_23_05pre487203.value {}).git-annex;
                 git-annex-remote-rclone = override nixpkgsCurrent.packages.git-annex-remote-rclone (nixpkgsCurrent.callPackage ./pkgs/git-annex-remote-rclone {});
             };
         };

@@ -6,7 +6,7 @@ let
 	capsules           = topLevel.capsules;
 	nixpkgs            = sources.nixos_23_05.value {};
 	mailserver         = sources.mailserver_23_05.value;
-	nextcloud_apps     = sources.nextcloud_25_apps.value;
+	nextcloud_apps     = sources.nextcloud_26_apps.value;
 	komputiloj         = capsules.komputiloj;
 	gorinchemindialoog = capsules.gorinchemindialoog;
 	hello              = capsules.hello-infra;
@@ -536,7 +536,7 @@ in with boltons; {
 		services.nextcloud = {
 			enable = true;
 
-			package = pkgs.nextcloud25;
+			package = pkgs.nextcloud26;
 
 			home = "/mnt/storage/live/nextcloud/rootdir";
 
@@ -570,14 +570,15 @@ in with boltons; {
 
 			database.type = "sqlite3";
 
-			rootUrl = "https://thee.radstand.nl/";
-			domain = "thee.radstand.nl";
-
 			# NOTE: after changing the stateDir, regenerate gitea's authorized_keys file through the admin webinterface.
 			stateDir = "/mnt/storage/live/gitea/rootdir";
 
 			# mailerPasswordFile = ...;
 			settings = {
+				server = {
+					ROOT_URL = "https://thee.radstand.nl/";
+					DOMAIN = "thee.radstand.nl";
+				};
 				mailer = {
 					ENABLED = true;
 					FROM = "thee@radstand.nl";
@@ -645,7 +646,7 @@ in with boltons; {
 			vmailUserName = "vmail";
 			vmailUID = 70002;
 
-			certificateScheme = 3; # let's hope this uses the regular letsencrypt infrastructure of NixOS so it doesn't clash with nginx
+			certificateScheme = "acme-nginx"; # let's hope this uses the regular letsencrypt infrastructure of NixOS so it doesn't clash with nginx
 		};
 
 		services.radicale = {

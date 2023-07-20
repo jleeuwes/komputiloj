@@ -64,7 +64,7 @@ in {
 	boot.loader.efi.canTouchEfiVariables = true;
 
 	# Make /tmp in-memory:
-	boot.tmpOnTmpfs = true;
+	boot.tmp.useTmpfs = true;
 
 	# Enable read-write NTFS support:
 	boot.supportedFilesystems = [ "ntfs" ];
@@ -152,7 +152,7 @@ in {
 		gitFull vim file subversionClient pciutils pmount squashfsTools
 		parted gparted
 		wget rtorrent
-		nixpkgsFuture.packages.git-annex nixpkgsFuture.packages.git-annex-remote-rclone rclone
+		git-annex nixpkgsFuture.packages.git-annex-remote-rclone rclone
 		sshpass
 		gnupg paperkey qrencode zbar pwgen
 		komputiloj.packages.wachtwoord
