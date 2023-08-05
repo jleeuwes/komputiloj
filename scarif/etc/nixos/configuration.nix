@@ -214,7 +214,7 @@ in {
 		eid-mw
 
 		# other package managers (to be used for non-reproducable things only):
-		nodejs #npm
+		# nodejs #npm
 
 		zip unzip
 		par2cmdline # for error-correcting archives
