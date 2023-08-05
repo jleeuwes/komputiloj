@@ -146,6 +146,7 @@ in {
 		ocrad
 
 		# usefull programs:
+		unicode-paracode
 		gitFull vim file subversionClient pciutils pmount squashfsTools
 		parted gparted
 		wget rtorrent
