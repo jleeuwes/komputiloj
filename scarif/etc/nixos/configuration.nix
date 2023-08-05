@@ -51,8 +51,9 @@ in {
 	];
 
 	imports =
-		[ # Include the results of the hardware scan.
+		[
 			./hardware-configuration.nix
+			komputiloj.modules.dekstopomveging
 		];
 	
 
@@ -144,10 +145,6 @@ in {
 
 		ocrad
 
-		# prettiness ( more inspiration at https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 and https://stackoverflow.com/questions/38576616/how-to-install-gtk-themes-under-nixos-without-hacky-scripts )
-		# gtk-engine-murrine arc-theme arc-icon-theme elementary-icon-theme
-		# gtk
-		hicolor-icon-theme xfce.xfce4-icon-theme tango-icon-theme
 		# usefull programs:
 		gitFull vim file subversionClient pciutils pmount squashfsTools
 		parted gparted
@@ -201,12 +198,6 @@ in {
 		chromium
 		geany
 		zathura # pdf viewer
-		# gnome stuff (won't work because dconf is missing):
-		# gnome3.gedit
-		# xfce stuff:
-		# support stuff (needed for generating thumbnails for instance - maar het werkt voor geen zak)
-		xfce.exo xfce.xfconf # xfce.xfce4settings
-		shared-mime-info xfce.tumbler # <- these two in particular seemed to do the trick!
 		# mindmapping-tools:
 		vym freemind
 		vlc ffmpeg
@@ -216,17 +207,8 @@ in {
 		libreoffice antiword
 		audacity
 		
-		hsetroot # program to help my xmonad config set the background in an xfce-terminal compatible way
-		# xorg.xbacklight # doesn't work anymore - https://github.com/NixOS/nixpkgs/issues/55520#issuecomment-470501591
-		brightnessctl
-		unclutter-xfixes # hides the mouse if unused
-		dmenu xsel # some helpers for menus
-		xmobar # status bar
-		
 		pstree
 		
-		# actual programs:
-		xfce.xfce4-terminal xfce.thunar xfce.ristretto
 		# Belgian eID (it looks in /run/current-system/sw/ by default for some things so it's easier to have it installed system-wide):
 		eid-mw
 
@@ -320,72 +302,8 @@ ctl.pulse {
 		# allowAnyUser = true; # of moeten we rechten via systemd regelen?
 	};
 
-	# Enable the X11 windowing system.
-	services.xserver = {
-		enable = true;
-		layout = "us";
-		xkbOptions = "compose:ralt,eurosign:e";
-
-		displayManager.lightdm.greeters.gtk.cursorTheme = {
-			# This only sets the cursor on the greeter screen,
-			# but it also install the cursor package,
-			# which we use in a bunch of our user-local config to configure the
-			# cursor theme and size *inside* an X session.
-			name = "Vanilla-DMZ";
-			package = pkgs.vanilla-dmz;
-			size = 32;
-		};
-
-		# displayManager.sessionCommands = ''
-		# 	# ( adapted from https://gist.github.com/taohansen/d15e1fe4674a286cb9bcd8e3378a9f23 )
-		# 	# (lijkt allemaal voor geen flikker te werken)
-		# 	# This allows GTK to load SVG icons.
-		# 	export GDK_PIXBUF_MODULE_FILE=$(echo ${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/*/loaders.cache)
-		# 	# Set GTK_PATH so that GTK+ can find the Xfce theme engine.
-		# 	export GTK_PATH=${pkgs.gtk-engine-murrine}/lib/gtk-2.0
-		# 	# Set GTK_DATA_PREFIX so that GTK+ can find the Xfce themes.
-		# 	export GTK_DATA_PREFIX=${config.system.path}
-		# 	# Launch xfce settings daemon.
-		# 	${pkgs.xfce.xfce4-settings}/bin/xfsettingsd &
-		# '';
-
-		windowManager.xmonad.enable = true;
-		windowManager.xmonad.enableContribAndExtras = true;
-		desktopManager.xterm.enable = false;
-		desktopManager.xfce.enable = true;
-	
-		# touchpad
-		# (this was synaptics before, but I had to change to libinput
-		# because xfce demands it, and it turns out to work better. Yay!)
-		libinput.enable = true;
-		libinput.touchpad = {
-			scrollMethod = "twofinger";
-			sendEventsMode = "disabled-on-external-mouse";
-			tapping = false;
-			tappingDragLock = false;
-			disableWhileTyping = true;
-		};
-	};
-
-	# en xfce voor de goodies
-	# services.xserver.desktopManager.xfce.enable = true;
-	# (TODO die vereist upower, dus staat nu uit;
-	# als ik dingen mis moet ik de losse programma's maar installeren)
-	
-
-	# services.udev.extraRules = ''
-	#   # https://wiki.archlinux.org/index.php/Touchpad_Synaptics#Disable_touchpad_on_mouse_detection
-	#   # Turn off touchpad when mouse is connected (hardcoded for user jeroen)
-	#   # ACTION=="add", ATTRS{bInterfaceProtocol}=="02", ATTRS{bInterfaceClass}=="03", ATTRS{bInterfaceSubClass}=="01", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="/home/jeroen/.Xauthority", RUN+="${pkgs.xorg.xf86inputsynaptics}/bin/synclient TouchpadOff=1"
-	#   ACTION=="add", SUBSYSTEM=="input", KERNEL=="mouse[0-9]*", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="/home/jeroen/.Xauthority", RUN+="${pkgs.xorg.xf86inputsynaptics}/bin/synclient TouchpadOff=1"
-	#   ACTION=="remove", SUBSYSTEM=="input", KERNEL=="mouse[0-9]*", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="/home/jeroen/.Xauthority", RUN+="${pkgs.xorg.xf86inputsynaptics}/bin/synclient TouchpadOff=0"
-	# '';
 	# Enable adb group and udev rules and such:
 	programs.adb.enable = true;
-
-	# Enable the KDE Desktop Environment.
-	# services.xserver.displayManager.kdm.enable = true;
-	# services.xserver.desktopManager.kde4.enable = true;
 
 	# For 32-bit games:
 	hardware.opengl.driSupport32Bit = true;

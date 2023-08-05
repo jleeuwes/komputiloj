@@ -1,12 +1,4 @@
 {-# LANGUAGE FlexibleContexts #-}
---
--- xmonad example config file.
---
--- A template showing all available configuration hooks,
--- and how to override the defaults in your own xmonad.hs conf file.
---
--- Normally, you'd only override those defaults you care about.
---
 
 import XMonad
 import Data.Monoid
@@ -36,20 +28,32 @@ import qualified Data.Map        as M
 
 import Graphics.X11.ExtraTypes.XF86
 
+main :: IO ()
+main = do
+    -- TODO run xmobar through dekstop
+    config <- withUrgencyHook NoUrgencyHook <$> statusBar "xmobar" myPP toggleStrutsKey myConfig
+    dirs <- getDirectories
+    launch config dirs
+  where toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
+
+runDekstop :: [String] -> X ()
+runDekstop args
+  = safeSpawn "dekstop" args
+
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
 --
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- launch a terminal (TODO updatePointer doesn't work here; add it to the hook for new windows?)
-    [ ((modm .|. shiftMask, xK_Return),   safeSpawn (XMonad.terminal conf) [])
-    , ((modm .|. shiftMask, xK_KP_Enter), safeSpawn (XMonad.terminal conf) [])
+    [ ((modm .|. shiftMask, xK_Return),   runDekstop ["terminal"])
+    , ((modm .|. shiftMask, xK_KP_Enter), runDekstop ["terminal"])
 
     -- launch dmenu
-    , ((modm, xK_p),                      runDmenu "dmenu_run")
-    , ((modm, xK_w),                      runDmenu "wachtwoord-balk")
-    , ((modm, xK_s),                      runDmenu "beeld-balk")
-    , ((0, xK_F8),                     runDmenu "wifi-balk")
+    , ((modm, xK_p), runDekstop ["bar", "run"])
+    , ((modm, xK_w), runDekstop ["bar", "password"])
+    , ((modm, xK_s), runDekstop ["bar", "screen"])
+    , ((0, xK_F8),   runDekstop ["bar", "wifi"])
     --     ^ ideally xF86XK_WLAN, but that is hardwired somewhere to toggle WIFI on/off
     
     -- close focused window
@@ -125,25 +129,25 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm .|. shiftMask, xK_q     ), io (exitWith ExitSuccess))
 
     -- Restart xmonad
-    , ((modm              , xK_q     ), spawn "xmonad --recompile; xmonad --restart")
+    , ((modm              , xK_q     ), restart "xmonad" True)
 
     -- Switch to a not-yet-logged-in user (otherwise use Ctrl-Alt-F8 and co)
-    , ((0, xF86XK_LaunchA), spawn "dm-tool switch-to-greeter")
+    , ((0, xF86XK_LaunchA), runDekstop ["second-session"])
 
     -- Brightness control
     -- Step size 23 is chosen so we can go from 852 (100%) to 1 (absolute minimum brightness).
     -- When going up from 0, the min-value options make sure we get back to a proper multiple-of-23-plus-1.
     -- Without shift we do 10 steps, which approximately cuts the space in four brightness levels,
     -- and also goes down to 1 (and then 0 if you press again).
-    , ((0         , xF86XK_MonBrightnessUp   ), spawn "brightnessctl set +230 --min-value=231")
-    , ((0         , xF86XK_MonBrightnessDown ), spawn "brightnessctl set 230-")
-    , ((shiftMask , xF86XK_MonBrightnessUp   ), spawn "brightnessctl set +23 --min-value=24")
-    , ((shiftMask , xF86XK_MonBrightnessDown ), spawn "brightnessctl set 23-")
+    , ((0         , xF86XK_MonBrightnessUp   ), runDekstop ["brightness", "up"])
+    , ((0         , xF86XK_MonBrightnessDown ), runDekstop ["brightness", "down"])
+    , ((shiftMask , xF86XK_MonBrightnessUp   ), runDekstop ["brightness", "up-a-bit"])
+    , ((shiftMask , xF86XK_MonBrightnessDown ), runDekstop ["brightness", "down-a-bit"])
     
     -- Multimedia keys
-    , ((0, xF86XK_AudioRaiseVolume), spawn "amixer set Master 5%+")
-    , ((0, xF86XK_AudioLowerVolume), spawn "amixer set Master 5%-")
-    , ((0, xF86XK_AudioMute), spawn "amixer set Master toggle")
+    , ((0, xF86XK_AudioRaiseVolume), runDekstop ["volume", "up"])
+    , ((0, xF86XK_AudioLowerVolume), runDekstop ["volume", "down"])
+    , ((0, xF86XK_AudioMute),        runDekstop ["volume", "toggle"])
     ]
     ++
 
@@ -306,12 +310,8 @@ updateBackgroundHook = do
     setBgX "#000000" -- prevent more burn-in -- $ withIndex workspaceColor workspace
 
   where
-    -- Set background using hsetroot because that is compatible with
-    -- xfce-terminal (launching a process on each change is not ideal but hey)
-    setBgH hexcolor = liftIO $ safeSpawn "/run/current-system/sw/bin/hsetroot" ["-solid", hexcolor]
-
     -- Set background by painting on the root window (not compatible with
-    -- xfce-temrinal transparency)
+    -- xfce-terminal transparency; use hsetroot for that)
     setBgX hexcolor = do
         disp <- asks display
         root <- asks theRoot
@@ -336,13 +336,6 @@ myStartupHook = return ()
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
-
--- Run xmonad with the settings you specify. No need to modify this.
---
-main = statusBar "xmobar" myPP toggleStrutsKey myConfig
-      >>= return . withUrgencyHook NoUrgencyHook
-      >>= xmonad
-  where toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
 
 -- Leuke vormpjes:
 -- https://en.wikipedia.org/wiki/Geometric_Shapes
@@ -399,11 +392,6 @@ withIndex f = f . index
     index
       = read . ('0' :) . filter (`elem` "0123456789")
 
-runDmenu cmd = safeSpawn cmd dmenu_opts
-  where
-    dmenu_opts
-      = ["-b", "-nb", "#000", "-nf", "#fff", "-sb", "#fff", "-sf", "#000", "-fn", "inconsolata:size=14"]
-
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
 -- use the defaults defined in xmonad/XMonad/Config.hs
@@ -412,7 +400,7 @@ runDmenu cmd = safeSpawn cmd dmenu_opts
 --
 myConfig = def {
       -- simple stuff
-        terminal           = "xfce4-terminal",
+        terminal           = "dekstop terminal", -- might be used by some contrib stuff, I don't know
         focusFollowsMouse  = True,
         borderWidth        = 2,
         modMask            = mod4Mask,

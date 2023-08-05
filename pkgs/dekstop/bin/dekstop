@@ -1,0 +1,136 @@
+#!/bin/bash
+
+set -Eeu -o pipefail
+
+# We need to record the original path for spawning a terminal:
+AMBIENT_PATH="$PATH"
+# But we want to take our dependencies from the DEPS_PATH defined in the package:
+export PATH="$DEPS_PATH"
+
+DMENU_OPTS=( -b -nb '#000' -nf '#fff' -sb '#fff' -sf '#000' -fn inconsolata:size=14 )
+
+brightness() {
+	local cmd=
+	
+	if [[ $# -eq 1 ]]; then
+		cmd="$1"
+	else
+		# Trigger help on wrong number of args.
+		cmd=
+	fi
+
+	# Step size 23 is chosen so we can go from 852 (100%) to 1 (absolute minimum brightness).
+	# When going up from 0, the min-value options make sure we get back to a proper multiple-of-23-plus-1.
+	# The big steps cut the space in approximately four brightness levels,
+	# but this doesn't nicely go down to 1.
+	# TODO use a logarithmic scale (steps seem a lot bigger when the screen is darker)
+	# (I tried to use brightnessctl --exponent=2 and percentages, but it becomes
+	# buggy in the lower regions: 10%- sometimes turns the brightness UP)
+	case "$cmd" in
+	up)
+		brightnessctl set -q +230 --min-value=231
+	;;
+	up-a-bit)
+		brightnessctl set -q +23 --min-value=24
+	;;
+	down-a-bit)
+		brightnessctl set -q 23-
+	;;
+	down)
+		brightnessctl set -q 230-
+	;;
+	*)
+		printf 'Usage: %s %s up\n'         "$0" "${FUNCNAME[0]}" >&2
+		printf 'or:    %s %s up-a-bit\n'   "$0" "${FUNCNAME[0]}" >&2
+		printf 'or:    %s %s down-a-bit\n' "$0" "${FUNCNAME[0]}" >&2
+		printf 'or:    %s %s down\n'       "$0" "${FUNCNAME[0]}" >&2
+		exit 1
+	;;
+	esac
+}
+
+volume() {
+	local cmd=
+	
+	if [[ $# -eq 1 ]]; then
+		cmd="$1"
+	else
+		# Trigger help on wrong number of args.
+		cmd=
+	fi
+
+	case "$cmd" in
+	up)
+		amixer -q set Master 5%+
+	;;
+	down)
+		amixer -q set Master 5%-
+	;;
+	toggle)
+		amixer -q set Master toggle
+	;;
+	*)
+		printf 'Usage: %s %s up\n'         "$0" "${FUNCNAME[0]}" >&2
+		printf 'or:    %s %s down\n'       "$0" "${FUNCNAME[0]}" >&2
+		printf 'or:    %s %s toggle\n'     "$0" "${FUNCNAME[0]}" >&2
+		exit 1
+	;;
+	esac
+}
+
+bar() {
+	local cmd
+	
+	if [[ $# -ge 1 ]]; then
+		cmd="$1"
+		shift
+	else
+		cmd=
+	fi
+
+	case "$cmd" in
+	run)
+		exec dmenu_run "${DMENU_OPTS[@]}" "$@"
+	;;
+	*)
+		printf 'Usage: %s %s run\n'         "$0" "${FUNCNAME[0]}" >&2
+		exit 1
+	;;
+	esac
+}
+
+main() {
+	local cmd
+	
+	if [[ $# -ge 1 ]]; then
+		cmd="$1"
+		shift
+	else
+		# Trigger unknown command on wrong number of args.
+		cmd=
+	fi
+
+	case "$cmd" in
+	brightness)
+		brightness "$@"
+	;;
+	volume)
+		volume "$@"
+	;;
+	terminal)
+		# NOTE: the PATH will only influence the first terminal we spawn.
+		#       If we don't want that we should pass --disable-server
+		export PATH="$AMBIENT_PATH"
+		exec "$XFCE_TERMINAL_PATH"/xfce4-terminal
+	;;
+	bar)
+		bar "$@"
+	;;
+	*)
+		printf 'Unknown command: %s\n' "$cmd" >&2
+		exit 1
+	;;
+	esac
+}
+
+main "$@"
