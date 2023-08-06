@@ -30,8 +30,7 @@ import Graphics.X11.ExtraTypes.XF86
 
 main :: IO ()
 main = do
-    -- TODO run xmobar through dekstop
-    config <- withUrgencyHook NoUrgencyHook <$> statusBar "xmobar" myPP toggleStrutsKey myConfig
+    config <- withUrgencyHook NoUrgencyHook <$> statusBar "dekstop bar status" myPP toggleStrutsKey myConfig
     dirs <- getDirectories
     launch config dirs
   where toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
@@ -51,8 +50,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- launch dmenu
     , ((modm, xK_p), runDekstop ["bar", "run"])
-    , ((modm, xK_w), runDekstop ["bar", "password"])
-    , ((modm, xK_s), runDekstop ["bar", "screen"])
+    , ((modm, xK_w), runDekstop ["bar", "wachtwoord"])
+    , ((modm, xK_s), runDekstop ["bar", "beeld"])
     , ((0, xK_F8),   runDekstop ["bar", "wifi"])
     --     ^ ideally xF86XK_WLAN, but that is hardwired somewhere to toggle WIFI on/off
     

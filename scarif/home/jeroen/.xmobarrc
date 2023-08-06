@@ -5,14 +5,14 @@ Config { font = "DejaVu Sans Mono 11"
        , alpha = 255
        , commands =
           [ Run DateZone "%a %-e %B [%V] %Y %H:%M<fc=#404040>:%S</fc>" "nl_NL.UTF8" "" "date" 1
-          , Run Com "/home/jeroen/bin/xmobar-powerstatus" [] "power" 10
+          , Run Com "xmobar-powerstatus" [] "power" 10
           , Run Wireless "wlp4s0" [
               "-L","49","-H","89",
               "-l","#ff6666", "-n","#ffe040","-h","#66ff66",
               "-t", "<fc=#a0e0f0><essid></fc>🛜<quality>"] 10
-          , Run Com "/home/jeroen/bin/xmobar-diskusage" [] "disku" 5
-          , Run Com "/home/jeroen/bin/xmobar-selection" [] "xsel" 10
-          , Run Com "/home/jeroen/bin/xmobar-agentstatus" [] "keys" 10
+          , Run Com "xmobar-diskusage" [] "disku" 5
+          , Run Com "xmobar-selection" [] "xsel" 10
+          , Run Com "xmobar-agentstatus" [] "keys" 10
           , Run StdinReader
           ]
        , sepChar = "%"

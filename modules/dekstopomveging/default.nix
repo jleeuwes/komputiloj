@@ -64,8 +64,7 @@ with builtins;
             
             komputiloj.packages.dekstop # must be in PATH for our xmonad config!
         
-            dmenu xsel # some helpers for menus
-            xmobar # status bar
+            xsel
 
             # actual programs:
             # xfce.xfce4-terminal

@@ -3,6 +3,7 @@
 set -Eeu
 set -o pipefail
 
+# NOTE: these are machine-dependent
 LAPTOP=eDP-1
 DP=DP-1
 HDMI=HDMI-2
@@ -14,7 +15,7 @@ HDMI=HDMI-2
 switch_conditionally() {
 	local thing="$1"
 	shift
-	if xrandr --query|egrep "^$thing connected" > /dev/null; then
+	if xrandr --query|grep -E "^$thing connected" > /dev/null; then
 		xrandr --output "$LAPTOP" --off --output "$thing" "$@"
 	else
 		echo "$thing is not connected. Doing nothing." >&2

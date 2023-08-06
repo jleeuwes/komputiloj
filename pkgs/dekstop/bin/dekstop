@@ -89,11 +89,33 @@ bar() {
 	fi
 
 	case "$cmd" in
+	status)
+		printf 'PATH=%q\n' "$PATH" >&2
+		exec xmobar -v "$XMOBARRC"
+	;;
 	run)
-		exec dmenu_run "${DMENU_OPTS[@]}" "$@"
+		exec dmenu_run "${DMENU_OPTS[@]}"
+	;;
+	wachtwoord)
+		wn=$(ls ~/passwords | dmenu "${DMENU_OPTS[@]}")
+		ww=$(wachtwoord cat ~/passwords/"$wn" | tr --delete '\n')
+		printf "%s" "$ww" | timeout 10 xsel -in
+	;;
+	beeld)
+		bn=$(beeld list | dmenu "${DMENU_OPTS[@]}")
+		beeld "$bn"
+	;;
+	wifi)
+		wn=$((echo '*' ; wpa_cli list_networks | grep -E ^[0-9] | cut -f2 ) | dmenu "${DMENU_OPTS[@]}")
+		if [[ "$wn" = '*' ]]; then
+			wpa_cli reconfigure
+		else
+			number=$(wpa_cli list_networks | grep -F -- "$wn" | cut -f1)
+			wpa_cli select_network "$number"
+		fi
 	;;
 	*)
-		printf 'Usage: %s %s run\n'         "$0" "${FUNCNAME[0]}" >&2
+		printf 'Unknown bar: %s\n' "$cmd" >&2
 		exit 1
 	;;
 	esac

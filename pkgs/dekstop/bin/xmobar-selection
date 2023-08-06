@@ -12,7 +12,7 @@ clipboard_length=20
 # TODO limit the total length instead of each length
 
 primary_selection=$(timeout -k 0.01 0.1 xsel -t 50 --primary |
-	egrep -o "^.{0,$primary_length}.?")
+	grep -Eo "^.{0,$primary_length}.?")
 if [[ ${#primary_selection} -gt $primary_length ]]; then
 	primary_selection=${primary_selection:0:$primary_length}
 	primary_suffix="<fc=$ellipsis_color>…</fc>"
@@ -20,7 +20,7 @@ else
 	primary_suffix=
 fi
 
-clipboard_selection=$(timeout -k 0.01 0.1 xsel -t 50 --clipboard | egrep -o '^.{0,31}')
+clipboard_selection=$(timeout -k 0.01 0.1 xsel -t 50 --clipboard | grep -Eo '^.{0,31}')
 if [[ ${#clipboard_selection} -gt $clipboard_length ]]; then
 	clipboard_selection=${clipboard_selection:0:$clipboard_length}
 	clipboard_suffix="<fc=$ellipsis_color>…</fc>"

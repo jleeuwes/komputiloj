@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 gpg=$(gpg-connect-agent 'keyinfo --no-ask 48D11D2F4E0E8CF9BC917E7F2CD4CC092ED98DC7 Err Pmt Des' /bye | awk '{print $7}')
 ssh=$(gpg-connect-agent 'keyinfo --no-ask 69382006961639E86A64CD16AFCDBCE65227229A Err Pmt Des' /bye | awk '{print $7}')

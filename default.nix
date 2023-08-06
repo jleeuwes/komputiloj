@@ -8,8 +8,8 @@ let
     komputiloj_capsule = {
         users = importDir ./users.d;
         packages = let
-            callPackage = pkg: capsules.nixpkgsCurrent.callPackage pkg { inherit boltons; };
-        in {
+            callPackage = pkg: capsules.nixpkgsCurrent.callPackage pkg (capsules // { inherit boltons; });
+        in rec {
             wachtwoord = callPackage ./pkgs/wachtwoord;
             radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook;
             tipctl = callPackage ./pkgs/tipctl;
