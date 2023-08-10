@@ -1,7 +1,7 @@
 {
   komputiloj,
   lib, stdenv, makeWrapper,
-  bash, coreutils, gnused, gawk, gnugrep,
+  bash, coreutils, gnused, gawk, gnugrep, findutils,
   xfce, brightnessctl, alsaUtils, dmenu, xmobar, gnupg, xsel,
   xrandr, wpa_supplicant,
   ...
@@ -9,6 +9,7 @@
 let
     deps = [
         bash coreutils gnused gawk gnugrep
+        findutils # xargs
         xfce.xfce4-terminal brightnessctl alsaUtils dmenu
         xmobar gnupg xsel komputiloj.packages.wachtwoord xrandr wpa_supplicant
     ];
