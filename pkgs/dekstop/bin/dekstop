@@ -2,10 +2,25 @@
 
 set -Eeu -o pipefail
 
-# We need to record the original path for spawning a terminal:
+# We need to record the original PATH for spawning a terminal
+# or another program that needs to run with the user's regular PATH:
 AMBIENT_PATH="$PATH"
 # But we want to take our dependencies from the DEPS_PATH defined in the package:
 export PATH="$DEPS_PATH"
+
+# Look up a program in our current PATH and run it with the AMBIENT_PATH.
+# Caveats apply: https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then
+exec_with_path() {
+	local cmd
+	local prog
+
+	cmd="$1"
+	shift
+
+	prog=$(command -v -- "$cmd")
+	export PATH="$AMBIENT_PATH"
+	exec -- "$prog" "$@"
+}
 
 DMENU_OPTS=( -b -nb '#000' -nf '#fff' -sb '#fff' -sf '#000' -fn inconsolata:size=14 )
 
@@ -90,11 +105,10 @@ bar() {
 
 	case "$cmd" in
 	status)
-		printf 'PATH=%q\n' "$PATH" >&2
 		exec xmobar -v "$XMOBARRC"
 	;;
 	run)
-		exec dmenu_run "${DMENU_OPTS[@]}"
+		exec_with_path dmenu_run "${DMENU_OPTS[@]}"
 	;;
 	wachtwoord)
 		wn=$(ls ~/passwords | dmenu "${DMENU_OPTS[@]}")
@@ -142,8 +156,7 @@ main() {
 	terminal)
 		# NOTE: the PATH will only influence the first terminal we spawn.
 		#       If we don't want that we should pass --disable-server
-		export PATH="$AMBIENT_PATH"
-		exec "$XFCE_TERMINAL_PATH"/xfce4-terminal
+		exec_with_path xfce4-terminal
 	;;
 	bar)
 		bar "$@"
