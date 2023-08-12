@@ -5,6 +5,9 @@
 ; There is no way to get subdomains automatically, so query those separately!
 
 @		3600	IN	MX	1 mx.soverin.net.
-@		3600	IN	TXT	"Soverin=ptSVpFcNTeybAXer"
 @		3600	IN	TXT	v=spf1 +a include:soverin.net ~all
-soverin._domainkey	3600	IN	TXT	v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnaDn/m5XHhKx9W2AiWDximzkuxt87KvowXCO1SPCeolTNj3yqV0CB1B/vyhen4zzuy52NzCz4egyRiVrHunKc0nQUWdog/AjsamMbYVJTLPDfeNw2b+bM5ROGLqBRLA3RYxBVsHhyhq6KE2kok3a7SjypUhnEj76er4uc/fY36+NVBw54/Y/S500SE5xzLkOapr1JIOHAx7tbAqQJSgYpQObh17jERncvRJ6rQH1BYuggy9yoHYizo4xUxUDs9yE5fTEB49F2kPzwBIcAcAEuHYBR4F6eJ7vnIZbETpH95DklY6V5Fn7F6cNi6gsuPdb0qAydHOIJo4xBAIgxIY5IwIDAQAB
+
+soverin1._domainkey	3600	IN	CNAME	soverin1._domainkey.sover.in.
+soverin2._domainkey	3600	IN	CNAME	soverin2._domainkey.sover.in.
+soverin3._domainkey	3600	IN	CNAME	soverin3._domainkey.sover.in.
+_dmarc	3600	IN	CNAME	none._dmarc.sover.in.
