@@ -52,6 +52,11 @@ show_battery() {
 		fi
 	fi
 	output="$percentage%"
+	if [[ "$status" = "Discharging" ]]; then
+		output="<box width=2 type=Bottom>$output</box>"
+	elif [[ "$status" = "Charging" ]]; then
+		output="<box width=2 type=Top>$output</box>"
+	fi
 	output="$icon<fc=$color>$output</fc>"
 	printf '%s' "$output"
 }
