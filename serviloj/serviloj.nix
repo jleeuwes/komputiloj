@@ -6,10 +6,10 @@ let
 	capsules           = topLevel.capsules;
 	nixpkgs            = sources.nixos_23_05.value {};
 	mailserver         = sources.mailserver_23_05.value;
-	nextcloud_apps     = sources.nextcloud_26_apps.value;
 	komputiloj         = capsules.komputiloj;
 	gorinchemindialoog = capsules.gorinchemindialoog;
 	hello              = capsules.hello-infra;
+	wolk               = capsules.wolk;
 	inherit (nixpkgs.lib.strings) escapeShellArgs;
 in with boltons; {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
@@ -61,6 +61,7 @@ in with boltons; {
 			hello.modules."70004-autocommit"
 			hello.modules."70004-ingest-data"
 			hello.modules."70004-known-host"
+			wolk.modules.all_in_one
 		];
 
 		nixpkgs.overlays = [
@@ -75,12 +76,7 @@ in with boltons; {
 			"luks-storage" = {
 				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
 			};
-			"nextcloud-admin" = {
-				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/admin@wolk.radstand.nl" ];
-				user = "nextcloud";
-				group = "nextcloud";
-				permissions = "ug=r,o=";
-			};
+			"nextcloud-admin" = wolk.nixopsKeys.nextcloud-admin;
 			"account-gorinchemindialoog-bcrypt" = {
 				destDir = "/run/keys/persist";
 				keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
@@ -328,14 +324,6 @@ in with boltons; {
 			# Warning: changing uids here after a user has been created has no effect!
 			# (I think - the note here was about containers.)
 			# You have to rm /var/lib/nixos/uid-map and userdel the user.
-			users.nextcloud = {
-				uid = 70000;
-				group = "nextcloud";
-				extraGroups = [ "keys" ];
-			};
-			groups.nextcloud = {
-				gid = 70000;
-			};
 			users.gitea = {
 				uid = 70001;
 				group = "gitea";
@@ -435,10 +423,6 @@ in with boltons; {
 				# careful with the default server, otherwise every subdomain
 				# might end up with HTST enabled.
 
-				"wolk.radstand.nl" = {
-					forceSSL = true;
-					enableACME = true;
-				};
 				"thee.radstand.nl" = {
 					forceSSL = true;
 					enableACME = true;
@@ -533,38 +517,6 @@ in with boltons; {
 			};
 		};
 
-		services.nextcloud = {
-			enable = true;
-
-			package = pkgs.nextcloud26;
-
-			home = "/mnt/storage/live/nextcloud/rootdir";
-
-			autoUpdateApps = {
-				enable = true;
-			};
-
-			hostName = "wolk.radstand.nl";
-			https = true; # no idea how this relates to config.overwriteProtocol
-
-			maxUploadSize = "512M";
-
-			enableBrokenCiphersForSSE = false; # https://github.com/NixOS/nixpkgs/pull/198470
-
-			config = {
-				adminuser = "admin";
-				adminpassFile = "/run/keys/nextcloud-admin";
-				
-				dbtype = "sqlite"; # let's start simple
-				
-				overwriteProtocol = "https";
-			};
-
-			extraApps = let apps = nextcloud_apps pkgs; in {
-				inherit (apps) files_linkeditor calendar;
-			};
-		};
-		
 		services.gitea = {
 			enable = true;
 

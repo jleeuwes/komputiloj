@@ -33,6 +33,7 @@ let
             inherit capsules;
         };
         gorinchemindialoog = sources.gorinchemindialoog.value;
+        wolk = (import ./apps/wolk) (capsules // { inherit boltons; });
     };
     all_capsule = let
         cs = attrValues real_capsules;
@@ -64,6 +65,12 @@ let
             # source, we will never catch up.
             packages = {
                 git-annex-remote-rclone = override nixpkgsCurrent.packages.git-annex-remote-rclone (nixpkgsCurrent.callPackage ./pkgs/git-annex-remote-rclone {});
+            };
+        };
+        nextcloud = {
+            packages = {
+                nextcloud = nixpkgsCurrent.packages.nextcloud26;
+                apps = sources.nextcloud_26_apps.value nixpkgsCurrent.packages;
             };
         };
     };
