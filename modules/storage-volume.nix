@@ -39,10 +39,6 @@ in {
             wantedBy = [ "multi-user.target" ];
             # TODO move requiredBy and before to the respective services
             requiredBy = [
-                "nextcloud-cron.service"
-                "nextcloud-setup.service"
-                "nextcloud-update-plugins.service"
-                "phpfpm-nextcloud.service"
                 "gitea.service"
                 "btrbk-storage.service" # TODO make requisite
                 "postfix.service"
@@ -50,10 +46,6 @@ in {
                 "radicale.service"
             ];
             before = [
-                "nextcloud-cron.service"
-                "nextcloud-setup.service"
-                "nextcloud-update-plugins.service"
-                "phpfpm-nextcloud.service"
                 "gitea.service"
                 "btrbk-storage.service"
                 "postfix.service"
