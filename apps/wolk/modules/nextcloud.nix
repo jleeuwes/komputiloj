@@ -59,5 +59,26 @@
                 inherit (nextcloud.packages.apps) files_linkeditor calendar;
             };
         };
+
+        systemd.services = {
+            # Augment nextcloud's own services:
+            # TODO requisite nextcloud-admin key (setup only?)
+            nextcloud-cron = {
+                needsStorageVolume = "requires";
+                mailOnFailure = true;
+            };
+            nextcloud-setup = {
+                needsStorageVolume = "requires";
+                mailOnFailure = true;
+            };
+            nextcloud-update-plugins = {
+                needsStorageVolume = "requires";
+                mailOnFailure = true;
+            };
+            phpfpm-nextcloud = {
+                needsStorageVolume = "requires";
+                mailOnFailure = true;
+            };
+        };
     };
 }
