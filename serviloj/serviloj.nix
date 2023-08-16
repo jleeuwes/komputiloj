@@ -72,11 +72,10 @@ in with boltons; {
 		deployment.provisionSSHKey = false;
 		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
 		
-		deployment.keys = {
+		deployment.keys = wolk.nixopsKeys // {
 			"luks-storage" = {
 				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
 			};
-			"nextcloud-admin" = wolk.nixopsKeys.nextcloud-admin;
 			"account-gorinchemindialoog-bcrypt" = {
 				destDir = "/run/keys/persist";
 				keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];

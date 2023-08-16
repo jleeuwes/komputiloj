@@ -1,4 +1,4 @@
-{ boltons, nextcloud, ... }:
+{ boltons, nextcloud, nixpkgsCurrent, ... }:
 { ... }:
 {
     imports = [
@@ -61,23 +61,106 @@
         };
 
         systemd.services = {
+            mount-nextcloud-bigstorage = rec {
+                serviceConfig = {
+                    Type = "simple";
+                    User = "nextcloud";
+                };
+                needsStorageVolume = "requires";
+                requires = [
+                    "bigstorage1-wolk-webdav-pass-key.service"
+                    "bigstorage1-wolk-crypt-pass-key.service"
+                    "bigstorage1-wolk-crypt-salt-key.service"
+                ];
+                after = requires;
+                mailOnFailure = true;
+                path = [
+                    nixpkgsCurrent.packages.rclone
+                    nixpkgsCurrent.packages.gnugrep
+                    nixpkgsCurrent.packages.coreutils
+                ];
+                script = ''
+                    # Give rclone access to fusermount3 wrapper
+                    # (which hopefully is installed by default)
+                    export PATH="$PATH":/run/wrappers/bin
+
+                    export RCLONE_CONFIG_LOWER_TYPE=webdav
+                    export RCLONE_CONFIG_LOWER_URL=https://u362967-sub1.your-storagebox.de
+                    export RCLONE_CONFIG_LOWER_VENDOR=other
+                    export RCLONE_CONFIG_LOWER_USER=u362967-sub1
+                    export RCLONE_CONFIG_LOWER_PASS=$(rclone obscure - < /run/keys/bigstorage1-wolk-webdav-pass)
+                    export RCLONE_CONFIG_UPPER_TYPE=crypt
+                    export RCLONE_CONFIG_UPPER_REMOTE=lower:encrypted
+                    export RCLONE_CONFIG_UPPER_PASSWORD=$(rclone obscure - < /run/keys/bigstorage1-wolk-crypt-pass)
+                    export RCLONE_CONFIG_UPPER_PASSWORD2=$(rclone obscure - < /run/keys/bigstorage1-wolk-crypt-salt)
+                    rclone mount upper: /mnt/per-user/nextcloud/bigstorage \
+                        --config=/dev/null \
+                        --vfs-cache-mode=writes \
+                        --vfs-cache-max-size=1G \
+                        --cache-dir=/mnt/storage/work/nextcloud/vfs-cache
+                '';
+                postStart = ''
+                    while ! grep -F /mnt/per-user/nextcloud/bigstorage /proc/mounts; do
+                        sleep 1
+                    done
+                '';
+                preStop = ''
+                    export PATH="$PATH":/run/wrappers/bin
+                    fusermount -u /mnt/per-user/nextcloud/bigstorage
+                '';
+            };
+
+            mount-nextcloud-bindmounts = rec {
+                serviceConfig = {
+                    Type = "oneshot";
+                    User = "nextcloud";
+                };
+                needsStorageVolume = "requires";
+                requires = [
+                    "mount-nextcloud-bigstorage.service"
+                ];
+                after = requires;
+                mailOnFailure = true;
+                path = [
+                ];
+                script = ''
+                    echo PLACEHOLDER
+                '';
+            };
+
             # Augment nextcloud's own services:
             # TODO requisite nextcloud-admin key (setup only?)
             nextcloud-cron = {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
+                # requires = [
+                #     "mount-nextcloud-bindmounts.service"
+                # ];
+                # after = requires;
             };
             nextcloud-setup = {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
+                # requires = [
+                #     "mount-nextcloud-bindmounts.service"
+                # ];
+                # after = requires;
             };
             nextcloud-update-plugins = {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
+                # requires = [
+                #     "mount-nextcloud-bindmounts.service"
+                # ];
+                # after = requires;
             };
             phpfpm-nextcloud = {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
+                # requires = [
+                #     "mount-nextcloud-bindmounts.service"
+                # ];
+                # after = requires;
             };
         };
     };
