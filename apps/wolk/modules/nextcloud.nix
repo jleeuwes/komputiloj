@@ -119,7 +119,7 @@
 
             mount-nextcloud-bindmounts = rec {
                 serviceConfig = {
-                    Type = "oneshot";
+                    Type = "simple";
                     User = "nextcloud";
                 };
                 needsStorageVolume = "requires";
@@ -129,9 +129,39 @@
                 after = requires;
                 mailOnFailure = true;
                 path = [
+                    nixpkgsCurrent.packages.bindfs
+                    nixpkgsCurrent.packages.coreutils
+                    nixpkgsCurrent.packages.utillinux
                 ];
+                preStart = ''
+                '';
                 script = ''
-                    echo PLACEHOLDER
+                    test -d /mnt/storage/live/nextcloud/rootdir/data/testje
+                    mkdir -p /mnt/storage/live/nextcloud/rootdir/data/testje/files
+                    chmod u+w /mnt/storage/live/nextcloud/rootdir/data/testje/files
+                    # TODO warn if dir is not empty
+
+                    # Option -f makes bindfs run in the foreground
+                    bindfs -f --no-allow-other \
+                        /mnt/per-user/nextcloud/bigstorage/testje \
+                        /mnt/storage/live/nextcloud/rootdir/data/testje/files
+                '';
+                postStart = ''
+                    while kill -0 "$MAINPID"; do
+                        if mountpoint -q /mnt/storage/live/nextcloud/rootdir/data/testje/files; then
+                            echo "Nextcloud user testje bindmounted."
+                            break
+                        else
+                            echo "Waiting for nextcloud user testje to mount..."
+                            sleep 1
+                        fi
+                    done
+                '';
+                preStop = ''
+                    export PATH="$PATH":/run/wrappers/bin
+                    fusermount -u /mnt/storage/live/nextcloud/rootdir/data/testje/files
+                    # Try and prevent writing to the mountpoint when not mounted:
+                    chmod ug-w /mnt/storage/live/nextcloud/rootdir/data/testje/files
                 '';
             };
 
