@@ -78,6 +78,7 @@
                     nixpkgsCurrent.packages.rclone
                     nixpkgsCurrent.packages.gnugrep
                     nixpkgsCurrent.packages.coreutils
+                    nixpkgsCurrent.packages.utillinux
                 ];
                 script = ''
                     # Give rclone access to fusermount3 wrapper
@@ -100,8 +101,14 @@
                         --cache-dir=/mnt/storage/work/nextcloud/vfs-cache
                 '';
                 postStart = ''
-                    while ! grep -F /mnt/per-user/nextcloud/bigstorage /proc/mounts; do
-                        sleep 1
+                    while kill -0 "$MAINPID"; do
+                        if mountpoint -q /mnt/per-user/nextcloud/bigstorage; then
+                            echo "Bigstorage mounted."
+                            break
+                        else
+                            echo "Waiting for bigstorage to mount..."
+                            sleep 1
+                        fi
                     done
                 '';
                 preStop = ''
