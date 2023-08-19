@@ -67,12 +67,12 @@
                     User = "nextcloud";
                 };
                 needsStorageVolume = "requires";
-                requires = [
+                wants = [
                     "bigstorage1-wolk-webdav-pass-key.service"
                     "bigstorage1-wolk-crypt-pass-key.service"
                     "bigstorage1-wolk-crypt-salt-key.service"
                 ];
-                after = requires;
+                after = wants;
                 mailOnFailure = true;
                 path = [
                     nixpkgsCurrent.packages.rclone
