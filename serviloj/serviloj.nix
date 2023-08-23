@@ -72,7 +72,7 @@ in with boltons; {
 		deployment.provisionSSHKey = false;
 		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
 		
-		deployment.keys = {
+		deployment.keys = wolk.nixopsKeys // {
 			"luks-storage" = {
 				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
 			};
