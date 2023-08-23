@@ -106,6 +106,7 @@ let
         preStart = ''
         '';
         script = ''
+            export PATH="$PATH":/run/wrappers/bin
             user=${escapeShellArg user}
             userdir=/mnt/storage/live/nextcloud/rootdir/data/"$user"
             bigdir=/mnt/per-user/nextcloud/bigstorage/"$user"
@@ -115,17 +116,17 @@ let
             }
 
             if [[ ! -d "$userdir" ]]; then
-                printf '<3>Data dir %q does not exist so we can't mount there.\n' "$userdir"
+                printf '<3>Data dir %q does not exist so we cannot mount there.\n' "$userdir"
                 exit 1
             fi
             mkdir -p  -- "$userdir"/files
-            if ! is_empty_dir "$userdir"/files)"; then
+            if ! is_empty_dir "$userdir"/files; then
                 if is_empty_dir "$bigdir"; then
                     printf '<3>There are files in %q that would disappear behind the bindmount. Aborting.\n' "$userdir"/files
                     exit 1
                 else
                     # The <4> makes it a warning: https://wiki.archlinux.org/title/Systemd/Journal
-                    printf '<4>There are files in both %q and %q! I'll continue but this should be investigated.\n' "$userdir"/files "$bigdir"
+                    printf '<4>There are files in both %q and %q! I will continue but this should be investigated.\n' "$userdir"/files "$bigdir"
                 fi
             fi
             
@@ -133,7 +134,7 @@ let
             chmod u+w -- "$userdir"/files
             # Slight window between chmod and bindfs in which files might be written :(
             # Option -f makes bindfs run in the foreground
-            bindfs -f --no-allow-other -- "$bigdir" "$userdir"/files
+            bindfs -f --no-allow-other "$bigdir" "$userdir"/files
         '';
         postStart = ''
             user=${escapeShellArg user}
@@ -148,9 +149,9 @@ let
             done
         '';
         postStop = ''
+            export PATH="$PATH":/run/wrappers/bin
             user=${escapeShellArg user}
             userdir=/mnt/storage/live/nextcloud/rootdir/data/"$user"
-            export PATH="$PATH":/run/wrappers/bin
 
             fusermount -u -- "$userdir"/files
             # Try and prevent writing to the mountpoint when not mounted:
@@ -160,7 +161,7 @@ let
                 [[ -z "$(ls -A1q -- "$1")" ]]
             }
 
-            if ! is_empty_dir "$userdir"/files)"; then
+            if ! is_empty_dir "$userdir"/files; then
                 printf '<3>There are files in %q that would disappear behind the bindmount next time.\n' "$userdir"/files
                 exit 1 # attempt to trigger failure so we get a mail
             fi
