@@ -1,4 +1,4 @@
-{ boltons, nextcloud, nixpkgsCurrent, ... }:
+{ boltons, nextcloud, nixpkgsCurrent, users, ... }:
 with boltons;
 { ... }:
 let
@@ -58,7 +58,12 @@ let
             export PATH="$PATH":/run/wrappers/bin
             
             config_file=/run/keys/bigstorage1-wolk-config
-
+            
+            # NOTE: the cache dir should not be deleted without thought:
+            # it can contain yet-to-be-written files.
+            # So TODO maybe we should put it on /mnt/storage/live instead of /mnt/storage/work.
+            # (Allthough we back up with far bigger delay than the write cache delay,
+            # so it won't necessarily reduce the amount of lost data in case of losing our storage volume.)
             rclone mount upper: /mnt/per-user/nextcloud/bigstorage \
                 --config="$config_file" \
                 --vfs-cache-mode=writes \
@@ -167,6 +172,13 @@ let
             fi
         '';
     };
+    userlist = attrValues users;
+    usersWithBigstorage = filter (user: user.apps.wolk.bigstorage or false) userlist;
+    bindmountServices = listToAttrs (map (user: {
+        name = "mount-nextcloud-bindmount-${user.name}";
+        value = bindmountService user.name;
+    }) usersWithBigstorage);
+    bindmountServicesAsDeps = map (nm: "${nm}.service") (attrNames bindmountServices);
 in {
     imports = [
         # TODO depends on storage-volume
@@ -227,45 +239,30 @@ in {
             };
         };
 
-        systemd.services = {
+        systemd.services = bindmountServices // {
             mount-nextcloud-bigstorage = bigstorageService;
 
-            mount-nextcloud-bindmount-testje = bindmountService "testje";
-            mount-nextcloud-bindmount-jeroen = bindmountService "jeroen";
-
             # Augment nextcloud's own services:
-            # TODO requisite nextcloud-admin key (setup only?)
+            # TODO wants nextcloud-admin key (setup only?)
             nextcloud-cron = {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
-                # requires = [
-                #     "mount-nextcloud-bindmounts.service"
-                # ];
-                # after = requires;
+                wants = bindmountServicesAsDeps;
+                after = bindmountServicesAsDeps;
             };
             nextcloud-setup = {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
-                # requires = [
-                #     "mount-nextcloud-bindmounts.service"
-                # ];
-                # after = requires;
             };
             nextcloud-update-plugins = {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
-                # requires = [
-                #     "mount-nextcloud-bindmounts.service"
-                # ];
-                # after = requires;
             };
             phpfpm-nextcloud = {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
-                # requires = [
-                #     "mount-nextcloud-bindmounts.service"
-                # ];
-                # after = requires;
+                wants = bindmountServicesAsDeps;
+                after = bindmountServicesAsDeps;
             };
         };
     };

@@ -92,7 +92,7 @@ rotate() {
 
 if [[ -t 2 ]]; then
 	# stderr is a terminal, so display progress
-	RSYNC=(rsync --progress)
+	RSYNC=(rsync --info=progress2 -hhh)
 else
 	# don't litter redirected stdout with progress info
 	RSYNC=(rsync)

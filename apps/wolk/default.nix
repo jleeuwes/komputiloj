@@ -1,7 +1,10 @@
-{ boltons, nextcloud, nixpkgsCurrent, ... }:
+{ boltons, nextcloud, nixpkgsCurrent, all, ... }:
 {
     modules = {
-        all_in_one = (import ./modules/nextcloud.nix) { inherit boltons nextcloud nixpkgsCurrent; };
+        all_in_one = (import ./modules/nextcloud.nix) {
+            inherit boltons nextcloud nixpkgsCurrent;
+            users = all.users;
+        };
     };
     
     nixopsKeys = {

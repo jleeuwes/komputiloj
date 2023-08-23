@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#
+# Usage: mount latest mnt
+
+set -Eeu -o pipefail
+
+here=$(dirname -- "$0")
+
+if [[ "$(id -u)" = 0 ]]; then
+	echo "NOPE! Not running this as root."
+	exit 1
+fi
+
+export RCLONE_CONFIG_LOCAL_TYPE=local
+export RCLONE_CONFIG_DECRYPT_TYPE=crypt
+export RCLONE_CONFIG_DECRYPT_REMOTE=local:/root/backup/bigstorage1/home."$1"/wolk/encrypted
+export RCLONE_CRYPT_PASSWORD=$(wachtwoord cat -n ~/passwords/bigstorage1-wolk-crypt-pass@hetzner | rclone obscure -)
+export RCLONE_CRYPT_PASSWORD2=$(wachtwoord cat -n ~/passwords/bigstorage1-wolk-crypt-salt@hetzner | rclone obscure -)
+
+sudo -E rclone mount --allow-other --read-only --config=/dev/null decrypt: "$2"

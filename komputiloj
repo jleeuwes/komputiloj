@@ -183,8 +183,12 @@ do_backup() {
 		printf 'Usage: %q backup\n' "$0" >&2
 		return 1
 	fi
-
-	exec sudo -E "$KOMPUTILOJ_PATH"/bin/backup-storage
+	
+	echo "FIRST: backup-storage"
+	sudo -E "$KOMPUTILOJ_PATH"/bin/backup-storage
+	echo
+	echo "THEN: backup-bigstorage1"
+	sudo -E "$KOMPUTILOJ_PATH"/bin/backup-bigstorage1
 }
 
 main "$@"
