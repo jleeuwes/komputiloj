@@ -122,6 +122,8 @@ do_nixops_something() {
 	export NIXOPS_STATE="$KOMPUTILOJ_PATH"/serviloj/state.nixops
 	export NIXOPS_DEPLOYMENT=serviloj
 	local args_escaped=$(printf '%q ' "$@")
+	# TODO add nixops to gcroots to prevent rebuilding everytime
+	# (best way to do this is probably to put shells in a capsule)
 	nix-shell \
 		-E 'with import <nixpkgs> {}; with import <komputiloj>; mkShell { buildInputs = [
 			sources.nixops.value.default
