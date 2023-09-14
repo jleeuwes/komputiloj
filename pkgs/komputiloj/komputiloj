@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+main() {
+	local cmd
+	
+	if [[ "$#" -eq 0 ]]; then
+		printf 'Usage: %q COMMAND\n' "$0" >&2
+		exit 1
+	fi
+
+	cmd="$1"
+	shift
+	case "$cmd" in
+		update-sources)
+			do_update_sources
+		;;
+		nixos-rebuild)
+			do_nixos_rebuild "$@"
+		;;
+		deploy)
+			do_deploy "$@"
+		;;
+		activate-apps)
+			do_activate_apps "$@"
+		;;
+		update-domains)
+			do_update_domains "$@"
+		;;
+		nixops)
+			do_nixops "$@"
+		;;
+		cleanup)
+			do_cleanup "$@"
+		;;
+		backup)
+			do_backup "$@"
+		;;
+		*)
+			printf 'Unknown command %q\n' "$cmd" >&2
+		;;
+	esac
+}
+
+do_update_sources() {
+	for source_dir in "$KOMPUTILOJ_PATH"/sources.d/*; do
+		if [[ -d "$source_dir" ]]; then
+		(
+			cd -- "$source_dir"
+			if [[ -x update ]]; then
+				printf 'Updating source %s\n' "$source_dir" >&2
+				./update
+			else
+				printf 'Skipping source without update script: %s\n' "$source_dir" >&2
+			fi
+		)
+		fi
+	done
+}
+
+do_nixos_rebuild() {
+	printf 'Using implicit current host configuration from /etc/nixos\n' >&2 # TODO just use a (host-specific) dir in KOMPUTILOJ_PATH directly
+	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$NIXPKGS_PATH:nixos-config=/etc/nixos/configuration.nix"
+	exec sudo -E nixos-rebuild "$@"
+}
+
+do_deploy() {
+	do_nixops_something "$KOMPUTILOJ_PATH"/serviloj/deploy "$@"
+	echo "TODO now activate-apps?" >&2
+}
+
+do_update_domains() {
+	# TODO put domains in top-level default.nix
+	# TODO it's weird to refer to serviloj here; put secrets higher
+	export TRANSIP_USER=jeroenleeuwestein
+	export TRANSIP_PRIVKEY=$(wachtwoord cat -n \
+		"$KOMPUTILOJ_PATH"/serviloj/secrets/privkey@api.transip.nl)
+	export VERSIO_USER=jeroen@lwstn.eu:$(wachtwoord cat -n \
+		"$KOMPUTILOJ_PATH"/serviloj/secrets/jeroen@lwstn.eu@versio.nl)
+	
+	for domain_dir in "$KOMPUTILOJ_PATH"/domains.d/*; do
+		if [[ -d "$domain_dir" ]]; then
+		(
+			cd -- "$domain_dir"
+			if [[ -x update ]]; then
+				printf 'Updating domain %s\n' "$domain_dir" >&2
+				./update
+			else
+				printf 'Skipping domain without update script: %s\n' "$domain_dir" >&2
+			fi
+		)
+		fi
+	done
+}
+
+do_nixops() {
+	do_nixops_something "$KOMPUTILOJ_PATH"/serviloj/command "$@"
+}
+
+do_nixops_something() {
+	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$NIXPKGS_PATH"
+	export NIXOPS_CMD=nixops
+	export NIXOPS_STATE="$KOMPUTILOJ_PATH"/serviloj/state.nixops
+	export NIXOPS_DEPLOYMENT=serviloj
+	"$@"
+}
+
+do_activate_apps() {
+	# TODO It's weird to reference serviloj here.
+	export THEE_USER=jeroen
+	export THEE_PASSWORD=$(wachtwoord cat -n \
+		"$KOMPUTILOJ_PATH"/serviloj/secrets/jeroen@thee.radstand.nl)
+	komputiloj-activate-app-thee
+}
+
+do_cleanup() {
+	local host
+
+	if [[ "$#" -ne 1 ]]; then
+		printf 'Usage: %q cleanup HOSTNAME\n' "$0" >&2
+		return 1
+	fi
+
+	host="$1"
+	if [[ "$host" = "$HOSTNAME" ]]; then
+		echo "Doing local nix garbage collection..."
+		sudo nix-collect-garbage
+		echo
+		echo "Garbage was collected. However,"
+		echo "there might be lingering old system generations:"
+		echo
+		sudo nix-env -p /nix/var/nix/profiles/system --list-generations
+		echo
+		echo "To delete:"
+		echo "    sudo nix-env -p /nix/var/nix/profiles/system --delete-generations NUMBER..."
+		echo "    sudo nix-collect-garbage"
+	else
+	case "$host" in
+		gently)
+			# TODO study https://nixos.wiki/wiki/Storage_optimization
+			# for an automated solution.
+			ssh root@gently.radstand.nl nix-collect-garbage -d
+		;;
+		*)
+			printf "Don't know how to clean up host %q.\n" "$host" >&2
+			return 1
+		;;
+	esac
+	fi
+}
+
+do_backup() {
+	# TODO determine dependencies
+	export PATH="$IMPURE_PATH"
+
+	if [[ "$#" -ne 0 ]]; then
+		printf 'Usage: %q backup\n' "$0" >&2
+		return 1
+	fi
+	
+	echo "FIRST: backup-storage"
+	sudo -E "$KOMPUTILOJ_PATH"/bin/backup-storage
+	echo
+	echo "THEN: backup-bigstorage1"
+	sudo -E "$KOMPUTILOJ_PATH"/bin/backup-bigstorage1
+}
+
+main "$@"
+

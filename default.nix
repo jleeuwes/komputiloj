@@ -8,12 +8,17 @@ let
     komputiloj_capsule = {
         users = importDir ./users.d;
         packages = let
-            callPackage = pkg: capsules.nixpkgsCurrent.callPackage pkg (capsules // { inherit boltons; });
+            callPackage = pkg: overrides: capsules.nixpkgsCurrent.callPackage pkg
+                (capsules // { inherit boltons; } // overrides);
         in rec {
-            wachtwoord = callPackage ./pkgs/wachtwoord;
-            radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook;
-            tipctl = callPackage ./pkgs/tipctl;
-            dekstop = callPackage ./pkgs/dekstop;
+            wachtwoord = callPackage ./pkgs/wachtwoord {};
+            radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook {};
+            tipctl = callPackage ./pkgs/tipctl {};
+            dekstop = callPackage ./pkgs/dekstop {};
+            komputiloj = callPackage ./pkgs/komputiloj {
+                inherit tipctl wachtwoord;
+                nixops = capsules.nixops.packages.default;
+            };
             # git-annex-remote-rclone is not here but in nixpkgsFuture,
             # because we will remove our copy of the package when the
             # desired version is included in nixpkgs
@@ -66,6 +71,9 @@ let
             packages = {
                 git-annex-remote-rclone = override nixpkgsCurrent.packages.git-annex-remote-rclone (nixpkgsCurrent.callPackage ./pkgs/git-annex-remote-rclone {});
             };
+        };
+        nixops = {
+            packages = sources.nixops.value;
         };
         nextcloud = {
             packages = {
