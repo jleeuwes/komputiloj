@@ -5,6 +5,7 @@ let
     sources = importDir ./sources.d;
     default_nixos = "nixos_23_05"; # defines default nixos used by all of komputiloj
     default_nixos_source = getAttr default_nixos sources;
+    default_mailserver_source = sources.mailserver_23_05; # defined here to not forget updating nixos and mailserver together
     komputiloj_capsule = {
         users = importDir ./users.d;
         packages = let
@@ -18,6 +19,7 @@ let
             # because we will remove our copy of the package when the
             # desired version is included in nixpkgs
         };
+
         modules = {
             dekstopomveging = (import ./modules/dekstopomveging) (capsules // { inherit boltons; });
         };
@@ -54,6 +56,12 @@ let
             # TODO use flakes.
             packages = (default_nixos_source.value {});
             callPackage = packages.callPackage;
+            modules = {
+                # Is it wise to put extra stuff in this capsule?
+                # We do it because the mailserver is closely linked to the NixOS
+                # (i.e. nixpkgs) version.
+                mailserver = default_mailserver_source.value;
+            };
         };
         nixpkgsFuture = let
             override = old: new: trace ("🕑🕐🕛 nixpkgsFuture: Replacing " + old.name + " with " + new.name) new;
