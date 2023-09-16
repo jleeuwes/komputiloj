@@ -17,7 +17,35 @@ in {
 	# - ...
 	#
 	
-	gently2 = { config, nodes, lib, pkgs, ... }:
+	gently2.nixopsStuff = {
+		deployment.targetHost = "gently.radstand.nl";
+		deployment.provisionSSHKey = false;
+		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
+		
+		deployment.keys = wolk.nixopsKeys // {
+			"luks-storage" = {
+				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
+			};
+			"nextcloud-admin" = wolk.nixopsKeys.nextcloud-admin;
+			"account-gorinchemindialoog-bcrypt" = {
+				destDir = "/run/keys/persist";
+				keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
+			};
+			"radicale-auth" = {
+				destDir = "/run/keys/persist";
+				keyCommand = [ "sh" "-c"
+					"wachtwoord hash-with-bcrypt ${escapeShellArgs
+						(map (username: "secrets/${username}@knol.radstand.nl")
+							hello.radicale.users
+					)} | sed -E 's/^secrets\\/([^@]*)@[^:]*/\\1/'"
+				];
+				user = "radicale";
+				group = "radicale";
+				permissions = "ug=r,o=";
+			};
+		};
+    };
+	gently2.nixosStuff = { config, lib, pkgs, ... }:
 	let
 		makeJob = s: s // {
 			mailOnFailure = true;
@@ -61,39 +89,11 @@ in {
 			komputiloj.overlays.undesired-packages
 		];
 
-		deployment.targetHost = "gently.radstand.nl";
-		deployment.provisionSSHKey = false;
-		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
 		
-		deployment.keys = wolk.nixopsKeys // {
-			"luks-storage" = {
-				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
-			};
-			"nextcloud-admin" = wolk.nixopsKeys.nextcloud-admin;
-			"account-gorinchemindialoog-bcrypt" = {
-				destDir = "/run/keys/persist";
-				keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
-			};
-			"radicale-auth" = {
-				destDir = "/run/keys/persist";
-				keyCommand = [ "sh" "-c"
-					"wachtwoord hash-with-bcrypt ${escapeShellArgs
-						(map (username: "secrets/${username}@knol.radstand.nl")
-							hello.radicale.users
-					)} | sed -E 's/^secrets\\/([^@]*)@[^:]*/\\1/'"
-				];
-				user = "radicale";
-				group = "radicale";
-				permissions = "ug=r,o=";
-			};
-		};
-		
-		# The rest is a configuration just like nixos/configuration.nix
-		
-		# WARNING this setting is ignored.
+		# WARNING this setting is ignored by nixops.
 		# Instead, nixops determines the stateVersion at first deploy based on the NixOS version it encounters.
 		# Our deploy script stores this state on gently now to keep the correct stateVersion.
-		# system.stateVersion = lib.mkForce "20.09";
+		system.stateVersion = lib.mkForce "20.09";
 		
 		i18n = {
 			supportedLocales = [

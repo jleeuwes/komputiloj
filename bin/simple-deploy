@@ -1,0 +1,29 @@
+# TODO blauwdruk voor hoe ons activation script eruit moet gaan zien
+# dit moet niet hier staat maar ik wil het even kwijt
+
+set -Eeu -o pipefail
+
+export KOMPUTILOJ_PATH=/home/jeroen/komputiloj
+
+# mkdir -p -- "$KOMPUTILOJ_PATH"/results
+
+# new_toplevel=$(nix-build --out-link "$KOMPUTILOJ_PATH"/results/gently \
+# 	-A capsules.komputiloj.nixosConfigurations.gently.config.system.build.toplevel \
+# 	-- "$KOMPUTILOJ_PATH")
+
+# TODO eventueel --use-substitutes indien has_fast_connection
+# nix-copy-closure --to root@gently "$new_toplevel"
+
+key_upload_dir=/run/keys/upload."$RANDOM"
+ssh root@gently bash - <<-EOF
+	mkdir $key_upload_dir
+	chmod go= $key_upload_dir
+EOF
+wachtwoord cat -n "$KOMPUTILOJ_PATH"/serviloj/secrets/luks-storage@hetzner | \
+	ssh root@gently "cat > $key_upload_dir/luks-storage"
+ssh root@gently bash - <<-EOF
+	mv $key_upload_dir/* /run/keys/test
+	rmdir $key_upload_dir
+EOF
+
+# ssh root@gently "$new_toplevel"/bin/switch-to-configuration switch
