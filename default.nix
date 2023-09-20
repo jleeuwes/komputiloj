@@ -6,10 +6,12 @@ let
     default_nixos = "nixos_23_05"; # defines default nixos used by all of komputiloj
     default_nixos_source = getAttr default_nixos sources;
     default_mailserver_source = sources.mailserver_23_05; # defined here to not forget updating nixos and mailserver together
+    nixpkgsLib = import (default_nixos_source.nix_path + "/lib");
+    callPackageWith = nixpkgsLib.callPackageWith;
     komputiloj_capsule = {
         users = importDir ./users.d;
         packages = let
-            callPackage = pkg: capsules.nixpkgsCurrent.lib.callPackage pkg capsules_and_boltons;
+            callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages pkg capsules_and_boltons;
         in rec {
             wachtwoord = callPackage ./pkgs/wachtwoord;
             radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook;
@@ -50,18 +52,16 @@ let
     };
     real_capsules = {
         komputiloj = komputiloj_capsule;
-        hello-infra = sources.hello-infra.value {
-            inherit boltons;
-            inherit capsules;
-        };
+        hello-infra = sources.hello-infra.value capsules_and_boltons;
         gorinchemindialoog = sources.gorinchemindialoog.value;
-        wolk = (import ./apps/wolk) (capsules // { inherit boltons; });
+        wolk = (import ./apps/wolk) capsules_and_boltons;
     };
     all_capsule = let
-        cs = attrValues real_capsules;
+        cs = attrValues (real_capsules // fake_capsules);
     in {
         # special capsule which aggregates stuff from all other capsules
         users = mergeAttrsets (catAttrs "users" cs);
+        lib = mergeAttrsets (catAttrs "lib" cs);
     };
     fake_capsules = rec {
         nixpkgsCurrent = rec {
@@ -72,9 +72,14 @@ let
             # have the same architecture (x86_64).
             # TODO use flakes.
             packages = (default_nixos_source.value {});
-            lib.callPackage = packages.callPackage;
-            lib.nixosSystem = import (default_nixos_source.nix_path + "/nixos/lib/eval-config.nix");
-            lib.writeShellApplication = packages.writeShellApplication;
+            lib = {
+                # We need to distribute callPackageWith to imported files. Is this really the best way to do that?
+                inherit callPackageWith;
+
+                nixosSystem = import (default_nixos_source.nix_path + "/nixos/lib/eval-config.nix");
+
+                writeShellApplication = packages.writeShellApplication;
+            };
 
             modules = {
                 # Is it wise to put extra stuff in this capsule?
@@ -92,7 +97,9 @@ let
             # take packages directly from one perpetually updated unstable
             # source, we will never catch up.
             packages = {
-                git-annex-remote-rclone = override nixpkgsCurrent.packages.git-annex-remote-rclone (nixpkgsCurrent.lib.callPackage ./pkgs/git-annex-remote-rclone {});
+                git-annex-remote-rclone = override
+                    nixpkgsCurrent.packages.git-annex-remote-rclone
+                    (callPackageWith nixpkgsCurrent.packages ./pkgs/git-annex-remote-rclone {});
             };
         };
         nextcloud = {
