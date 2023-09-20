@@ -5,6 +5,7 @@ builtins // rec {
     attrsToList = (attrs: map (key: {name = key; value = getAttr key attrs;}) (attrNames attrs));
     
     mapNames = (f: attrs: listToAttrs (map (a: {name = f a.name; value = a.value;}) (attrsToList attrs)));
+    mapValues = f: mapAttrs (name: value: f value);
 
     filterAttrs = (f: attrs: listToAttrs (filter f (attrsToList attrs)));
     
@@ -14,7 +15,7 @@ builtins // rec {
         duplicates = attrNames (intersectAttrs a b);
         loc = nm: set: let
             l = unsafeGetAttrPos nm set;
-        in "${l.file}:${toString l.line}";
+        in if l == null then "<unknown>" else "${l.file}:${toString l.line}";
         mkError = nm: "mergeAtts: attribute \"${nm}\" is defined in both ${loc nm a} and ${loc nm b}";
     in if duplicates == []
     then (a // b)
@@ -38,6 +39,8 @@ builtins // rec {
         importedFiles = map importFile
             (filter (matches ".*\.nix") entries.files);
     in listToAttrs (importedFiles ++ importedDirs);
+
+    importDirAndApply = path: arg: mapValues (f: f arg) (importDir path);
 
     readDirPerType = path: let
         entries = attrsToList (readDir path);

@@ -16,6 +16,7 @@ DEFAULT_NIXOS=$(nix-instantiate --eval "$KOMPUTILOJ_PATH" -A default_nixos | egr
 
 main() {
 	local cmd
+	local cmdpath
 	
 	if [[ "$#" -eq 0 ]]; then
 		printf 'Usage: %q COMMAND\n' "$0" >&2
@@ -50,7 +51,18 @@ main() {
 			do_backup "$@"
 		;;
 		*)
-			printf 'Unknown command %q\n' "$cmd" >&2
+			cmdpath=commands."$cmd"
+			export NIX_PATH=komputiloj="$KOMPUTILOJ_PATH"
+			# The stupid attrset is a trick to prevent a multiple derivations to be built in case of a mistake in the nix files.
+			# nix-build otherwise happily builds multiple derivations and we would execute an arbitrary one of them :-(
+			nix-build -E '{ cmd }: { force-single-derivation = (builtins.getAttr cmd (import <komputiloj>).commands); }' \
+				--argstr cmd "$cmd" \
+				--out-link "$KOMPUTILOJ_PATH"/results/"$cmdpath" || (
+				echo -n "Available commands: "
+				nix-instantiate --eval -E 'builtins.attrNames (import <komputiloj>).commands'
+				exit 1
+			)
+			"$KOMPUTILOJ_PATH"/results/"$cmdpath" "$@"
 		;;
 	esac
 }

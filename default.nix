@@ -10,6 +10,9 @@ let
     callPackageWith = nixpkgsLib.callPackageWith;
     komputiloj_capsule = {
         users = importDir ./users.d;
+
+        commands = importDirAndApply ./commands.d capsules_and_boltons;
+
         packages = let
             callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages pkg capsules_and_boltons;
         in rec {
@@ -22,8 +25,14 @@ let
             # desired version is included in nixpkgs
         };
 
-        lib = with (import ./lib/machine-deployment.nix) capsules_and_boltons; {
-            inherit makeMachineDeploymentPackage makeMachineDeployable;
+        lib = {
+            writeCommand = args: let
+                scriptDir = capsules.nixpkgsCurrent.lib.writeShellApplication {
+                    name = "script";
+                    runtimeInputs = args.runtimeInputs or [];
+                    text = args.text;
+                };
+            in capsules.nixpkgsCurrent.lib.concatScript args.name [ "${scriptDir}/bin/script" ];
         };
 
         modules = {
@@ -37,7 +46,7 @@ let
         machines = let
             serviloj = (import ./serviloj/serviloj-modular.nix) capsules_and_boltons;
         in {
-            gently = capsules.komputiloj.lib.makeMachineDeployable {
+            gently = {
                 hostName = "gently.radstand.nl";
                 # you can nix-build config.system.build.toplevel from it
                 nixosSystem = capsules.nixpkgsCurrent.lib.nixosSystem {
@@ -64,21 +73,25 @@ let
         lib = mergeAttrsets (catAttrs "lib" cs);
     };
     fake_capsules = rec {
-        nixpkgsCurrent = rec {
+        nixpkgsCurrent = let
+            nixpkgs = default_nixos_source.value {};
+        in rec {
             # NOTE: This is actually very wrong:
             # nixpkgs {} is impure and selects the architecture of the current
             # system. So these packages won't be good for other hosts than
             # scarif. Currently we get away with it because gently and scarif
             # have the same architecture (x86_64).
-            # TODO use flakes.
-            packages = (default_nixos_source.value {});
-            lib = {
+            packages = nixpkgs; # TODO remove libs and other non-package stuff
+
+            lib = nixpkgs.lib // {
                 # We need to distribute callPackageWith to imported files. Is this really the best way to do that?
                 inherit callPackageWith;
 
                 nixosSystem = import (default_nixos_source.nix_path + "/nixos/lib/eval-config.nix");
 
                 writeShellApplication = packages.writeShellApplication;
+                writeShellScript = packages.writeShellScript;
+                concatScript = packages.concatScript;
             };
 
             modules = {
@@ -120,4 +133,10 @@ in {
         inherit boltons;
         inherit capsules;
     };
+    commands = let
+        meta_commands = {};
+        capsule_commands = capsuleName: capsule: mapNames (commandName: "${capsuleName}.${commandName}") (capsule.commands or {});
+        per_capsule_commands = attrValues (mapAttrs capsule_commands capsules);
+    # We flatten the commands so we can easily pull one out with getAttr
+    in mergeAttrsets ([ meta_commands capsules.komputiloj.commands ] ++ per_capsule_commands );
 }
