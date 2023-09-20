@@ -9,7 +9,16 @@ builtins // rec {
     filterAttrs = (f: attrs: listToAttrs (filter f (attrsToList attrs)));
     
     # Merges a list of attrsets with //
-    mergeAttrs = foldl' (a: b: a // b) {};
+    mergeAttrsets = foldl' (a: b: mergeAttrs a b) {};
+    mergeAttrs = a: b: let
+        duplicates = attrNames (intersectAttrs a b);
+        loc = nm: set: let
+            l = unsafeGetAttrPos nm set;
+        in "${l.file}:${toString l.line}";
+        mkError = nm: "mergeAtts: attribute \"${nm}\" is defined in both ${loc nm a} and ${loc nm b}";
+    in if duplicates == []
+    then (a // b)
+    else throw (mkError (head duplicates));
 
     # Make an attrset containing an attribute for each .nix file and each
     # directory in the given path.

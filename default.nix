@@ -61,10 +61,7 @@ let
         cs = attrValues real_capsules;
     in {
         # special capsule which aggregates stuff from all other capsules
-        users =
-            # TODO merge with check for duplicates
-            mergeAttrs (catAttrs "users" cs)
-        ;
+        users = mergeAttrsets (catAttrs "users" cs);
     };
     fake_capsules = rec {
         nixpkgsCurrent = rec {
