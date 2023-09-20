@@ -3,7 +3,7 @@
   lib, stdenv, makeWrapper,
   bash, coreutils, gnused, gawk, gnugrep, findutils,
   xfce, brightnessctl, alsaUtils, dmenu, xmobar, gnupg, xsel,
-  xrandr, wpa_supplicant,
+  xorg, wpa_supplicant,
   ...
 }:
 let
@@ -11,7 +11,7 @@ let
         bash coreutils gnused gawk gnugrep
         findutils # xargs
         xfce.xfce4-terminal brightnessctl alsaUtils dmenu
-        xmobar gnupg xsel komputiloj.packages.wachtwoord xrandr wpa_supplicant
+        xmobar gnupg xsel komputiloj.packages.wachtwoord xorg.xrandr wpa_supplicant
     ];
 in stdenv.mkDerivation rec {
     pname = "dekstop";
