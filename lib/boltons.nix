@@ -59,6 +59,7 @@ builtins // rec {
         (split "\n" input);
     
     unlines = concatStringsSep "\n";
+    unwords = concatStringsSep " ";
 
     mapLines = f: input: unlines (map f (lines input));
 

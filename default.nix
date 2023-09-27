@@ -56,6 +56,7 @@ let
                         # TODO add keys
                     ];
                 };
+                nixopsKeys = serviloj.gently2.nixopsStuff.deployment.keys;
             };
         };
     };
