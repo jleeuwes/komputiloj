@@ -18,7 +18,7 @@ let
         '';
     };
     receiveKeyScript = key: let
-        destDir = (key.destDir or "/run/keys") + "/test"; # TODO remove test suffix
+        destDir = key.destDir or "/run/keys";
         user = key.user or "root"; # NOTE: we bypass the nixops module system here
         group = key.group or "root"; # NOTE: we bypass the nixops module system here
         permissions = key.permissions or "0600"; # NOTE: we bypass the nixops module system here

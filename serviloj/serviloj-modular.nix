@@ -7,9 +7,6 @@ let
 in {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
-	network.description = "Our humble all-encompassing serviloj deployment";
-	network.nixpkgs = nixpkgs;
-
 	# TODO quota
 	# TODO monitoring:
 	# - laat backupscript zijn laatste backup vermelden ergens op de server,

@@ -46,14 +46,18 @@ let
         machines = let
             serviloj = (import ./serviloj/serviloj-modular.nix) capsules_and_boltons;
         in {
-            gently = {
+            gently = rec {
                 hostName = "gently.radstand.nl";
                 # you can nix-build config.system.build.toplevel from it
                 nixosSystem = capsules.nixpkgsCurrent.lib.nixosSystem {
                     system = "x86_64-linux";
                     modules = [
                         (serviloj.gently2.nixosStuff)
-                        # TODO add keys
+                        {
+                            imports = [ ./modules/nixops-keys.nix ];
+                            deployment.keys = nixopsKeys;
+                            networking.extraHosts = "\n"; # makes built system identical to the nixops one
+                        }
                     ];
                 };
                 nixopsKeys = serviloj.gently2.nixopsStuff.deployment.keys;
