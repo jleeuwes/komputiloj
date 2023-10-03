@@ -46,6 +46,14 @@ let
         machines = let
             serviloj = (import ./serviloj/serviloj-modular.nix) capsules_and_boltons;
         in {
+            scarif = {
+                nixosSystem = capsules.nixpkgsCurrent.lib.nixosSystem {
+                    system = "x86_64-linux";
+                    modules = [
+                        (import ./machines/scarif capsules_and_boltons)
+                    ];
+                };
+            };
             gently = rec {
                 sshTarget = "root@gently.radstand.nl";
                 # you can nix-build config.system.build.toplevel from it
@@ -81,6 +89,8 @@ let
         nixpkgsCurrent = let
             nixpkgs = default_nixos_source.value {};
         in rec {
+            nixPath = default_nixos_source.nix_path;
+
             # NOTE: This is actually very wrong:
             # nixpkgs {} is impure and selects the architecture of the current
             # system. So these packages won't be good for other hosts than

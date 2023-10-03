@@ -1,11 +1,6 @@
+{ komputiloj, nixpkgsCurrent, nixpkgsFuture, ... }:
 { config, pkgs, lib, ... }:
-let
-	topLevel = import <komputiloj>;
-	sources = topLevel.sources;
-	capsules = topLevel.capsules;
-	nixpkgsFuture = capsules.nixpkgsFuture;
-	komputiloj = capsules.komputiloj;
-in {
+{
 	# # Add the --option extra-builtins-file to nix
 	# # using a magic spell from https://elvishjerricco.github.io/2018/06/24/secure-declarative-key-management.html
 	# (Doesn't work: warning: ignoring the user-specified setting 'extra-builtins-file', because it is a restricted setting and you are not a trusted user)
@@ -20,7 +15,7 @@ in {
 		# Don't do ${<nixpkgs>}, because that makes a weird non-working copy of
 		# our sources.nix in the nix-store. With toString the literal path is
 		# used instead.
-		"nixpkgs=${builtins.toString <nixpkgs>}"
+		"nixpkgs=${nixpkgsCurrent.nixPath}"
 		# I don't think we need these during normal operation:
 		# "komputiloj=${builtins.toString <komputiloj>}"
 		# "nixos-config=${builtins.toString <nixos-config>}"
