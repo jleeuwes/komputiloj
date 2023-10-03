@@ -2,6 +2,7 @@
 with boltons;
 let
     machine = komputiloj.machines.gently;
+    sshTarget = "root@${machine.targetHost}";
     escapeShellArg = nixpkgsCurrent.lib.strings.escapeShellArg;
     esc = escapeShellArg;
     escapeShellArgs = nixpkgsCurrent.lib.strings.escapeShellArgs;
@@ -39,7 +40,7 @@ let
             # touch /run/keys/done # TODO
         '';
     };
-    sshCmd = "ssh ${esc machine.sshTarget}";
+    sshCmd = "ssh ${esc sshTarget}";
 in komputiloj.lib.writeCommand {
     name = "send-keys-to-gently";
     runtimeInputs = [
@@ -50,7 +51,7 @@ in komputiloj.lib.writeCommand {
     text = ''
         [[ -n "$KOMPUTILOJ_PATH" ]]
 
-        nix-copy-closure --to ${esc machine.sshTarget} \
+        nix-copy-closure --to ${esc sshTarget} \
             ${prepareKeyUploadDirScript} \
             ${finishKeyUploadScript} \
             ${unwords (map (key: "${receiveKeyScript key}") keys_to_upload)}

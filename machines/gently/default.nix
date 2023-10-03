@@ -4,7 +4,7 @@ let
 	nixpkgs            = nixpkgsCurrent.packages;
 	hello              = hello-infra;
 	inherit (nixpkgs.lib.strings) escapeShellArgs;
-in {
+in rec {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
 	# TODO quota
@@ -12,37 +12,45 @@ in {
 	# - laat backupscript zijn laatste backup vermelden ergens op de server,
 	#   zodat de server ons kan herinneren als er te lang geen backup is gemaakt
 	# - ...
-	#
 	
-	gently2.nixopsStuff = {
-		deployment.targetHost = "gently.radstand.nl";
-		deployment.provisionSSHKey = false;
-		# deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
-		
-		deployment.keys = wolk.nixopsKeys // {
-			"luks-storage" = {
-				keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
-			};
-			"nextcloud-admin" = wolk.nixopsKeys.nextcloud-admin;
-			"account-gorinchemindialoog-bcrypt" = {
-				destDir = "/run/keys/persist";
-				keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
-			};
-			"radicale-auth" = {
-				destDir = "/run/keys/persist";
-				keyCommand = [ "sh" "-c"
-					"wachtwoord hash-with-bcrypt ${escapeShellArgs
-						(map (username: "secrets/${username}@knol.radstand.nl")
-							hello.radicale.users
-					)} | sed -E 's/^secrets\\/([^@]*)@[^:]*/\\1/'"
-				];
-				user = "radicale";
-				group = "radicale";
-				permissions = "ug=r,o=";
-			};
+	targetHost = "gently.radstand.nl";
+	nixopsKeys = wolk.nixopsKeys // {
+		"luks-storage" = {
+			keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
+		};
+		"nextcloud-admin" = wolk.nixopsKeys.nextcloud-admin;
+		"account-gorinchemindialoog-bcrypt" = {
+			destDir = "/run/keys/persist";
+			keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
+		};
+		"radicale-auth" = {
+			destDir = "/run/keys/persist";
+			keyCommand = [ "sh" "-c"
+				"wachtwoord hash-with-bcrypt ${escapeShellArgs
+					(map (username: "secrets/${username}@knol.radstand.nl")
+						hello.radicale.users
+				)} | sed -E 's/^secrets\\/([^@]*)@[^:]*/\\1/'"
+			];
+			user = "radicale";
+			group = "radicale";
+			permissions = "ug=r,o=";
 		};
     };
-	gently2.nixosStuff = { config, lib, pkgs, ... }:
+	
+	nixosSystem = nixpkgsCurrent.lib.nixosSystem {
+		system = "x86_64-linux";
+		modules = [
+			mainModule
+
+			{
+				imports = [ komputiloj.modules.nixops-keys ];
+				deployment.keys = nixopsKeys;
+				networking.extraHosts = "\n"; # makes built system identical to the nixops one
+			}
+		];
+	};
+
+	mainModule = { config, lib, pkgs, ... }:
 	let
 		makeJob = s: s // {
 			mailOnFailure = true;
@@ -70,10 +78,9 @@ in {
 			else time;
 	in {
 		imports = [
-			# TODO take all modules from merged top-level komputiloj?
-			./modules/hetzner_vps.nix
-			../modules/systemd-failure-mailer.nix
-			../modules/storage-volume.nix
+			komputiloj.modules.hetzner_vps
+			komputiloj.modules.systemd-failure-mailer
+			komputiloj.modules.storage-volume
 			nixpkgsCurrent.modules.mailserver
 			hello.modules."70004-backup"
 			hello.modules."70004-autocommit"

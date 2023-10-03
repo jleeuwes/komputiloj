@@ -3,7 +3,8 @@ with boltons;
 let
     machine = komputiloj.machines.gently;
     esc = nixpkgsCurrent.lib.strings.escapeShellArg;
-    sshCmd = "ssh ${esc machine.sshTarget}";
+    sshTarget = "root@${machine.targetHost}";
+    sshCmd = "ssh ${esc sshTarget}";
 in komputiloj.lib.writeCommand {
     name = "deploy-to-gently";
     runtimeInputs = [ nixpkgsCurrent.packages.openssh ];
@@ -12,7 +13,7 @@ in komputiloj.lib.writeCommand {
 
         # TODO: nixops copies some (most?) things from https://cache.nixos.org
         # instead of through ssh
-        nix-copy-closure --to ${esc machine.sshTarget} "$new_toplevel"
+        nix-copy-closure --to ${esc sshTarget} "$new_toplevel"
         ${komputiloj.commands.send-keys-to-gently}
         # We assume nix-env is present on the remote machine.
         ${sshCmd} nix-env -p /nix/var/nix/profiles/system --set "$new_toplevel"

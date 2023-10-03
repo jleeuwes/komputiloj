@@ -1,10 +1,11 @@
+{ boltons, komputiloj, ... }:
 # Common configuration to import into every container.
 # Maybe make this module export a function that creates/finishes
 # a container so we can also put stuff like autoStart and privateNetwork here
 # (we can't do that with imports because autoStart is defined outside the config
 # attribute)
 { ... }: {
-	imports = [ ./machinelike.nix ];
+	imports = [ komputiloj.modules.machinelike ];
 	config = {
 		# nixpkgs is afraid we're locking ourselves out if don't
 		# give a root password of if we set it to !

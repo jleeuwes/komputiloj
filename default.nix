@@ -35,17 +35,14 @@ let
             in capsules.nixpkgsCurrent.lib.concatScript args.name [ "${scriptDir}/bin/script" ];
         };
 
-        modules = {
-            dekstopomveging = (import ./modules/dekstopomveging) capsules_and_boltons;
-        };
+        # TODO make this modules.d
+        modules = importDirAndApply ./modules capsules_and_boltons;
 
         overlays = rec {
             undesired-packages = import ./overlays/undesired-packages.nix { inherit boltons; };
         };
 
-        machines = let
-            serviloj = (import ./serviloj/serviloj-modular.nix) capsules_and_boltons;
-        in {
+        machines = {
             scarif = {
                 nixosSystem = capsules.nixpkgsCurrent.lib.nixosSystem {
                     system = "x86_64-linux";
@@ -54,22 +51,7 @@ let
                     ];
                 };
             };
-            gently = rec {
-                sshTarget = "root@gently.radstand.nl";
-                # you can nix-build config.system.build.toplevel from it
-                nixosSystem = capsules.nixpkgsCurrent.lib.nixosSystem {
-                    system = "x86_64-linux";
-                    modules = [
-                        (serviloj.gently2.nixosStuff)
-                        {
-                            imports = [ ./modules/nixops-keys.nix ];
-                            deployment.keys = nixopsKeys;
-                            networking.extraHosts = "\n"; # makes built system identical to the nixops one
-                        }
-                    ];
-                };
-                nixopsKeys = serviloj.gently2.nixopsStuff.deployment.keys;
-            };
+            gently = import ./machines/gently capsules_and_boltons;
         };
     };
     real_capsules = {

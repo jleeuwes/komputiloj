@@ -2,14 +2,18 @@
 with builtins;
 let
     topLevel = import ../.;
-    args = { inherit (topLevel) boltons; } // topLevel.capsules;
-    modular = (import ./serviloj-modular.nix) args;
+    machine = topLevel.capsules.komputiloj.machines.gently;
 in {
     network.description = "Our humble all-encompassing serviloj deployment";
     network.nixpkgs = topLevel.capsules.nixpkgsCurrent.packages;
     gently2 = { config, lib, pkgs, ...}:
-        (modular.gently2.nixosStuff {
+        (machine.mainModule {
             inherit config lib pkgs;
-        }) // modular.gently2.nixopsStuff;
+        }) // {
+            deployment.targetHost = machine.targetHost;
+            deployment.provisionSSHKey = false;
+            # deployment.hasFastConnection = true; # helps to deploy when DNS is borked on the server
+            deployment.keys = machine.nixopsKeys;
+        };
 }
 

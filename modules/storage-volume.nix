@@ -1,3 +1,4 @@
+{ boltons, ... }:
 { config, options, lib, pkgs, ...}:
 with lib;
 let

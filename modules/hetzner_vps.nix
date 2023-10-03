@@ -1,7 +1,8 @@
+{ boltons, komputiloj, ... }:
 { modulesPath, ... }: {
 	imports = [
 		(modulesPath + "/profiles/qemu-guest.nix")
-		./machinelike.nix
+		komputiloj.modules.machinelike
 	];
 
 	config = {
