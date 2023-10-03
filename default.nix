@@ -47,7 +47,7 @@ let
             serviloj = (import ./serviloj/serviloj-modular.nix) capsules_and_boltons;
         in {
             gently = rec {
-                hostName = "gently.radstand.nl";
+                sshTarget = "root@gently.radstand.nl";
                 # you can nix-build config.system.build.toplevel from it
                 nixosSystem = capsules.nixpkgsCurrent.lib.nixosSystem {
                     system = "x86_64-linux";
