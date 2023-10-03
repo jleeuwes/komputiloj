@@ -267,6 +267,7 @@ in {
 		};
 
 		services.openssh = {
+			# Do NOT disable this, or we lose the ability to deploy.
 			enable = true;
 			extraConfig = stripTabs ''
 				Match Group sftp_only
@@ -305,6 +306,7 @@ in {
 				# otherwise we're locking ourselves out.
 				passwordFile = "/root/password";
 				openssh.authorizedKeys.keyFiles = [
+					# Always have a key here, otherwise we can't deploy.
 					../scarif/home/jeroen/.ssh/id_rsa.pub
 				];
 			};
