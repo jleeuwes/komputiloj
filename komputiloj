@@ -57,11 +57,7 @@ main() {
 			# nix-build otherwise happily builds multiple derivations and we would execute an arbitrary one of them :-(
 			nix-build -E '{ cmd }: { force-single-derivation = (builtins.getAttr cmd (import <komputiloj>).commands); }' \
 				--argstr cmd "$cmd" \
-				--out-link "$KOMPUTILOJ_PATH"/results/"$cmdpath" || (
-				echo -n "Available commands: "
-				nix-instantiate --eval -E 'builtins.attrNames (import <komputiloj>).commands'
-				exit 1
-			)
+				--out-link "$KOMPUTILOJ_PATH"/results/"$cmdpath"
 			"$KOMPUTILOJ_PATH"/results/"$cmdpath" "$@"
 		;;
 	esac
