@@ -41,16 +41,10 @@ let
         overlays = rec {
             undesired-packages = import ./overlays/undesired-packages.nix { inherit boltons; };
         };
-
+        
+        # TODO just use importDirAndApply ./machines.d
         machines = {
-            scarif = {
-                nixosSystem = capsules.nixpkgsCurrent.lib.nixosSystem {
-                    system = "x86_64-linux";
-                    modules = [
-                        (import ./machines/scarif capsules_and_boltons)
-                    ];
-                };
-            };
+            scarif = import ./machines/scarif capsules_and_boltons;
             gently = import ./machines/gently capsules_and_boltons;
         };
     };

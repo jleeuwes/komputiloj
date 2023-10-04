@@ -1,6 +1,11 @@
 { komputiloj, nixpkgsCurrent, nixpkgsFuture, ... }:
-{ config, pkgs, lib, ... }:
-{
+rec {
+    nixosSystem = nixpkgsCurrent.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [ mainModule ];
+    };
+
+    mainModule = { config, pkgs, lib, ... }: {
 	# # Add the --option extra-builtins-file to nix
 	# # using a magic spell from https://elvishjerricco.github.io/2018/06/24/secure-declarative-key-management.html
 	# (Doesn't work: warning: ignoring the user-specified setting 'extra-builtins-file', because it is a restricted setting and you are not a trusted user)
@@ -333,5 +338,6 @@ ctl.pulse {
 
 	# The NixOS release to be compatible with for stateful data such as databases.
 	system.stateVersion = "16.09";
+    };
 
 }
