@@ -84,7 +84,7 @@ do_nixos_rebuild() {
 
 	printf 'Using nixpkgs source %q\n' "$DEFAULT_NIXOS" >&2
 	nixpkgs_path=$(nix-instantiate --eval "$KOMPUTILOJ_PATH" -A sources."$DEFAULT_NIXOS".nix_path | egrep -o '[^"]+')
-	nixos_config="$KOMPUTILOJ_PATH/machines/$HOSTNAME/compat.nix"
+	nixos_config="$KOMPUTILOJ_PATH/machines.d/$HOSTNAME/compat.nix"
 	printf 'Using configuration from %q\n' "$nixos_config" >&2
 	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path:nixos-config=$nixos_config"
 	printf 'Using nixos-rebuild from PATH\n' >&2

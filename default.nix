@@ -35,18 +35,13 @@ let
             in capsules.nixpkgsCurrent.lib.concatScript args.name [ "${scriptDir}/bin/script" ];
         };
 
-        # TODO make this modules.d
-        modules = importDirAndApply ./modules capsules_and_boltons;
+        modules = importDirAndApply ./modules.d capsules_and_boltons;
 
         overlays = rec {
             undesired-packages = import ./overlays/undesired-packages.nix { inherit boltons; };
         };
         
-        # TODO just use importDirAndApply ./machines.d
-        machines = {
-            scarif = import ./machines/scarif capsules_and_boltons;
-            gently = import ./machines/gently capsules_and_boltons;
-        };
+        machines = importDirAndApply ./machines.d capsules_and_boltons;
     };
     real_capsules = {
         komputiloj = komputiloj_capsule;
