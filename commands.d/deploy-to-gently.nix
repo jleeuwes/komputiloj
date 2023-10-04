@@ -11,9 +11,10 @@ in komputiloj.lib.writeCommand {
     text = ''
         new_toplevel=${machine.nixosSystem.config.system.build.toplevel}
 
-        # TODO: nixops copies some (most?) things from https://cache.nixos.org
-        # instead of through ssh
-        nix-copy-closure --to ${esc sshTarget} "$new_toplevel"
+        nix-copy-closure \
+            --to ${esc sshTarget} \
+            --gzip --use-substitutes \
+            "$new_toplevel"
         ${komputiloj.commands.send-keys-to-gently}
         # We assume nix-env is present on the remote machine.
         ${sshCmd} nix-env -p /nix/var/nix/profiles/system --set "$new_toplevel"
