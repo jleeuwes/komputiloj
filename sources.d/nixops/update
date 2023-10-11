@@ -1,1 +1,6 @@
-../update-github-source
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+printf "Keep using the old nixops until we stop using nixops.\n" >&2
+
