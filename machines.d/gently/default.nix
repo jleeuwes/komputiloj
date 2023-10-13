@@ -165,7 +165,7 @@ in rec {
 				};
 				check-disk-usage = makeJob {
 					serviceConfig.Type = "simple";
-					startAt = "*:0,15,30,45";
+					startAt = "*:0";
 					path = [ pkgs.btrfs-progs ];
 					script = stripTabs ''
 						if problems=$(df -h | fgrep '100%'); then
