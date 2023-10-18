@@ -189,7 +189,9 @@ in rec {
 								Succes ermee!
 							EOF
 						fi
-						if problems=$(btrfs fi usage /mnt/storage | sed -E 's/\.[0-9]+//g' | egrep 'Meta.*([789][0-9]|100)%'); then
+						# General rule of thumb: you want 5GB worth of UNALLOCATED space on EACH device to allow BTRFS to work properly.
+						# -- https://old.reddit.com/r/btrfs/comments/xxlju2/how_full_is_too_full/
+						if problems=$(btrfs fi usage /mnt/storage | sed -E 's/\.[0-9]+//g' | egrep 'unallocated.*([0-9]B|MiB|[321]GiB)'); then
 							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] BTRFS-metadata raakt vol!' jeroen@lwstn.eu <<-EOF
 								Hoi,
 
@@ -200,7 +202,11 @@ in rec {
 								Suggestie: btrfs balance start -dusage=NUM /mnt/storage
 								Begin met NUM=0 en ga steeds hoger tot er iets
 								gebeurt en btrfs fi usage omlaag gaat.
-								Meer info hier: https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Problem_FAQ.html#I_get_.22No_space_left_on_device.22_errors.2C_but_df_says_I.27ve_got_lots_of_space
+								Meer info hier:
+
+								* https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Problem_FAQ.html#I_get_.22No_space_left_on_device.22_errors.2C_but_df_says_I.27ve_got_lots_of_space
+								* https://old.reddit.com/r/btrfs/comments/15a1pw2/unallocated_vs_free_space/
+								* https://old.reddit.com/r/btrfs/comments/xxlju2/how_full_is_too_full/
 
 								Succes ermee!
 							EOF
