@@ -258,8 +258,14 @@ in rec {
 				storage = {
 					settings = {
 						timestamp_format = "long-iso"; # safe from the caveat at https://digint.ch/btrbk/doc/btrbk.conf.5.html#_reference_time as long as we don't use btrbk for backups
+						# We should preserve at least the latest 2 snapshots,
+						# otherwise our backup script can fail if it runs during
+						# btrbk's hourly run.
+						# There's no way to specify latest 2.
+						# 2h tends to preserve 3 snapshots, but that's good
+						# enough.
 						snapshot_preserve_min = "latest";
-						snapshot_preserve = "14d";
+						snapshot_preserve = "2h 14d";
 						preserve_day_of_week = "monday";
 						preserve_hour_of_day = "0";
 						volume."/mnt/storage" = {
