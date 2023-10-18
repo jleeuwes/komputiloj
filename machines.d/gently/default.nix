@@ -633,6 +633,7 @@ in rec {
 			mailutils
 			gitMinimal
 			gitAndTools.git-annex
+			btdu # btrfs disk usage profiler
 
 			# This makes the gitea CLI available
 			# TODO put this somewhere else
