@@ -213,6 +213,20 @@ in rec {
 						fi
 					'';
 				};
+				btrfs-balance-storage = makeJobWithStorage {
+					serviceConfig.Type = "simple";
+					startAt = "01:00 Europe/Amsterdam";
+					path = [ pkgs.btrfs-progs ];
+					# Start with a bunch of low numbers to handle cases where
+					# space is very limited. Then go faster up to 75% to
+					# actually reclaim significant allocated space if possible.
+					script = stripTabs ''
+						for percent in 0 1 2 3 4 5 6 7 8 9 10 25 50 75; do
+							printf 'Balancing blocks with usage below %d%%...\n' "$percent"
+							btrfs balance start -dusage="$percent" /mnt/storage
+						done
+					'';
+				};
 				setup-persistent-homedirs = makeService {
 					serviceConfig.Type = "oneshot";
 					wantedBy = [ "multi-user.target" ];
