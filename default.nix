@@ -39,6 +39,7 @@ let
 
         overlays = rec {
             undesired-packages = import ./overlays/undesired-packages.nix { inherit boltons; };
+            rclone-deterministic-obscure = import ./overlays/rclone-deterministic-obscure.nix { inherit boltons; };
         };
         
         machines = importDirAndApply ./machines.d capsules_and_boltons;
@@ -58,7 +59,17 @@ let
     };
     fake_capsules = rec {
         nixpkgsCurrent = let
-            nixpkgs = default_nixos_source.value {};
+            # TODO use pkgs/top-level/default.nix instead of default.nix
+            # (which calls pkgs/top-level/impure.nix)
+            nixpkgs = default_nixos_source.value {
+                overlays = [
+                    capsules.komputiloj.overlays.rclone-deterministic-obscure
+                    # TODO move overlays that should be global from machines to here
+                ];
+            };
+            nixpkgsModule = {
+                config.nixpkgs.pkgs = nixpkgs;
+            ];
         in rec {
             nixPath = default_nixos_source.nix_path;
 
@@ -73,7 +84,11 @@ let
                 # We need to distribute callPackageWith to imported files. Is this really the best way to do that?
                 inherit callPackageWith;
 
-                nixosSystem = import (default_nixos_source.nix_path + "/nixos/lib/eval-config.nix");
+                # Prepare a function to make a nixosSystem with the nixpkgs we are defining here,
+                # including overlays, while still allowing per-machine nixpkgs.overlays.
+                # TODO use something less impure (like we want to do with nixpkgs, see above)
+                nixosSystem = let evalConfig = import (default_nixos_source.nix_path + "/nixos/lib/eval-config.nix");
+                              in attrs: evalConfig (attrs // { modules = attrs.modules ++ [ nixpkgsModule ]; });
 
                 writeShellApplication = packages.writeShellApplication;
                 writeShellScript = packages.writeShellScript;
@@ -87,18 +102,28 @@ let
                 mailserver = default_mailserver_source.value;
             };
         };
+        # TODO rename this to nixpkgsFiddled or something and use this instead of overlays as much as possible.
         nixpkgsFuture = let
             override = old: new: trace ("🕑🕐🕛 nixpkgsFuture: Replacing " + old.name + " with " + new.name) new;
+            override' = icon: old: f: let new = f old; in trace (icon + " Replacing " + old.name + " with " + new.name) new;
+            replaceWithNewerVersion = override' "🕑🕐🕛";
+            replaceWithPatchedVersion = override' "🩹🩹🩹";
         in {
-            # NOTE: Each this we use something from unstable, we should pin
+            # NOTE: Each time we use something from unstable, we should pin
             # that exact source. That way, we can someday move away from the
             # unstable version when it hits the stable channels.  If we would
             # take packages directly from one perpetually updated unstable
             # source, we will never catch up.
             packages = {
-                git-annex-remote-rclone = override
+                git-annex-remote-rclone = replaceWithNewerVersion
                     nixpkgsCurrent.packages.git-annex-remote-rclone
-                    (callPackageWith nixpkgsCurrent.packages ./pkgs/git-annex-remote-rclone {});
+                    (original: callPackageWith nixpkgsCurrent.packages ./pkgs/git-annex-remote-rclone {});
+                rcloneWithMountableOnTheFlyRemotes = replaceWithPatchedVersion
+                    nixpkgsCurrent.packages.rclone
+                    (original: original.overrideAttrs (oldAttrs: {
+                        version = oldAttrs.version + "-with-deterministic-obscure";
+                        patches = [ ./rclone-deterministic-obscure.patch ];
+                    }));
             };
         };
         nextcloud = {

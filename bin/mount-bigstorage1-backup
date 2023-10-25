@@ -17,4 +17,4 @@ export RCLONE_CONFIG_DECRYPT_REMOTE=local:/root/backup/bigstorage1/home."$1"/wol
 export RCLONE_CRYPT_PASSWORD=$(wachtwoord cat -n ~/passwords/bigstorage1-wolk-crypt-pass@hetzner | rclone obscure -)
 export RCLONE_CRYPT_PASSWORD2=$(wachtwoord cat -n ~/passwords/bigstorage1-wolk-crypt-salt@hetzner | rclone obscure -)
 
-sudo -E rclone mount --allow-other --read-only --config=/dev/null decrypt: "$2"
+sudo -E rclone mount -v --allow-other --read-only --config=/dev/null decrypt: "$2"
