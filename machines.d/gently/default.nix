@@ -192,7 +192,7 @@ in rec {
 						# General rule of thumb: you want 5GB worth of UNALLOCATED space on EACH device to allow BTRFS to work properly.
 						# -- https://old.reddit.com/r/btrfs/comments/xxlju2/how_full_is_too_full/
 						if problems=$(btrfs fi usage /mnt/storage | sed -E 's/\.[0-9]+//g' | egrep 'unallocated.*([0-9]B|MiB|[321]GiB)'); then
-							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] BTRFS-metadata raakt vol!' jeroen@lwstn.eu <<-EOF
+							${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s '[gently] BTRFS raakt vol!' jeroen@lwstn.eu <<-EOF
 								Hoi,
 
 								Potentiële problemen op BTRFS:
