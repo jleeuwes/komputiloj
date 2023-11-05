@@ -199,9 +199,11 @@ in rec {
 
 								$problems
 
-								Suggestie: btrfs balance start -dusage=NUM /mnt/storage
-								Begin met NUM=0 en ga steeds hoger tot er iets
-								gebeurt en btrfs fi usage omlaag gaat.
+								Ik balance elke nacht. Dat zou normaal moeten helpen.
+								Als deze mail blijft komen, dan is onze storage echt aan het vollopen
+								en moeten er dingen worden weggegooid
+								of moet het volume worden vergroot.
+
 								Meer info hier:
 
 								* https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Problem_FAQ.html#I_get_.22No_space_left_on_device.22_errors.2C_but_df_says_I.27ve_got_lots_of_space
