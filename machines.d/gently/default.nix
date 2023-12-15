@@ -89,6 +89,12 @@ in rec {
 			wolk.modules.all_in_one
 		];
 
+		nixpkgs.config = {
+			permittedInsecurePackages = [
+				"gitea-1.19.4"
+			];
+		};
+
 		nixpkgs.overlays = [
 			komputiloj.overlays.undesired-packages
 		];
@@ -354,6 +360,7 @@ in rec {
 			users.gitea = {
 				uid = 70001;
 				group = "gitea";
+				isSystemUser = true;
 			};
 			groups.gitea = {
 				gid = 70001;
@@ -453,9 +460,9 @@ in rec {
 				"thee.radstand.nl" = {
 					forceSSL = true;
 					enableACME = true;
-					locations."/" = {
-						proxyPass = "http://localhost:3000/";
-					};
+					# locations."/" = {
+					# 	proxyPass = "http://localhost:3000/";
+					# };
 				};
 				"knol.radstand.nl" = {
 					forceSSL = true;
@@ -545,7 +552,7 @@ in rec {
 		};
 
 		services.gitea = {
-			enable = true;
+			enable = false;
 
 			database.type = "sqlite3";
 
