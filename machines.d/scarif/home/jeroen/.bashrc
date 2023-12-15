@@ -3,6 +3,16 @@
 eval "$(dircolors --sh ~/.dircolors)"
 
 export HISTCONTROL=ignoreboth
+export HISTSIZE=10000
+export HISTFILESIZE=10000
+# Store the time of commands, but also serves as a separator in the history
+# file so that multiline commands are read back in as one command
+# (as long as the whole bash_history file contains these timestamps!):
+export HISTTIMEFORMAT='%F %T: '
+# Write commands to history instantly for use in new shells:
+export PROMPT_COMMAND="$PROMPT_COMMAND ; history -a"
+# Prevent overwriting of history file if full:
+shopt -s histappend
 
 sz() {
 	local size
