@@ -106,8 +106,8 @@ rec {
         time.timeZone = "Europe/Amsterdam";
 
         fonts = {
-            enableDefaultFonts = true; # <- dit lijkt niet echt iets uit te maken t.o.v.  weglaten
-            fonts = [
+            enableDefaultPackages = true; # <- dit lijkt niet echt iets uit te maken t.o.v.  weglaten
+            packages = [
                 # nerdfonts is HUGE and nixos-rebuild hangs without progress information
                 # (withFont does not help)
                 # (also it is a useless font for emoji - it has nice icons but only

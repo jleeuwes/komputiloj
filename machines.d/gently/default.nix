@@ -345,7 +345,7 @@ in rec {
 				# Password file must be present and readable by the system
 				# during boot, without storage being mounted yet,
 				# otherwise we're locking ourselves out.
-				passwordFile = "/root/password";
+				hashedPasswordFile = "/root/password";
 				openssh.authorizedKeys.keyFiles = [
 					# Always have a key here, otherwise we can't deploy.
 					../scarif/home/jeroen/.ssh/id_rsa.pub
@@ -404,7 +404,7 @@ in rec {
 				createHome = false;
 				home = "/home/gorinchemindialoog"; # must exist both inside and outside the sftp_only chroot
 				uid = gorinchemindialoog.users.gorinchemindialoog.linux.uid;
-				passwordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
+				hashedPasswordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
 				extraGroups = [ "sftp_only" ];
 			};
 		};
