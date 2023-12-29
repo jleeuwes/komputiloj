@@ -223,8 +223,6 @@ in {
 
             maxUploadSize = "512M";
 
-            enableBrokenCiphersForSSE = false; # https://github.com/NixOS/nixpkgs/pull/198470
-
             config = {
                 adminuser = "admin";
                 adminpassFile = "/run/keys/nextcloud-admin";
