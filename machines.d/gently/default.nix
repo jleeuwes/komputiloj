@@ -89,12 +89,6 @@ in rec {
 			wolk.modules.all_in_one
 		];
 
-		nixpkgs.config = {
-			permittedInsecurePackages = [
-				"gitea-1.19.4"
-			];
-		};
-
 		nixpkgs.overlays = [
 			komputiloj.overlays.undesired-packages
 		];
@@ -460,9 +454,9 @@ in rec {
 				"thee.radstand.nl" = {
 					forceSSL = true;
 					enableACME = true;
-					# locations."/" = {
-					# 	proxyPass = "http://localhost:3000/";
-					# };
+					locations."/" = {
+						proxyPass = "http://localhost:3000/";
+					};
 				};
 				"knol.radstand.nl" = {
 					forceSSL = true;
@@ -552,7 +546,9 @@ in rec {
 		};
 
 		services.gitea = {
-			enable = false;
+			enable = true;
+			# TODO move to services.forgejo one day? See https://github.com/NixOS/nixpkgs/pull/248310
+			package = nixpkgs.pkgs.forgejo;
 
 			database.type = "sqlite3";
 
