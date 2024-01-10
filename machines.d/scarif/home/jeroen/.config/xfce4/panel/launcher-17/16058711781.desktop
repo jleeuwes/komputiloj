@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=exo-open --launch TerminalEmulator
+Icon=utilities-terminal
+StartupNotify=true
+Terminal=false
+Categories=Utility;X-XFCE;X-Xfce-Toplevel;
+OnlyShowIn=XFCE;
+X-AppStream-Ignore=True
+Name=Terminal Emulator
+Name[nl]=Terminalvenster
+Comment=Use the command line
+Comment[nl]=Gebruik de opdrachtregel
+X-XFCE-Source=file:///nix/store/6ry02ba86va6ykjib1a6if0lb3h7dpis-exo-0.12.8/share/applications/exo-terminal-emulator.desktop

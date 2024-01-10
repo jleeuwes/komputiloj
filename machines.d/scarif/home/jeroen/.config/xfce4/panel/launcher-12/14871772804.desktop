@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Exec=xfce4-appfinder
+Icon=gtk-find
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Utility;X-XFCE;
+Name=Application Finder
+Name[nl]=Toepassingenzoeker
+Comment=Find and launch applications installed on your system
+Comment[nl]=Toepassingen zoeken en uitvoeren die geïnstalleerd zijn in uw systeem.
+X-XFCE-Source=file:///run/current-system/sw/share/applications/xfce4-appfinder.desktop
