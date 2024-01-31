@@ -178,10 +178,10 @@ rec {
             dejsonlz4 # for reading firefox jsonlz4 files
             remarshal # for yaml2json etc
             jq # json manipulation
-            jetbrains.idea-community
+            # jetbrains.idea-community
             openjdk11 maven visualvm
-            love_11
-            arduino
+            # love_11
+            # arduino
             haskellPackages.ghc
             
             # unstable.android-studio
@@ -189,13 +189,13 @@ rec {
 
             # LaTeX and PDF:
             # (Not sure if rubber uses the chosen texlive distribution)
-            texlive.combined.scheme-medium
-            rubber
+            # texlive.combined.scheme-medium
+            # rubber
             poppler_utils
             qpdf pdftk
 
             firefox thunderbird
-            isync # for e-mail backups (eigenlijk mbsync)
+            # isync # for e-mail backups (eigenlijk mbsync)
             chromium
             geany
             zathura # pdf viewer
@@ -211,7 +211,7 @@ rec {
             pstree
             
             # Belgian eID (it looks in /run/current-system/sw/ by default for some things so it's easier to have it installed system-wide):
-            eid-mw
+            # eid-mw
 
             # other package managers (to be used for non-reproducable things only):
             # nodejs #npm
