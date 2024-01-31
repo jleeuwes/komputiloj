@@ -6,12 +6,34 @@ set -o pipefail
 set -o noclobber
 
 CMD_GPG=gpg2
+CMD_AGE=age
 CMD_MKPASSWD=mkpasswd
 CMD_HTPASSWD=htpasswd # from apache httpd
-CMD_TR=tr # from coreutils
 
 # Identity to sign with and to always encrypt for:
 ME=jeroen@lwstn.eu
+AGE_RECIPIENTS=~/passwords/.age/recipients
+AGE_IDENTITY=~/passwords/.age/identity.age
+unset AGE_IDENTITY_DECRYPTED
+
+if [[ -v WACHTWOORD_SESSION_ID && -n "$WACHTWOORD_SESSION_ID" ]]; then
+	AGE_IDENTITY_DECRYPTED="$XDG_RUNTIME_DIR"/wachtwoord/"$WACHTWOORD_SESSION_ID"
+	trap 'try_cloak "$AGE_IDENTITY_DECRYPTED"' EXIT
+fi
+
+try_cloak() {
+	if [[ -e "$1" ]]; then
+		cloak "$1"
+	fi
+}
+
+cloak() {
+	chmod a= -- "$1"
+}
+
+decloak() {
+	chmod u=r -- "$1"
+}
 
 checkpath() {
 	if ! type -P "$1" > /dev/null; then
@@ -21,9 +43,15 @@ checkpath() {
 }
 
 checkpath $CMD_GPG
+checkpath $CMD_AGE
 checkpath $CMD_MKPASSWD
 checkpath $CMD_HTPASSWD
-checkpath $CMD_TR
+
+# from coreutils:
+checkpath tr
+checkpath head
+checkpath mkdir
+checkpath chmod
 
 main() {
 	local command
@@ -59,10 +87,12 @@ main() {
 		  exit 1
 		fi
 		
-		local recipients=(--recipient "$ME")
+		# local recipients=(--recipient "$ME")
 		for recipient in "$@"; do
-			echo "Wachtwoord zal ook leesbaar zijn voor $recipient" >&2
-			recipients+=(--recipient "$recipient")
+			echo "Extra ontvangers zijn niet ondersteund." >&2
+			exit 1
+			# echo "Wachtwoord zal ook leesbaar zijn voor $recipient" >&2
+			# recipients+=(--recipient "$recipient")
 		done
 		
 		local pass=""
@@ -81,9 +111,34 @@ main() {
 		fi
 		local content
 		# We don't redirect the command to $file directly so no empty file will be created on error
-		content=$(printf "%s" "$pass" | $CMD_GPG --batch --use-agent --armor --encrypt --sign --local-user "$ME" "${recipients[@]}")
+		content=$(printf "%s" "$pass" | $CMD_AGE --encrypt --armor --recipients-file="$AGE_RECIPIENTS")
 		printf "%s" "$content" > "$file"
 		echo "Wachtwoord $file opgeslagen." >&2
+	;;
+	unlock)
+		local session_id
+		mkdir -p -- "$XDG_RUNTIME_DIR"/wachtwoord
+		chmod a=,u=wx -- "$XDG_RUNTIME_DIR"/wachtwoord
+		session_id=$(random_string 64)
+		$CMD_AGE --decrypt -- "$AGE_IDENTITY" > "$XDG_RUNTIME_DIR"/wachtwoord/"$session_id"
+		cloak "$XDG_RUNTIME_DIR"/wachtwoord/"$session_id"
+		printf '# eval this\n'
+		printf 'export WACHTWOORD_SESSION_ID=%q\n' "$session_id"
+	;;
+	lock)
+		rm -f -- "$AGE_IDENTITY_DECRYPTED"
+		printf '# eval this\n'
+		printf 'export WACHTWOORD_SESSION_ID=\n'
+	;;
+	lock-all)
+		# The makes the directory listable,
+		# that's why we bother with all the cloaking:
+		# the files will not be readable themselves
+		# in the small window of time between chmod and rm.
+		chmod u=rwx -- "$XDG_RUNTIME_DIR"/wachtwoord
+		rm -rf -- "$XDG_RUNTIME_DIR"/wachtwoord
+		printf '# eval this\n'
+		printf 'export WACHTWOORD_SESSION_ID=\n'
 	;;
 	*)
 		echo "Onbekend commando '$command'. Tot ziens!" >&2
@@ -98,9 +153,11 @@ do_show() {
 	local success=0
 	local seen=0
 	local prefix=""
+	local header
 	local content
 	local suppress_last_newline=no
 	local format
+	local cmd
 	while [ $# -ge 1 ]; do
 		case "$1" in
 		-n)
@@ -130,8 +187,19 @@ do_show() {
 		format=single
 	fi
 	for file in "$@"; do
-		# We let gpg produce any errors for us and use && to make sure we continue with the other files in case of an error
-		content=$($CMD_GPG --use-agent --batch --decrypt -- "$file") && {
+		header=$(head -n1 -- "$file")
+		if   [[ $header = '-----BEGIN PGP MESSAGE-----' ]]; then
+			cmd="$CMD_GPG --use-agent --batch --decrypt"
+		elif [[ $header = '-----BEGIN AGE ENCRYPTED FILE-----' ]]; then
+			decloak "$AGE_IDENTITY_DECRYPTED"
+			cmd=$(printf '%s --decrypt --identity=%q' "$CMD_AGE" "$AGE_IDENTITY_DECRYPTED")
+			cloak "$AGE_IDENTITY_DECRYPTED"
+		else
+			echo 'Unrecognized encryption type' >&2
+			exit 1
+		fi
+		# We let gpg/age produce any errors for us and use && to make sure we continue with the other files in case of an error
+		content=$($cmd -- "$file") && {
 			if [ $success -gt 0 ]; then
 				# This approach gives a messy combination of stdout and stderr,
 				# but it does make sure we never put empty lines on stdout.
@@ -156,12 +224,19 @@ show_plain() {
 	printf "%s" "$1"
 }
 show_hashed() {
-	printf '%s' "$1" | $CMD_MKPASSWD --stdin --method=sha512crypt | $CMD_TR -d %'\n'
+	printf '%s' "$1" | $CMD_MKPASSWD --stdin --method=sha512crypt | tr -d %'\n'
 }
 show_hashed_bcrypt() {
 	# bcrypt is more robust against offline brute-forcing,
 	# but does not seem to be supported for use in /etc/shadow
-	printf '%s' "$1" | $CMD_HTPASSWD -niB username | cut -d: -f2 | $CMD_TR -d $'\n'
+	printf '%s' "$1" | $CMD_HTPASSWD -niB username | cut -d: -f2 | tr -d $'\n'
+}
+
+random_string() {
+	local length
+	length="$1"
+	# https://stackoverflow.com/a/66223024/21375902
+	head -c "$length" <(tr -dc 'a-zA-Z0-9' < /dev/urandom)
 }
 
 main "$@"
