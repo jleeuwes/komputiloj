@@ -3,6 +3,10 @@
 import XMonad
 import Data.Monoid
 import System.Exit
+import qualified System.Process as Process
+import qualified System.Environment as Env
+import qualified System.Random.Stateful as Random
+import Control.Monad (replicateM)
 
 import Numeric
 
@@ -30,19 +34,39 @@ import Graphics.X11.ExtraTypes.XF86
 
 main :: IO ()
 main = do
-    config <- withUrgencyHook NoUrgencyHook <$> statusBar "dekstop bar status" myPP toggleStrutsKey myConfig
+    wachtwoordSessionId <- randomString 64
+    let myConfig' = myConfig wachtwoordSessionId
+    -- TODO pass wachtwoordSessionId to status bar so we can show age unlocked status
+    config <- withUrgencyHook NoUrgencyHook <$> statusBar "dekstop bar status" myPP toggleStrutsKey myConfig'
     dirs <- getDirectories
     launch config dirs
   where toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
+
+randomString :: Int -> IO String
+randomString len = replicateM len mkChar
+  where mkChar = (chars !!) <$> Random.uniformRM (0, length chars - 1) Random.globalStdGen
+        chars = ['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']
 
 runDekstop :: [String] -> X ()
 runDekstop args
   = safeSpawn "dekstop" args
 
+runWithWachtwoorden :: MonadIO m => String -> String -> [String] -> m ()
+runWithWachtwoorden wachtwoordSessionId cmd args = do
+    modifiedEnv <- setEnv "WACHTWOORD_SESSION_ID" wachtwoordSessionId <$> liftIO Env.getEnvironment
+    let cp = (Process.proc cmd args) {
+      Process.std_in = Process.NoStream,
+      Process.env = Just modifiedEnv
+    }
+    _ <- liftIO $ Process.createProcess cp
+    return ()
+  where
+    setEnv nm val = M.toList . M.insert nm val . M.fromList
+
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
 --
-myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
+myKeys wachtwoordSessionId conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- launch a terminal (TODO updatePointer doesn't work here; add it to the hook for new windows?)
     [ ((modm .|. shiftMask, xK_Return),   runDekstop ["terminal"])
@@ -50,7 +74,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- launch dmenu
     , ((modm, xK_p), runDekstop ["bar", "run"])
-    , ((modm, xK_w), runDekstop ["bar", "wachtwoord"])
+    , ((modm .|. shiftMask, xK_w), runWithWachtwoorden wachtwoordSessionId "dekstop"
+        -- disable-server is necessary to pass the environment
+        ["terminal", "--disable-server", "-x", "wachtwoord", "manual-session-unlock"])
+    , ((modm, xK_w), runWithWachtwoorden wachtwoordSessionId "dekstop" ["bar", "wachtwoord"])
     , ((modm, xK_s), runDekstop ["bar", "beeld"])
     , ((0, xK_F8),   runDekstop ["bar", "wifi"])
     --     ^ ideally xF86XK_WLAN, but that is hardwired somewhere to toggle WIFI on/off
@@ -125,10 +152,16 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- , ((modm              , xK_b     ), sendMessage ToggleStruts)
 
     -- Quit xmonad
-    , ((modm .|. shiftMask, xK_q     ), io (exitWith ExitSuccess))
+    , ((modm .|. shiftMask, xK_q     ), do
+        runWithWachtwoorden wachtwoordSessionId "wachtwoord" ["manual-session-lock"]
+        io (exitWith ExitSuccess)
+      )
 
     -- Restart xmonad
-    , ((modm              , xK_q     ), restart "xmonad" True)
+    , ((modm              , xK_q     ), do
+        runWithWachtwoorden wachtwoordSessionId "wachtwoord" ["manual-session-lock"]
+        restart "xmonad" True
+      )
 
     -- Switch to a not-yet-logged-in user (otherwise use Ctrl-Alt-F8 and co)
     , ((0, xF86XK_LaunchA), runDekstop ["second-session"])
@@ -397,7 +430,7 @@ withIndex f = f . index
 --
 -- No need to modify this.
 --
-myConfig = def {
+myConfig wachtwoordSessionId = def {
       -- simple stuff
         terminal           = "dekstop terminal", -- might be used by some contrib stuff, I don't know
         focusFollowsMouse  = True,
@@ -409,7 +442,7 @@ myConfig = def {
         focusedBorderColor = "#000000",
 
       -- key bindings
-        keys               = myKeys,
+        keys               = myKeys wachtwoordSessionId,
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts

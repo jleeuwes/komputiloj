@@ -17,6 +17,6 @@ stdenv.mkDerivation rec {
 		chmod +x $out/bin/wachtwoord
 		# https://github.com/deepfire/nixos-wiki/blob/master/Nix%20Runtime%20Environment%20Wrapper.page
 		wrapProgram $out/bin/wachtwoord \
-			--set PATH ${lib.makeBinPath [ gnupg age apacheHttpd mkpasswd coreutils ]}
+			--set DEPS_PATH ${lib.makeBinPath [ gnupg age apacheHttpd mkpasswd coreutils ]}
 	'';
 }

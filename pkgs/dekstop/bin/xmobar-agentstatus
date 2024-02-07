@@ -19,4 +19,14 @@ else
 	printf -
 fi
 
+if [[ -v WACHTWOORD-SESSION-ID ]]; then
+	if [[ -e "$XDG_RUNTIME_DIR"/wachtwoord/"$WACHTWOORD_SESSION_ID" ]]; then
+		printf A
+	else
+		printf -
+	fi
+else
+	printf '?'
+fi
+
 printf '\n'

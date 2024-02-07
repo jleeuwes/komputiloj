@@ -3,7 +3,13 @@
 set -Eeu
 set -o pipefail
 
-set -o noclobber
+# We need to record the original PATH for spawning a terminal
+# or another program that needs to run with the user's regular PATH:
+AMBIENT_PATH="$PATH"
+## SPECIFIC FOR RUNNING INSIDE NIX PACKAGE WRAPPER
+# But we want to take our dependencies from the DEPS_PATH defined in the package:
+export PATH="$DEPS_PATH"
+## END SPECIFIC
 
 CMD_GPG=gpg2
 CMD_AGE=age
@@ -14,12 +20,6 @@ CMD_HTPASSWD=htpasswd # from apache httpd
 ME=jeroen@lwstn.eu
 AGE_RECIPIENTS=~/passwords/.age/recipients
 AGE_IDENTITY=~/passwords/.age/identity.age
-unset AGE_IDENTITY_DECRYPTED
-
-if [[ -v WACHTWOORD_SESSION_ID && -n "$WACHTWOORD_SESSION_ID" ]]; then
-	AGE_IDENTITY_DECRYPTED="$XDG_RUNTIME_DIR"/wachtwoord/"$WACHTWOORD_SESSION_ID"
-	trap 'try_cloak "$AGE_IDENTITY_DECRYPTED"' EXIT
-fi
 
 try_cloak() {
 	if [[ -e "$1" ]]; then
@@ -80,6 +80,8 @@ main() {
 		do_show hashed_bcrypt "$@"
 	;;
 	add|new)
+		set -o noclobber
+
 		file="$1"
 		shift
 		if [ -e "$file" ]; then
@@ -115,30 +117,33 @@ main() {
 		printf "%s" "$content" > "$file"
 		echo "Wachtwoord $file opgeslagen." >&2
 	;;
-	unlock)
-		local session_id
-		mkdir -p -- "$XDG_RUNTIME_DIR"/wachtwoord
-		chmod a=,u=wx -- "$XDG_RUNTIME_DIR"/wachtwoord
-		session_id=$(random_string 64)
-		$CMD_AGE --decrypt -- "$AGE_IDENTITY" > "$XDG_RUNTIME_DIR"/wachtwoord/"$session_id"
-		cloak "$XDG_RUNTIME_DIR"/wachtwoord/"$session_id"
-		printf '# eval this\n'
-		printf 'export WACHTWOORD_SESSION_ID=%q\n' "$session_id"
+	session)
+		WACHTWOORD_SESSION_ID="$(random_string 64)"
+		do_unlock
+		export WACHTWOORD_SESSION_ID
+		export PATH="$AMBIENT_PATH"
+		if [[ $# -eq 0 ]]; then
+			"$SHELL"
+		else
+			"$@"
+		fi
+		do_lock
 	;;
-	lock)
-		rm -f -- "$AGE_IDENTITY_DECRYPTED"
-		printf '# eval this\n'
-		printf 'export WACHTWOORD_SESSION_ID=\n'
+	# manual sessions for other tools, not for the user
+	manual-session-unlock)
+		do_unlock
 	;;
-	lock-all)
+	manual-session-lock)
+		do_lock
+	;;
+	cleanup-sessions)
 		# The makes the directory listable,
 		# that's why we bother with all the cloaking:
 		# the files will not be readable themselves
 		# in the small window of time between chmod and rm.
 		chmod u=rwx -- "$XDG_RUNTIME_DIR"/wachtwoord
 		rm -rf -- "$XDG_RUNTIME_DIR"/wachtwoord
-		printf '# eval this\n'
-		printf 'export WACHTWOORD_SESSION_ID=\n'
+		unset WACHTWOORD_SESSION_ID
 	;;
 	*)
 		echo "Onbekend commando '$command'. Tot ziens!" >&2
@@ -186,14 +191,17 @@ do_show() {
 	else
 		format=single
 	fi
+	if [[ -v WACHTWOORD_SESSION_ID && -n "$WACHTWOORD_SESSION_ID" ]]; then
+		AGE_IDENTITY="$XDG_RUNTIME_DIR"/wachtwoord/"$WACHTWOORD_SESSION_ID"
+		decloak "$AGE_IDENTITY"
+		trap 'try_cloak "$AGE_IDENTITY"' EXIT
+	fi
 	for file in "$@"; do
 		header=$(head -n1 -- "$file")
 		if   [[ $header = '-----BEGIN PGP MESSAGE-----' ]]; then
 			cmd="$CMD_GPG --use-agent --batch --decrypt"
 		elif [[ $header = '-----BEGIN AGE ENCRYPTED FILE-----' ]]; then
-			decloak "$AGE_IDENTITY_DECRYPTED"
-			cmd=$(printf '%s --decrypt --identity=%q' "$CMD_AGE" "$AGE_IDENTITY_DECRYPTED")
-			cloak "$AGE_IDENTITY_DECRYPTED"
+			cmd=$(printf '%s --decrypt --identity=%q' "$CMD_AGE" "$AGE_IDENTITY")
 		else
 			echo 'Unrecognized encryption type' >&2
 			exit 1
@@ -212,6 +220,9 @@ do_show() {
 			let ++success # ++ first because of weird exit code if expression is 0
 		}
 	done
+	if [[ -v WACHTWOORD_SESSION_ID && -n "$WACHTWOORD_SESSION_ID" ]]; then
+		cloak "$AGE_IDENTITY"
+	fi
 	if [ "$suppress_last_newline" = no -a $success -gt 0 ]; then
 		printf '\n'
 	fi
@@ -230,6 +241,20 @@ show_hashed_bcrypt() {
 	# bcrypt is more robust against offline brute-forcing,
 	# but does not seem to be supported for use in /etc/shadow
 	printf '%s' "$1" | $CMD_HTPASSWD -niB username | cut -d: -f2 | tr -d $'\n'
+}
+
+do_unlock() {
+	local decrypted
+	mkdir -p -- "$XDG_RUNTIME_DIR"/wachtwoord
+	chmod a=,u=wx -- "$XDG_RUNTIME_DIR"/wachtwoord
+	decrypted=$($CMD_AGE --decrypt -- "$AGE_IDENTITY")
+	printf '%s' "$decrypted" > "$XDG_RUNTIME_DIR"/wachtwoord/"$WACHTWOORD_SESSION_ID"
+	cloak "$XDG_RUNTIME_DIR"/wachtwoord/"$WACHTWOORD_SESSION_ID"
+}
+
+do_lock() {
+	rm -f -- "$XDG_RUNTIME_DIR"/wachtwoord/"$WACHTWOORD_SESSION_ID"
+	unset WACHTWOORD_SESSION_ID
 }
 
 random_string() {

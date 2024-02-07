@@ -156,7 +156,7 @@ main() {
 	terminal)
 		# NOTE: the PATH will only influence the first terminal we spawn.
 		#       If we don't want that we should pass --disable-server
-		exec_with_path xfce4-terminal
+		exec_with_path xfce4-terminal "$@"
 	;;
 	bar)
 		bar "$@"
