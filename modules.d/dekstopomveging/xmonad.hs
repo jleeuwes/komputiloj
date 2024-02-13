@@ -36,7 +36,8 @@ main :: IO ()
 main = do
     wachtwoordSessionId <- randomString 64
     let myConfig' = myConfig wachtwoordSessionId
-    -- TODO pass wachtwoordSessionId to status bar so we can show age unlocked status
+    -- xTODOx pass wachtwoordSessionId to status bar so we can show age unlocked status
+    -- NOPE NOPE: that would expose the session id in xmobar's environment variables
     config <- withUrgencyHook NoUrgencyHook <$> statusBar "dekstop bar status" myPP toggleStrutsKey myConfig'
     dirs <- getDirectories
     launch config dirs
