@@ -193,8 +193,10 @@ do_show() {
 	fi
 	if [[ -v WACHTWOORD_SESSION_ID && -n "$WACHTWOORD_SESSION_ID" ]]; then
 		AGE_IDENTITY="$XDG_RUNTIME_DIR"/wachtwoord/"$WACHTWOORD_SESSION_ID"
-		decloak "$AGE_IDENTITY"
-		trap 'try_cloak "$AGE_IDENTITY"' EXIT
+		if [[ -e "$AGE_IDENTITY" ]]; then
+			decloak "$AGE_IDENTITY"
+			trap 'try_cloak "$AGE_IDENTITY"' EXIT
+		fi
 	fi
 	for file in "$@"; do
 		header=$(head -n1 -- "$file")
@@ -220,7 +222,7 @@ do_show() {
 			let ++success # ++ first because of weird exit code if expression is 0
 		}
 	done
-	if [[ -v WACHTWOORD_SESSION_ID && -n "$WACHTWOORD_SESSION_ID" ]]; then
+	if [[ -v WACHTWOORD_SESSION_ID && -n "$WACHTWOORD_SESSION_ID" && -e "$AGE_IDENTITY" ]]; then
 		cloak "$AGE_IDENTITY"
 	fi
 	if [ "$suppress_last_newline" = no -a $success -gt 0 ]; then
