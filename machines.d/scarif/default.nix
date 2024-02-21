@@ -202,6 +202,7 @@ rec {
             # mindmapping-tools:
             vym freemind
             vlc ffmpeg
+            beets
 
             inkscape gimp exiftool
             imagemagick scrot
