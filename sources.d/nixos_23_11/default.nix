@@ -2,8 +2,8 @@
 with builtins;
 rec {
     nix_path = fetchTarball {
-        url    = "https://releases.nixos.org/nixos/23.11/nixos-23.11.4516.e0da498ad77a/nixexprs.tar.xz";
-        sha256 = "0h5bfkfhh7906qh65b39dliylqfcsxlk0bl309b0ij206sk7yhzd";
+        url    = "https://releases.nixos.org/nixos/23.11/nixos-23.11.4801.b7ee09cf5614/nixexprs.tar.xz";
+        sha256 = "0y855q2d8pwgd2vkpvsw7022ajkjki0yha75aifa3rqrhr8w2aij";
     };
     value = import nix_path;
 }
