@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# Backs up the default adb device.
+# Assumes root access.
+
+set -Eeu -o pipefail
+
+timestamp=$(date +%Y%m%d%H%M%S)
+mkdir -- "$timestamp"
+cd -- "$timestamp"
+
+echo "Creating backup $timestamp"
+
+do_adb_pull() {
+	local dir
+	local localdir
+	dir="$1"
+	localdir="$2"
+	echo "Pulling $dir..."
+	mkdir -p $localdir/$dir
+	adb pull -a $dir $(dirname $localdir/$dir)
+}
+
+do_tar() {
+	local dir
+	local localfile
+	local excludes
+	dir="$1"
+	localfile="$2"
+	echo "Building exclude list for $dir..."
+	excludes=$(adb shell mktemp)
+	adb shell "find $dir -type p -o -type s > $excludes"
+	adb shell "cat $excludes" | sed -E 's/^/\t/'
+	echo "Tarring $dir..."
+	adb shell "tar -c -X$excludes $dir" > $localfile
+}
+
+do_adb_pull /data/media/0 data.media.0
+do_tar /data/user/0 data.user.0.tar
+do_tar /data/media/0/Android/data data.media.0.Android.data.tar
+
+echo "Done."
