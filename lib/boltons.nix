@@ -58,7 +58,9 @@ builtins // rec {
         filter (element: typeOf element == "string")
         (split "\n" input);
     
-    unlines = concatStringsSep "\n";
+    unlines = lns: let
+        parts = map (ln: "${ln}\n") lns;
+        in concatStringsSep "" parts;
     unwords = concatStringsSep " ";
 
     mapLines = f: input: unlines (map f (lines input));
@@ -86,10 +88,20 @@ builtins // rec {
 
     # Determines the tab-based indentation of the first line of input,
     # then strips that amount of tabs at te start of each line.
+    # Also strips any tabs after the last line to support a less indented
+    # multiline string ending:
+    #
+    # {
+    #   str = ''
+    #       bla
+    #       bla
+    #   ''; # the tabs before '' are removed
+    # }
     stripTabs = input: let
         indentation = head (match "^(\t*).*$" input);
         regex = "^" + indentation;
-        in mapLines (replaceRegex regex "") input;
+        inputWithoutLastHangingLine = replaceRegex "\n\t+$" "" input;
+        in mapLines (replaceRegex regex "") inputWithoutLastHangingLine;
     
     traceThisString = input: trace input input;
 }
