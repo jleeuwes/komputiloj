@@ -321,6 +321,9 @@ in rec {
 				};
 			};
 		};
+		programs.screen.screenrc = stripTabs ''
+			defscrollback 1000
+		'';
 
 		programs.git = {
 			enable = true;
