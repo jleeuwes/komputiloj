@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+set -Eeu -o pipefail
+
+echo "Misschien is dit script niet meer nodig en"
+echo "moet je gewoon systemctl restart bluetooth doen."
+echo "Ik wacht even zodat je je kunt bedenken..."
+sleep 2
+
 MOUSE_ID_FILE=~/.blauwtandmuis
 
 MOUSE_ID=$(egrep '^[0-9A-F]{2}(:[0-9A-F]{2}){5}$' -- "$MOUSE_ID_FILE")
