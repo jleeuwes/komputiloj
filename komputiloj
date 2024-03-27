@@ -32,17 +32,18 @@ main() {
 		nixos-rebuild)
 			do_nixos_rebuild "$@"
 		;;
-		deploy)
-			do_deploy "$@"
-		;;
 		activate-apps)
+			# This is activate in the NixOS sense: make the configuration
+			# active. Apps are things I host and that are not necessarily
+			# defined completely in Nix config. Activation includes
+			# for example accounts that are created/updated through the API
+			# of a running service.
+			# TODO somehow make sure we routinely call this;
+			# I'm not even sure it currently works.
 			do_activate_apps "$@"
 		;;
 		update-domains)
 			do_update_domains "$@"
-		;;
-		nixops)
-			do_nixops "$@"
 		;;
 		cleanup)
 			do_cleanup "$@"
@@ -91,11 +92,6 @@ do_nixos_rebuild() {
 	exec sudo -E nixos-rebuild "$@"
 }
 
-do_deploy() {
-	do_nixops_something "$KOMPUTILOJ_PATH"/serviloj/deploy "$@"
-	echo "TODO now activate-apps?" >&2
-}
-
 do_update_domains() {
 	# TODO put domains in top-level default.nix
 	# TODO make a proper package instead of this nix-shell hacking
@@ -117,32 +113,16 @@ do_in_shell() {
 		--run "$args_escaped"
 }
 
-do_nixops() {
-	do_nixops_something "$KOMPUTILOJ_PATH"/serviloj/command "$@"
-}
-
-do_nixops_something() {
-	local nixpkgs_path
-
-	printf 'Using nixpkgs source %q\n' "$DEFAULT_NIXOS" >&2
-	nixpkgs_path=$(nix-instantiate --eval "$KOMPUTILOJ_PATH" -A sources."$DEFAULT_NIXOS".nix_path | egrep -o '[^"]+')
-	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path"
-	export NIXOPS_CMD=nixops
-	export NIXOPS_STATE="$KOMPUTILOJ_PATH"/serviloj/state.nixops
-	export NIXOPS_DEPLOYMENT=serviloj
-	local args_escaped=$(printf '%q ' "$@")
-	# TODO add nixops to gcroots to prevent rebuilding everytime
-	# (best way to do this is probably to put shells in a capsule)
-	nix-shell \
-		-E 'with import <nixpkgs> {}; with import <komputiloj>; mkShell { buildInputs = [
-			sources.nixops.value.default
-			capsules.komputiloj.packages.wachtwoord
-		]; }' \
-		--run "$args_escaped"
-}
-
 do_activate_apps() {
-	# TODO Take wachtwoord program from sources like in do_nixops_something.
+	# TODO Take wachtwoord program from sources
+	# with something like this (taken from defunct nixops command):
+	# nix-shell \
+	# 	-E 'with import <nixpkgs> {}; with import <komputiloj>; mkShell { buildInputs = [
+	# 		sources.nixops.value.default
+	# 		capsules.komputiloj.packages.wachtwoord
+	# 	]; }' \
+	# 	--run "$args_escaped"
+
 	# TODO It's weird to reference serviloj here.
 	export THEE_USER=jeroen
 	export THEE_PASSWORD=$(wachtwoord cat -n \
