@@ -548,15 +548,21 @@ in rec {
 			};
 		};
 
-		services.gitea = {
+		services.gitea.enable = false;
+		services.forgejo = {
 			enable = true;
-			# TODO move to services.forgejo one day? See https://github.com/NixOS/nixpkgs/pull/248310
-			package = nixpkgs.pkgs.forgejo;
 
-			database.type = "sqlite3";
+			user = "gitea";
+			group = "gitea";
 
 			# NOTE: after changing the stateDir, regenerate gitea's authorized_keys file through the admin webinterface.
 			stateDir = "/mnt/storage/live/gitea/rootdir";
+
+			database = {
+				type = "sqlite3";
+				createDatabase = false;
+				path = "/mnt/storage/live/gitea/rootdir/data/gitea.db";
+			};
 
 			# mailerPasswordFile = ...;
 			settings = {
@@ -595,6 +601,9 @@ in rec {
 					SHOW_FOOTER_VERSION = false;
 				};
 			};
+		};
+		systemd.services.forgejo = {
+			needsStorageVolume = "requires";
 		};
 
 		mailserver = {
@@ -668,7 +677,7 @@ in rec {
 			# (TODO add it to the gitea module someday)
 			(pkgs.writeShellApplication {
 				name = "gitea";
-				runtimeInputs = [ gitea ];
+				runtimeInputs = [ forgejo ];
 				text = stripTabs ''
 					if [[ $# -eq 0 ]]; then
 						echo "gitea without arguments would run the web app." >&2
@@ -676,10 +685,13 @@ in rec {
 						echo "Please give a command." >&2
 						exit 1
 					fi
-
+					
+					# not sure which of these gets picked up:
 					export GITEA_CUSTOM=/mnt/storage/live/gitea/rootdir/custom
+					export FORGEJO_CUSTOM=/mnt/storage/live/gitea/rootdir/custom
+
 					# TODO we probably also need to set GITEA_WORK_DIR
-					sudo --preserve-env=GITEA_CUSTOM -u gitea gitea "$@"
+					sudo --preserve-env=GITEA_CUSTOM,FORGEJO_CUSTOM -u gitea gitea "$@"
 				'';
 			})
 		];

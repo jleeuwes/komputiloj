@@ -40,14 +40,12 @@ in {
             wantedBy = [ "multi-user.target" ];
             # TODO move requiredBy and before to the respective services
             requiredBy = [
-                "gitea.service"
                 "btrbk-storage.service" # TODO make requisite
                 "postfix.service"
                 "dovecot2.service"
                 "radicale.service"
             ];
             before = [
-                "gitea.service"
                 "btrbk-storage.service"
                 "postfix.service"
                 "dovecot2.service"
