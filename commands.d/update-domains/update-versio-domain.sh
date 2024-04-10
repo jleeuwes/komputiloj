@@ -1,14 +1,10 @@
-#!/usr/bin/env bash
-
-set -Eeu -o pipefail
-
 # NOTE: the testapi url as specified on https://www.versio.nl/RESTapidoc/ gives a 404.
 # api_base=https://www2.versio.nl/testapi/v1
 api_base=https://www2.versio.nl/api/v1
 
-domain=$(basename -- "$PWD")
+domain=$1
 
-payload=$(cat -- ./records | \
+payload=$(cat -- "$2" | \
 	# remove comment lines:
 	grep -Ev '^;' | \
  	# remove empty lines:

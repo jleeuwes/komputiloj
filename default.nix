@@ -11,6 +11,8 @@ let
     komputiloj_capsule = {
         users = importDir ./users.d;
 
+        domains = importDir ./domains.d;
+
         commands = importDirAndApply ./commands.d capsules_and_boltons;
 
         packages = let
@@ -58,6 +60,7 @@ let
         # special capsule which aggregates stuff from all other capsules
         users = mergeAttrsets (catAttrs "users" cs);
         lib = mergeAttrsets (catAttrs "lib" cs);
+        domains = mergeAttrsets (catAttrs "domains" cs);
     };
     fake_capsules = rec {
         nixpkgsCurrent = let
@@ -78,11 +81,10 @@ let
 
                 nixosSystem = import (default_nixos_source.nix_path + "/nixos/lib/eval-config.nix");
 
-                writeShellApplication = packages.writeShellApplication;
-                writeShellScript = packages.writeShellScript;
-                writeTextDir = packages.writeTextDir;
-                symlinkJoin = packages.symlinkJoin;
-                concatScript = packages.concatScript;
+                inherit (packages)
+                    writeShellApplication writeShellScript
+                    writeTextFile writeTextDir
+                    symlinkJoin concatScript;
             };
 
             modules = {

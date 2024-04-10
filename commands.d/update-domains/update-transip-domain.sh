@@ -1,7 +1,3 @@
-#!/usr/bin/env bash
-
-set -Eeu -o pipefail
-
 export TRANSIP_URL=https://api.transip.nl/v6
 export TIPCTL_CFG=~/.config/transip-api/cli-config.json
 
@@ -50,11 +46,12 @@ get_access_token_without_tipctl() {
 		"$TRANSIP_URL"/auth
 }
 
+# TODO: why do this per domain?
 TRANSIP_TOKEN=$(get_access_token)
 
-domain=$(basename -- "$PWD")
+domain=$1
 
-payload=$(cat -- ./records | \
+payload=$(cat -- "$2" | \
 	# remove comment lines:
 	grep -Ev '^;' | \
  	# remove empty lines:

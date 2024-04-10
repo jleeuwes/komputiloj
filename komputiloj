@@ -32,9 +32,6 @@ main() {
 		nixos-rebuild)
 			do_nixos_rebuild "$@"
 		;;
-		update-domains)
-			do_update_domains "$@"
-		;;
 		cleanup)
 			do_cleanup "$@"
 		;;
@@ -80,27 +77,6 @@ do_nixos_rebuild() {
 	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path:nixos-config=$nixos_config"
 	printf 'Using nixos-rebuild from PATH\n' >&2
 	exec sudo -E nixos-rebuild "$@"
-}
-
-do_update_domains() {
-	# TODO put domains in top-level default.nix
-	# TODO make a proper package instead of this nix-shell hacking
-	do_in_shell "capsules.komputiloj.packages.tipctl" bash "$KOMPUTILOJ_PATH"/_komputiloj-update-domains
-}
-
-do_in_shell() {
-	local pkgs
-	pkgs="$1"
-	shift
-	printf 'Using nixpkgs source %q\n' "$DEFAULT_NIXOS" >&2
-	nixpkgs_path=$(nix-instantiate --eval "$KOMPUTILOJ_PATH" -A sources."$DEFAULT_NIXOS".nix_path | egrep -o '[^"]+')
-	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH:nixpkgs=$nixpkgs_path"
-	local args_escaped=$(printf '%q ' "$@")
-	nix-shell \
-		-E 'with import <nixpkgs> {}; with import <komputiloj>; mkShell { buildInputs = [
-			'"$pkgs"'
-		]; }' \
-		--run "$args_escaped"
 }
 
 do_cleanup() {
