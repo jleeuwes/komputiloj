@@ -11,8 +11,8 @@ and maybe someone might find something useful in there for their own config.
     cd
     git clone git@github.com:jleeuwes/komputiloj.git
     cd komputiloj
-    git submodule init    # some external repo(s) used by serviloj
-    git submodule update  # some external repo(s) used by serviloj at the moment
+    git submodule init    # for external sources
+    git submodule update  # for external sources
     ```
 2. Make some symlinks:
     ```
@@ -34,16 +34,12 @@ Upgrade within same NixOS version:
 
 	cd ~/komputiloj
 	./komputiloj update-sources
-	./komputiloj nixos-rebuild switch # local machine
-	./komputiloj deploy               # server(s)
+	./komputiloj deploy-on-scarif # local machine
+	./komputiloj deploy-to-gently # server(s)
 
-To upgrade the NixOS version for the local machine,
-change `DEFAULT_NIXOS` in `~/komputiloj/komputiloj`,
+To upgrade the NixOS version,
+change `default_nixos` in `~/komputiloj/default.nix`,
 then run the above commands.
-
-To upgrade the NixOS version for our servers,
-change `network.nixpkgs` in `serviloj.nix` to the major version you want,
-then run the above.
 
 ## Concepts
 
@@ -148,7 +144,7 @@ retrieve the content in case of scarif failing:
   we would need to retrieve datumoj's content in order to retrieve datumoj's content.
 - We MUST have a way to access the git part of datumoj without already having a
   git checkout of datumoj.
-  So, we need to be able to access our [Hetzner volume](serviloj/README.md),
+  So, we need to be able to access our [Hetzner volume](serviloj.md),
   which hosts gitea data.
   This can be achieved by storing our Hetzner
   credentials and the LUKS password with our paper private key

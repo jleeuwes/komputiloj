@@ -28,8 +28,7 @@ We have these subvolumes:
 
 - `live` holds a subvolume per app/service, holding persistent data for day-to-day use
 	- `live/komputiloj` holds data pertaining to komputiloj as a whole.
-	  At the moment only the NixOps state file is kept here,
-	  but we could also use it, for instance, for logs that we want to really keep.
+	  We could use it, for instance, for logs that we want to really keep.
 - `work` holds temporary data.
   Put stuff here instead of in e.g. `/tmp` to make sure it is not stored
   unencrypted.
@@ -111,7 +110,7 @@ To make the storage size bigger:
 
 1. Resize the volume through Hetzner's web interface.
 2. Reboot the server for LUKS to pick up the new size.
-3. Resend keys with `komputiloj nixops send-keys`.
+3. Resend keys with `komputiloj send-keys-to-$HOST`.
 4. Wait until `/mnt/storage` is mounted.
 5. Resize the filesystem with `btrfs filesystem resize max /mnt/storage`.
 
@@ -138,20 +137,20 @@ While you wait,
 give the server a name in DNS and set the reverse DNS in the Hetzner Cloud Console.
 Bind the name to a variable on your local machine for the later instructions to work:
 
-	VPS=gently2.radstand.nl
+	HOST=gently2.radstand.nl
 
 If you don't believe want to check if the install is still running,
 you can connect (untrusted, so what you'll see could be manipulated by a MITM)
 with the following command and run `top` for instance:
 
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$HOST
 
 After the server has rebooted into NixOS,
 tell the server (or the server of a MITM, but this is harmless)
 to make its host key fingerprint visible on the virtual console
 with this filthy command:
 
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS bash <<EOF
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$HOST bash <<EOF
 	fingerprint=$(ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key)
 	sed "s/^}$/services.mingetty.helpLine = \"$fingerprint\";\n}/" -i /etc/nixos/configuration.nix
 	nixos-rebuild switch
@@ -161,15 +160,15 @@ Now spam the login prompt on the online virtual console until the welcome text i
 and it will show the host fingerprint.
 Establish trust by connecting through SSH and comparing the fingerprint:
 
-	ssh root@$VPS
+	ssh root@$HOST
 
 ### Root password
 
-Just one more thing before we go on to NixOps deployment.
+Just one more thing before we go on to deploying our host config.
 We want to have a root password so we can get into the system through the online virtual console.
 
-	pwgen -s 10 | wachtwoord new passwords/root@$VPS
-	printf "root:%s" "$(wachtwoord cat passwords/root@$VPS)" | ssh root@$VPS chpasswd
+	pwgen -s 10 | wachtwoord new passwords/root@$HOST
+	printf "root:%s" "$(wachtwoord cat passwords/root@$HOST)" | ssh root@$HOST chpasswd
 
 To make this password permanent, see the next non-provider-specific section.
 
@@ -177,7 +176,7 @@ To make this password permanent, see the next non-provider-specific section.
 
 The system installed by Hetzner is no longer needed:
 
-	ssh root@$VPS rm -rf /old-root
+	ssh root@$HOST rm -rf /old-root
 
 ### A note on Hetzner's rescue system
 
@@ -194,7 +193,7 @@ which make it very hard to use through the virtual console.
 
 We can fix the keyboard without needing to trust the server:
 
-	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$VPS bash <<EOF
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$HOST bash <<EOF
 	sed -i 's/^XKBLAYOUT=.*$/XKBLAYOUT="us"/' /etc/default/keyboard
 	setupcon --force --save
 	EOF
@@ -212,7 +211,7 @@ We're going to mogrify it into a NixOS machine.
 
 Fill in hostname:
 
-	VPS=servilo-1.tilaa.cloud
+	HOST=servilo-1.tilaa.cloud
 
 Establish trusted SSH:
 
@@ -220,13 +219,13 @@ Establish trusted SSH:
   `ssh -o visualhostkey=yes localhost`  
   (don't accept, we just wanted to see the key)
 - Verify server key and add own key using
-  `ssh-copy-id -o visualhostkey=yes root@$VPS`
+  `ssh-copy-id -o visualhostkey=yes root@$HOST`
   (confirm only if the hostkey ascii art matches)
 
 Now install NixOS with one easy command:
 
 	curl https://raw.githubusercontent.com/jleeuwes/nixos-infect/master/nixos-infect |
-	ssh root@$VPS PROVIDER=tilaa bash -x
+	ssh root@$HOST PROVIDER=tilaa bash -x
 
 It will reboot when done.
 
@@ -235,9 +234,9 @@ but the host key is not.
 Moreover, the `root` account no longer has a password.
 So verify the host like this:
 
-1. `ssh root@$VPS`, which will fail.
+1. `ssh root@$HOST`, which will fail.
 2. Remove offending line from `known_hosts`.
-3. `ssh -o visualhostkey=yes root@$VPS` again, accepting the host key.
+3. `ssh -o visualhostkey=yes root@$HOST` again, accepting the host key.
 4. Run `passwd` on the VPS to reset the `root` password to the one Tilaa generated.
 5. Log in on the virtual console through Tilaa and run
    `ssh -o visualhostkey=yes localhost`  
@@ -249,7 +248,7 @@ So verify the host like this:
 
 Snippet to find the id of the right virtual machine through the Tilaa API:
 
-	curl -s -u $TILAA_API_USER:$TILAA_API_PASS https://api.tilaa.com/v1/virtual_machines | jq '.virtual_machines[] | select(.name=="'$VPS'") | .id'
+	curl -s -u $TILAA_API_USER:$TILAA_API_PASS https://api.tilaa.com/v1/virtual_machines | jq '.virtual_machines[] | select(.name=="'$HOST'") | .id'
 
 ## Make root password permanent
 
@@ -259,20 +258,14 @@ so we configure the root password to be read from `/root/password`.
 To make this work, the hashed password needs to be put there.
 Assuming the password is already set on the server:
 
-	ssh root@$VPS bash <<EOF
+	ssh root@$HOST bash <<EOF
 	sed -E 's/^root:([^:]+):.*$/\1/;t;d' /etc/shadow > /root/password
 	chmod go-r /root/password
 	EOF
 
-## NixOps
+## NixOS configuration deployment
 
-TODO
-
-Now update your NixOps deployment and deploy!
-
-## Upgrading
-
-See [the general readme](../README.md).
+See [the general readme](README.md).
 
 ## Other ways
 

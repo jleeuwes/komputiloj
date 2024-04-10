@@ -59,7 +59,7 @@ in komputiloj.lib.writeCommand {
         ${sshCmd} ${prepareKeyUploadDirScript}
         
         (
-        cd -- "$KOMPUTILOJ_PATH"/serviloj
+        cd -- "$KOMPUTILOJ_PATH"
         ${unlines (map
             (key: "${escapeShellArgs key.keyCommand}"
                 + " | "

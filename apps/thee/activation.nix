@@ -70,7 +70,7 @@ let
         name = "activate";
         runtimeInputs = [ nixpkgsCurrent.packages.jq ];
         text = ''
-            cd -- "$KOMPUTILOJ_PATH"/serviloj # TODO move secrets out of serviloj
+            cd -- "$KOMPUTILOJ_PATH"
             THEE_USER=jeroen
             THEE_PASSWORD=$(wachtwoord cat -n secrets/jeroen@thee.radstand.nl)
 

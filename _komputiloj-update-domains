@@ -1,10 +1,9 @@
-# TODO it's weird to refer to serviloj here; put secrets higher
 # TODO put domains in top-level default.nix
 export TRANSIP_USER=jeroenleeuwestein
 export TRANSIP_PRIVKEY=$(wachtwoord cat -n \
-	"$KOMPUTILOJ_PATH"/serviloj/secrets/privkey@api.transip.nl)
+	"$KOMPUTILOJ_PATH"/secrets/privkey@api.transip.nl)
 export VERSIO_USER=jeroen@lwstn.eu:$(wachtwoord cat -n \
-	"$KOMPUTILOJ_PATH"/serviloj/secrets/jeroen@lwstn.eu@versio.nl)
+	"$KOMPUTILOJ_PATH"/secrets/jeroen@lwstn.eu@versio.nl)
 
 for domain_dir in "$KOMPUTILOJ_PATH"/domains.d/*; do
 	if [[ -d "$domain_dir" ]]; then
