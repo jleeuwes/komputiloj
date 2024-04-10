@@ -27,6 +27,8 @@ let
 
         lib = {
             writeCommand = args: let
+                # TODO somehow enhance writeShellApplication to produce a clean PATH inside the script
+                # Currently it is too easy to rely on some undeclared dependency.
                 scriptDir = capsules.nixpkgsCurrent.lib.writeShellApplication {
                     name = "script";
                     runtimeInputs = args.runtimeInputs or [];

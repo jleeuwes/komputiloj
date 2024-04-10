@@ -4,6 +4,11 @@ The intended audience of this document is me;
 it is a public document so I won't loose it,
 but it's not necessarily useful to anyone else.
 
+## age
+
+We're switching from GPG to age.
+Take the rest of this document with a grain of salt.
+
 ## GPG
 
 My jeroen@lwstn.eu GPG key will be at the center of my secrets management.
@@ -56,5 +61,6 @@ unattended use by some device configured in komputiloj.
 
 Komputiloj being public and datumoj being duplicated/synchronizated between
 multiple devices will make sure these secrets are backed up.
-(But note that we need to ensure we can always access a copy! See [README.md].)
+(But note that we need to ensure we can always access a copy! See
+[README.md](README.md).)
 
