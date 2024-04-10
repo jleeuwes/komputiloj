@@ -106,14 +106,13 @@ let
                 user_processed[$u]=0
             done
             # Now set the value to 1 for each user already existing in gitea:
+            userdump=$(do_curl_bearer --fail "${api_base}/admin/users?limit=50" | jq -c '.[]|.login')
             while IFS= read -r u_json; do
                 u=$(printf '%s' "$u_json" | jq -r) # convert to raw string
                 user_exists[$u]=1
                 user_processed[$u]=0
                 existing_users+=( "$u" )
-            done < <(
-                do_curl_bearer --fail "${api_base}/admin/users?limit=50" | jq -c '.[]|.login'
-            )
+            done <<< "$userdump"
 
             # We currently completely ignore paging.
             # If the number of users gets bigger than MAX_RESPONSE_ITEMS
@@ -181,6 +180,8 @@ let
                 local key_title
                 local key_id
                 local key_json
+                local keydump
+                keydump=$(do_curl_bearer --fail "${api_base}/users/$user/keys?limit=50" | jq -c '.[]')
                 while IFS= read -r key_json; do
                     key_title=$(printf '%s' "$key_json" | jq -r .title)
                     key_id=$(printf '%s' "$key_json" | jq -r .id)
@@ -191,9 +192,7 @@ let
                     else
                         echo "Ignoring non-managed key for user $user: $key_title" >&2
                     fi
-                done < <(
-                    do_curl_bearer --fail "${api_base}/users/$user/keys?limit=50" | jq -c '.[]'
-                )
+                done <<< "$keydump"
             }
             add_user_keys() {
                 local user
