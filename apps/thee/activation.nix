@@ -95,7 +95,7 @@ let
                 "${api_base}/users/$THEE_USER/tokens/komputiloj" 1>&2
             THEE_TOKEN=$(do_curl_basic --fail -X POST \
                 "${api_base}/users/$THEE_USER/tokens" \
-                --data-raw '{"name": "komputiloj"}' | jq -r .sha1)
+                --data-raw '{"name": "komputiloj", "scopes": ["write:admin", "write:user"]}' | jq -r .sha1)
             
             declare -a existing_users
             declare -A user_exists
