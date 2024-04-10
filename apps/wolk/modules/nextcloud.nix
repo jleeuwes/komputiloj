@@ -2,8 +2,7 @@
 with boltons;
 { ... }:
 let
-    # TODO pull lib out of packages into the capsule?
-    escapeShellArg = nixpkgsCurrent.packages.lib.strings.escapeShellArg;
+    escapeShellArg = nixpkgsCurrent.lib.strings.escapeShellArg;
     bigstorageService = rec {
         serviceConfig = {
             Type = "simple";

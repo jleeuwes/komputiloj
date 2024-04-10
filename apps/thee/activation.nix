@@ -1,7 +1,8 @@
-{ boltons, lib, writeShellApplication, writeTextDir, symlinkJoin, jq, pwgen, users, ... }:
+{ boltons, nixpkgsCurrent, komputiloj, all }:
 with boltons;
-with lib.strings;
+with nixpkgsCurrent.lib.strings;
 let
+    inherit (nixpkgsCurrent.lib) writeShellApplication writeTextDir symlinkJoin;
     url_base = "https://thee.radstand.nl";
     api_base = "${url_base}/api/v1";
 
@@ -37,7 +38,7 @@ let
         read_only = false;
     };
     
-    userlist = attrValues users;
+    userlist = attrValues all.users;
     declared_users   = map (user: user.name) userlist;
     users_to_enable  = filter (user: user.apps.thee.enable or false) userlist;
     users_to_disable = filter (user: !(user.apps.thee.enable or false)) userlist;
@@ -50,7 +51,7 @@ let
             (writeTextDir "update.json" (user2gitea_update_enabled user))
             (writeShellApplication {
                 name = "generate-password";
-                runtimeInputs = [ pwgen ];
+                runtimeInputs = [ nixpkgsCurrent.packages.pwgen ];
                 text = stripTabs ''
                     ${if user.isHuman
                     then "pwgen 10 1"
@@ -65,13 +66,14 @@ let
             (writeTextDir "update.json" (user2gitea_update_disabled user))
         ];
     };
-    script_drv = writeShellApplication {
+    script_drv = komputiloj.lib.writeCommand {
         name = "activate";
-        runtimeInputs = [ jq ];
+        runtimeInputs = [ nixpkgsCurrent.packages.jq ];
         text = ''
-            [[ -n "$THEE_USER" ]]
-            [[ -n "$THEE_PASSWORD" ]]
-            set -u
+            cd -- "$KOMPUTILOJ_PATH"/serviloj # TODO move secrets out of serviloj
+            THEE_USER=jeroen
+            THEE_PASSWORD=$(wachtwoord cat -n secrets/jeroen@thee.radstand.nl)
+
             do_curl_basic() {
                 curl \
                     --no-progress-meter \

@@ -48,6 +48,7 @@ let
         hello-infra = sources.hello-infra.value capsules_and_boltons;
         gorinchemindialoog = sources.gorinchemindialoog.value;
         wolk = (import ./apps/wolk) capsules_and_boltons;
+        thee = (import ./apps/thee) capsules_and_boltons;
     };
     all_capsule = let
         cs = attrValues (real_capsules // fake_capsules);
@@ -77,6 +78,8 @@ let
 
                 writeShellApplication = packages.writeShellApplication;
                 writeShellScript = packages.writeShellScript;
+                writeTextDir = packages.writeTextDir;
+                symlinkJoin = packages.symlinkJoin;
                 concatScript = packages.concatScript;
             };
 

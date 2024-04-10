@@ -32,16 +32,6 @@ main() {
 		nixos-rebuild)
 			do_nixos_rebuild "$@"
 		;;
-		activate-apps)
-			# This is activate in the NixOS sense: make the configuration
-			# active. Apps are things I host and that are not necessarily
-			# defined completely in Nix config. Activation includes
-			# for example accounts that are created/updated through the API
-			# of a running service.
-			# TODO somehow make sure we routinely call this;
-			# I'm not even sure it currently works.
-			do_activate_apps "$@"
-		;;
 		update-domains)
 			do_update_domains "$@"
 		;;
@@ -111,26 +101,6 @@ do_in_shell() {
 			'"$pkgs"'
 		]; }' \
 		--run "$args_escaped"
-}
-
-do_activate_apps() {
-	# TODO Take wachtwoord program from sources
-	# with something like this (taken from defunct nixops command):
-	# nix-shell \
-	# 	-E 'with import <nixpkgs> {}; with import <komputiloj>; mkShell { buildInputs = [
-	# 		sources.nixops.value.default
-	# 		capsules.komputiloj.packages.wachtwoord
-	# 	]; }' \
-	# 	--run "$args_escaped"
-
-	# TODO It's weird to reference serviloj here.
-	export THEE_USER=jeroen
-	export THEE_PASSWORD=$(wachtwoord cat -n \
-		"$KOMPUTILOJ_PATH"/serviloj/secrets/jeroen@thee.radstand.nl)
-	export NIX_PATH="komputiloj=$KOMPUTILOJ_PATH"
-	nix-build --no-out-link . -A apps.thee.activate.pkg
-	activate_cmd=$(nix-instantiate --eval . -A apps.thee.activate.cmd | egrep -o '[^"]+')
-	"$activate_cmd"
 }
 
 do_cleanup() {
