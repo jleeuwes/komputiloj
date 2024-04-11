@@ -358,6 +358,7 @@ in rec {
 				uid = 70001;
 				group = "gitea";
 				isSystemUser = true;
+				# The rest of the configuration is near the gitea/forgejo config
 			};
 			groups.gitea = {
 				gid = 70001;
@@ -604,6 +605,11 @@ in rec {
 		};
 		systemd.services.forgejo = {
 			needsStorageVolume = "requires";
+		};
+		users.users.gitea = {
+			# Taken from https://github.com/NixOS/nixpkgs/blob/nixos-23.11/nixos/modules/services/misc/forgejo.nix
+			home = config.services.forgejo.stateDir; # needed to make authorized_keys work
+			useDefaultShell = true;
 		};
 
 		mailserver = {
