@@ -58,6 +58,8 @@ payload=$(cat -- "$2" | \
  	grep -Ev '^[[:space:]]*$' | \
  	# make jsons:
  	jq -Rc 'split("\t+"; "") | { name: .[0], expire: .[1], type: .[3], content: .[4] }' | \
+	# remove quotes around content and unescape \":
+	jq '.content |= sub("^\"(?<str>.*)\"$"; .str | gsub("\\\\\""; "\""))' | \
  	# join json:
  	jq --slurp -c '{dnsEntries: .}')
 
