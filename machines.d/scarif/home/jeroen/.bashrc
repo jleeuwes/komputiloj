@@ -2,6 +2,12 @@
 # Make symlinks red, among other things
 eval "$(dircolors --sh ~/.dircolors)"
 
+PROMPT_COLOR="38;2;255;255;255;40m"
+PS_WINDOW_TITLE_PART="\u@\h:\w"
+PS_PROMPT_BLOCK_PART="\u@\h:\w"
+PS_PROMPT_LAST_PART=" 𝄽"
+PS1="\n\[\033[$PROMPT_COLOR\]\[\e]0;$PS_WINDOW_TITLE_PART\a\]$PS_PROMPT_BLOCK_PART\[\033[0m\]$PS_PROMPT_LAST_PART"
+
 export HISTCONTROL=ignoreboth
 export HISTSIZE=10000
 export HISTFILESIZE=10000
