@@ -2,8 +2,8 @@
 {fetchNextcloudApp}:
 fetchNextcloudApp {
   # name    = "calendar";
-  # version = "4.6.7";
-  url     = "https://github.com/nextcloud-releases/calendar/releases/download/v4.6.7/calendar-v4.6.7.tar.gz";
-  sha256  = "18hlk6j3dzpcd61sgn8r8zmcc9d1bklq030kwyn4mzr20dcf75w5";
+  # version = "4.7.3";
+  url     = "https://github.com/nextcloud-releases/calendar/releases/download/v4.7.3/calendar-v4.7.3.tar.gz";
+  sha256  = "0svnbqp57pwiv2k88cix7apzsbiixqkm4r9gb65v9dx65zzx24gj";
   license = "agpl3Plus";
 }
