@@ -6,15 +6,50 @@ but it's not necessarily useful to anyone else.
 
 ## age
 
-We're switching from GPG to age.
-Take the rest of this document with a grain of salt.
+On scarif I have an age key (`~/passwords/.age/identity.age`),
+encrypted with a passphrase.
+
+All new passwords made with `wachtwoord new` are encrypted with this age key.
+
+### Backups
+
+Proper backup of my age key is imperative.
+
+My private key:
+
+- Is stored on my main workstation encrypted with a passphrase.
+- Is stored on paper unencrypted.
+- TODO: should be stored on another piece of paper in a separate location.
+
+Alternatively to the TODO, if I were to use multiple workstations and encrypt
+my passwords to all the workstations' keys,
+this would provided enough redundancy.
+
+Note that, contrary to GPG keys, age keys are very small,
+so there is no need to have a digital backup to prevent lots of typing
+from paper.
+
+The public key can be derived from the private key,
+so no special care is needed there.
 
 ## GPG
 
-My jeroen@lwstn.eu GPG key will be at the center of my secrets management.
+Most passwords are still encrypted with GPG
+but I'm phasing this out.
+
+No new passwords should be encrypted using this method.
+
+The GPG key is considered compromised since I lost
+my USB-stick with a backup on it.
+This is not an immediate problem,
+because the encrypted password files are not public;
+an attacker would also need to gain access to datumoj.
+
+My jeroen@lwstn.eu GPG key *WAS* at the center of my secrets management.
 It has a primary key for GPG identity management and subkeys for encryption and signing.
 The encryption and signing secret keys will be available on my workstation.
 The primary secret key will be placed on a removable medium for use when needed.
+Not sure what the status of this was.
 
 See [this Debian guide](https://wiki.debian.org/Subkeys) for information about
 removing the primary key from a keyring and using it from another location on
@@ -51,12 +86,15 @@ TODO not sure, work this out.
 ## Passwords and other secrets
 
 Passwords, tokens, etcetera are encrypted using `wachtwoord`,
-which encrypts secrets with my GPG key and optionally with the GPG key of some
-system user that needs access to it. Such system GPG keys can in turn also be
-encrypted using the `wachtwoord` program in this repository.
+which encrypts secrets with my age key.
+
+Regarding secrets that need to be used my some unattended system process:
+we could encrypt those with a system-specific key.
+We would need to think about managing such keys.
 
 The encrypted secrets are stored in the datumoj repository if they are for
-personal use, or in the komputiloj repository if they must be available for
+personal use, or _(maybe, not yet done)_
+in the komputiloj repository if they must be available for
 unattended use by some device configured in komputiloj.
 
 Komputiloj being public and datumoj being duplicated/synchronizated between
