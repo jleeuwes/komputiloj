@@ -111,7 +111,7 @@ bar() {
 		exec_with_path dmenu_run "${DMENU_OPTS[@]}"
 	;;
 	wachtwoord)
-		wn=$(ls ~/passwords | dmenu "${DMENU_OPTS[@]}")
+		wn=$(find ~/passwords/ -type f -printf '%P\n' | sort | dmenu "${DMENU_OPTS[@]}")
 		ww=$(wachtwoord cat ~/passwords/"$wn" | tr --delete '\n')
 		printf "%s" "$ww" | timeout 10 xsel -in
 	;;
