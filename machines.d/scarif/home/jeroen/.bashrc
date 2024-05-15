@@ -2,7 +2,7 @@
 # Make symlinks red, among other things
 eval "$(dircolors --sh ~/.dircolors)"
 
-PROMPT_COLOR="38;2;255;255;255;40m"
+PROMPT_COLOR="37;40m"
 PS_WINDOW_TITLE_PART="\u@\h:\w"
 PS_PROMPT_BLOCK_PART="\u@\h:\w"
 PS_PROMPT_LAST_PART=" 𝄽"
