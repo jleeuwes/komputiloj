@@ -35,6 +35,13 @@ sz() {
 # Alias for git add that bypasses git-annex
 # (preferably configure largefiles correctly)
 alias ga="git annex add --force-small"
+gaa() {
+	# Function to re-add annexed files as regular git files.
+	# See https://git-annex.branchable.com/tips/largefiles/
+	git annex unlock -- "$@"
+	git rm --cached -- "$@"
+	git annex add --force-small -- "$@"
+}
 
 alias lpr-bw="lpr -o CololModel=Gray -o print-color-mode=monochrome"
 
