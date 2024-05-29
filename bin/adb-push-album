@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+do_album() {
+	local local_path
+	local album_name
+	local path_rest
+	local artist_name
+	local remote_path
+	local cmd
+
+	local_path="$1"
+	album_name=$(basename -- "$local_path")
+	path_rest=$(dirname -- "$local_path")
+	artist_name=$(basename -- "$path_rest")
+	remote_path="/sdcard/Music/$artist_name/$album_name"
+	
+	cmd=$(printf 'mkdir -p %q' "$remote_path")
+	adb shell "$cmd"
+	adb push -- "$local_path"/* "$remote_path"
+}
+
+for path in "$@"; do
+	do_album "$path"
+done
