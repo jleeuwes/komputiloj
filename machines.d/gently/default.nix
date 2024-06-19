@@ -291,9 +291,13 @@ in rec {
 						#      empty or maybe with whereis information in it)
 						
 						# TODO manage empty dirs (put .gitkeep in them?)
-
+						
 						cd /mnt/storage/live/git-annex/Hello
 						git annex assist
+
+						# Fix git-annex not honouring sharedRepository
+						# (https://git-annex.branchable.com/tips/shared_git_annex_directory_between_multiple_users/)
+						find Hello -exec chmod g+w {} \;
 					'';
 					# # Voor de eerste setup heb ik dit gedaan:
 					# cd /mnt/storage/live/git-annex
