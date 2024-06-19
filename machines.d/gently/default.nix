@@ -266,6 +266,51 @@ in rec {
 					# 5. Run: git config --global user.email gorinchemindialoog@radstand.nl ; git config --global user.name 'Gorinchem in Dialoog'
 				};
 
+				git-annex-assist-hello = {
+					mailOnFailure = true;
+					needsStorageVolume = "requires";
+					serviceConfig = {
+						Type = "simple";
+						User = "git-annex";
+					};
+					startAt = "*:*:00";
+					wantedBy = [ "multi-user.target" ];
+					path = [ pkgs.gitMinimal pkgs.git-annex pkgs.openssh ];
+					script = stripTabs ''
+						git config --global user.name git-annex
+						git config --global user.email git-annex@radstand.nl
+
+						# TODO manage wanted content:
+						# - git annex get * in all dirs that have some WANTED marker file
+						#   (or some recursive variant of the marker file in a parent)
+						# - git annex drop * in all other dirs
+						# (wantedcontent should be set to manual)
+						
+						# TODO manage non-present files (put a filename.NIET_HIER
+						#      which should not be checked in,
+						#      empty or maybe with whereis information in it)
+						
+						# TODO manage empty dirs (put .gitkeep in them?)
+
+						cd /mnt/storage/live/git-annex/Hello
+						git annex assist
+					'';
+					# # Voor de eerste setup heb ik dit gedaan:
+					# cd /mnt/storage/live/git-annex
+					# mkdir Hello
+					# chown git-annex:git-annex Hello
+					# chmod g+xws,o= Hello
+					# sudo -u git-annex bash
+					# cd Hello
+					# git init -b main --shared
+					# git config --global user.name git-annex
+					# git config --global user.email git-annex@radstand.nl
+					# git annex init
+					# git commit -m 'Initial empty commit' --allow-empty
+					# git annex adjust --unlock-present
+					# mkdir Hello # this is the subdir we share on wolk, to hide the .git dir
+					# chmod g+w Hello
+				};
 			};
 		};
 		
@@ -349,6 +394,16 @@ in rec {
 				];
 			};
 
+			users.jeroen = {
+				uid = komputiloj.users.jeroen.linux.uid;
+				isNormalUser = true;
+				description = komputiloj.users.jeroen.fullName;
+				home = "/mnt/storage/live/home/jeroen";
+				openssh.authorizedKeys.keyFiles = [
+					../scarif/home/jeroen/.ssh/id_rsa.pub
+				];
+			};
+
 			# Make sure users have the same uid on all our machines.
 			# Add users here that don't have a fixed uid in nixpkgs/nixos.
 			# Warning: changing uids here after a user has been created has no effect!
@@ -405,6 +460,21 @@ in rec {
 				hashedPasswordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
 				extraGroups = [ "sftp_only" ];
 			};
+			users.git-annex = {
+				uid = 70005; # move to komputiloj.users.git-annex.linux.uid so we can also have a user in thee
+				group = "git-annex";
+				# extraGroups = [ "keys" ]; # later, for rclone config
+				isSystemUser = true;
+				home = "/mnt/storage/live/home/git-annex";
+				createHome = false;
+			};
+			groups.git-annex = {
+				gid = 70005;
+			};
+			# NOTE: if we want to host git-annex repositories for others,
+			# we need multiple git-annex groups to manage access.
+			users.nextcloud.extraGroups = [ "git-annex" ];
+			users.jeroen.extraGroups = [ "git-annex" ];
 		};
 
 		networking = {

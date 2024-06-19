@@ -231,6 +231,11 @@ in {
                 overwriteProtocol = "https";
             };
 
+            extraOptions = {
+                # Important for making git-annex shared repos work
+                "localstorage.umask" = "002";
+            };
+
             extraApps = {
                 inherit (nextcloud.packages.apps) files_linkeditor calendar;
             };
