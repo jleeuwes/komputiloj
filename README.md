@@ -14,19 +14,13 @@ and maybe someone might find something useful in there for their own config.
     git submodule init    # for external sources
     git submodule update  # for external sources
     ```
-2. Make some symlinks:
-    ```
-    mkdir -p /etc/nixos
-    sudo ln -s ~/komputiloj/scarif/etc/nixos/* /etc/nixos/
-    ```
-3. (Re)build the NixOS configuration with `~/komputiloj/komputiloj nixos-rebuild switch`
-4. Add a bunch of symlinks from `~` to files/dirs in `~/komputiloj/scarif/home/jeroen`
-   (use `ls -A ~/komputiloj/scarif/home/jeroen` to see all the dotfiles).
+2. (Re)build the NixOS configuration with `~/komputiloj/komputiloj deploy-to-scarif`
+3. Add a bunch of symlinks from `~` to files/dirs in `~/komputiloj/machines.d/scarif/home/jeroen`
+   (use `ls -A ~/komputiloj/machines.d/scarif/home/jeroen` to see all the dotfiles).
 
-(Unexplored alternative: set `NIXOS_CONFIG` environment variable instead of symlinking
-stuff. See <https://github.com/argumatronic/home-nixos> and
-<https://www.reddit.com/r/NixOS/comments/6zn5tv/manage_nixos_config_from_git_without_having_to/>
-for some good (and bad) ideas.)
+TODO replace symlinks to `~/komputiloj/scarif` with symlinks to
+`~/komputiloj/macines.d/scarif`. Use `find -type l -print0 | xargs -0 ls -ld | fgrep scarif`
+to find them.
 
 ## Upgrading
 
