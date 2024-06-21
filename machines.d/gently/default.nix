@@ -292,28 +292,28 @@ in rec {
 						
 						# TODO manage empty dirs (put .gitkeep in them?)
 						
-						cd /mnt/storage/live/git-annex/Hello
+						cd /mnt/storage/live/git-annex/rootdir/Hello
 						git annex assist
 
-						# Fix git-annex not honouring sharedRepository
-						# (https://git-annex.branchable.com/tips/shared_git_annex_directory_between_multiple_users/)
+						# Make the wolk-exposed subdir group-writeable
 						find Hello -exec chmod g+w {} \;
 					'';
-					# # Voor de eerste setup heb ik dit gedaan:
-					# cd /mnt/storage/live/git-annex
+					# # Nieuwe setup van een git-annex (niet getest):
+					# cd /mnt/storage/live/git-annex/rootdir
 					# mkdir Hello
 					# chown git-annex:git-annex Hello
-					# chmod g+xws,o= Hello
+					# chmod g+rx,o= Hello
 					# sudo -u git-annex bash
 					# cd Hello
-					# git init -b main --shared
+					# git init -b main
 					# git config --global user.name git-annex
 					# git config --global user.email git-annex@radstand.nl
 					# git annex init
 					# git commit -m 'Initial empty commit' --allow-empty
 					# git annex adjust --unlock-present
 					# mkdir Hello # this is the subdir we share on wolk, to hide the .git dir
-					# chmod g+w Hello
+					# chmod g+rwxs Hello
+					# touch Hello/.gitkeep
 				};
 			};
 		};
@@ -353,12 +353,23 @@ in rec {
 		services.openssh = {
 			# Do NOT disable this, or we lose the ability to deploy.
 			enable = true;
+			# NOTE: extraConfig is put in a heredoc, so $ needs to be escaped!
+			# TODO: maybe make a PR to fix that?
 			extraConfig = stripTabs ''
 				Match Group sftp_only
 					ChrootDirectory /mnt/storage/live/sftp/%u
 					ForceCommand internal-sftp
-					AllowTcpForwarding no
-					X11Forwarding no
+					DisableForwarding yes
+					PermitTTY no
+
+				Match User git-annex
+					ForceCommand git-annex-shell -c "\$SSH_ORIGINAL_COMMAND"
+					DisableForwarding yes
+					PermitTTY no
+				
+				# match nobody to make sure any config that might come after
+				# is not placed arbitrarily in the last Match block
+				Match User xxxxxxxxxxxxxxxxxxxx
 			'';
 		};
 		programs.ssh = {
@@ -392,19 +403,9 @@ in rec {
 				# during boot, without storage being mounted yet,
 				# otherwise we're locking ourselves out.
 				hashedPasswordFile = "/root/password";
-				openssh.authorizedKeys.keyFiles = [
+				openssh.authorizedKeys.keys = [
 					# Always have a key here, otherwise we can't deploy.
-					../scarif/home/jeroen/.ssh/id_rsa.pub
-				];
-			};
-
-			users.jeroen = {
-				uid = komputiloj.users.jeroen.linux.uid;
-				isNormalUser = true;
-				description = komputiloj.users.jeroen.fullName;
-				home = "/mnt/storage/live/home/jeroen";
-				openssh.authorizedKeys.keyFiles = [
-					../scarif/home/jeroen/.ssh/id_rsa.pub
+					komputiloj.users.jeroen.sshKeys.scarif
 				];
 			};
 
@@ -469,16 +470,26 @@ in rec {
 				group = "git-annex";
 				# extraGroups = [ "keys" ]; # later, for rclone config
 				isSystemUser = true;
-				home = "/mnt/storage/live/home/git-annex";
+				# Home is set such that we can with relative path:
+				#   git clone git-annex@gently:Hello
+				# This scheme looks nice but should not be opened up to untrusted users as-is,
+				# because you can still pass arbitrary full paths and maybe other weirdness
+				# (empty string, ~, ...?)
+				# Also, we would need to somehow restrict access to specific repos.
+				home = "/mnt/storage/live/git-annex/rootdir";
 				createHome = false;
+				shell = pkgs.bashInteractive; # needed for forced command
+				openssh.authorizedKeys.keys = [
+					# We already have restrictions in sshd_config,
+					# but there is no full equivalent to restrict in sshd_config,
+					# so we add restrict here just as an extra layer of security.
+					"restrict ${komputiloj.users.jeroen.sshKeys.scarif}"
+				];
 			};
 			groups.git-annex = {
 				gid = 70005;
 			};
-			# NOTE: if we want to host git-annex repositories for others,
-			# we need multiple git-annex groups to manage access.
 			users.nextcloud.extraGroups = [ "git-annex" ];
-			users.jeroen.extraGroups = [ "git-annex" ];
 		};
 
 		networking = {
