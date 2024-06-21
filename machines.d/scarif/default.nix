@@ -138,7 +138,9 @@ rec {
                     # flask
                     # flask-api
             ]; in with pkgs; [
-            mkpasswd
+            
+            # enhance nix-build
+            nix-output-monitor
 
             # for running precompiled games:
             steam-run-native
@@ -146,6 +148,7 @@ rec {
             ocrad
 
             # usefull programs:
+            mkpasswd
             unicode-paracode
             gitFull vim file subversionClient pciutils pmount squashfsTools
             parted gparted
