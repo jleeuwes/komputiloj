@@ -381,9 +381,12 @@ in rec {
 				};
 			};
 		};
-		programs.screen.screenrc = stripTabs ''
-			defscrollback 1000
-		'';
+		programs.screen = {
+			enable = true;
+			screenrc = stripTabs ''
+				defscrollback 1000
+			'';
+		};
 
 		programs.git = {
 			enable = true;
@@ -660,8 +663,9 @@ in rec {
 					ENABLED = true;
 					FROM = "thee@radstand.nl";
 					# https://docs.gitea.io/en-us/config-cheat-sheet/#mailer-mailer
-					HOST = "localhost:25";
-					SKIP_VERIFY = true; # this is okay, as long as it's localhost
+					SMTP_ADDR = "localhost";
+					SMTP_PORT = "25";
+					FORCE_TRUST_SERVER_CERT = true; # this is okay, as long as it's localhost
 					# https://github.com/NixOS/nixpkgs/issues/103446
 					# MAILER_TYPE = "sendmail"; # not sure which of...
 					# PROTOCOL = "sendmail";    # ...these two we need

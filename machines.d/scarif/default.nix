@@ -229,7 +229,7 @@ rec {
         programs.gnupg.agent = {
             enable = true;
             enableSSHSupport = true;
-            pinentryFlavor = "gtk2";
+            pinentryPackage = pkgs.pinentry-gtk2;
         };
 
         # Generate setuid wrappers for pmount:

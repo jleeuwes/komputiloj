@@ -3,9 +3,9 @@ let boltons = import ./lib/boltons.nix;
 in with boltons;
 let
     sources = importDir ./sources.d;
-    default_nixos = "nixos_23_11"; # defines default nixos used by all of komputiloj
+    default_nixos = "nixos_24_05"; # defines default nixos used by all of komputiloj
     default_nixos_source = getAttr default_nixos sources;
-    default_mailserver_source = sources.mailserver_23_11; # defined here to not forget updating nixos and mailserver together
+    default_mailserver_source = sources.mailserver_24_05; # defined here to not forget updating nixos and mailserver together
     nixpkgsLib = import (default_nixos_source.nix_path + "/lib");
     callPackageWith = nixpkgsLib.callPackageWith;
     komputiloj_capsule = {

@@ -231,6 +231,10 @@ in {
                 overwriteProtocol = "https";
             };
 
+            settings = {
+                default_phone_region = "NL";
+            };
+
             extraOptions = {
                 # Important for making git-annex shared repos work
                 "localstorage.umask" = "002";
