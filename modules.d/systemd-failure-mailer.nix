@@ -31,9 +31,10 @@ in {
                 ${pkgs.mailutils}/bin/mail -aFrom:systeem@radstand.nl -s "[gently] probleem met $unit" jeroen@lwstn.eu <<-EOF
                     Hoi,
 
-                    Er was een probleem met $unit:
+                    Er was een probleem met $unit.
+                    Hier is meer info, waaronder de laatste 100 logregels:
 
-                    $(systemctl status -- $unit)
+                    $(systemctl status -n100 -- $unit)
 
                     Succes ermee!
                 EOF
