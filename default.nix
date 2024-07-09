@@ -111,8 +111,8 @@ let
         };
         nextcloud = {
             packages = {
-                nextcloud = nixpkgsCurrent.packages.nextcloud28;
-                apps = sources.nextcloud_28_apps.value nixpkgsCurrent.packages;
+                nextcloud = nixpkgsCurrent.packages.nextcloud29;
+                apps = sources.nextcloud_29_apps.value nixpkgsCurrent.packages;
             };
         };
     };
