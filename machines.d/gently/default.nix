@@ -325,7 +325,7 @@ in rec {
 						git annex assist
 
 						# Make the wolk-exposed subdir group-writeable
-						find Hello -exec chmod g+w {} \;
+						find Hello -type d,f -exec chmod g+w {} \;
 					'';
 					# # Nieuwe setup van een git-annex (niet getest):
 					# cd /mnt/storage/live/git-annex/rootdir
