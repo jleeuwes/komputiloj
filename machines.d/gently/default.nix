@@ -1,4 +1,4 @@
-{ boltons, nixpkgsCurrent, komputiloj, gorinchemindialoog, hello-infra, wolk, ...  }:
+{ boltons, nixpkgsCurrent, komputiloj, privata, gorinchemindialoog, hello-infra, wolk, ...  }:
 with boltons;
 let
 	nixpkgs            = nixpkgsCurrent.packages;
@@ -14,6 +14,7 @@ in rec {
 	# - ...
 	
 	targetHost = "gently.radstand.nl";
+	inherit (privata.machines.gently) masterAgeKey;
 	nixopsKeys = wolk.nixopsKeys // {
 		"luks-storage" = {
 			keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
@@ -36,6 +37,16 @@ in rec {
 			permissions = "ug=r,o=";
 		};
     };
+	# TODO put decryption in activation script, then we can move these secrets to a nixos module
+	# (the capsule secrets remain, because those also provide information about updating a secret)
+	secrets = {
+		bigstorage1-git-annex-hello-creds = {
+			encryptedContent = hello.secrets.bigstorage1-git-annex-hello-creds.encryptedContent;
+			user = "git-annex";
+			group = "git-annex";
+			permissions = "u=r,go=";
+		};
+	};
 	
 	nixosSystem = nixpkgsCurrent.lib.nixosSystem {
 		system = "x86_64-linux";
@@ -275,10 +286,29 @@ in rec {
 					};
 					startAt = "*:*:00";
 					wantedBy = [ "multi-user.target" ];
-					path = [ pkgs.gitMinimal pkgs.git-annex pkgs.openssh ];
+					path = [
+						# basics:
+						pkgs.gitMinimal pkgs.git-annex pkgs.openssh
+						# needed for decryption:
+						pkgs.gnupg
+					];
 					script = stripTabs ''
 						git config --global user.name git-annex
 						git config --global user.email git-annex@radstand.nl
+
+						cd /mnt/storage/live/git-annex/rootdir/Hello
+
+						# We don't want to store plaintext credentials in the
+						# .git dir, so we set annex.cachecreds to false:
+						git config --global annex.cachecreds false
+						# We do *pretend* to have cached credentials by
+						# symlinking a secret into the place where the cached
+						# credentials usually reside, as a way to provide the
+						# credentials to git-annex:
+						mkdir -p .git/annex/creds
+						ln -sTf /run/keys/bigstorage1-git-annex-hello-creds \
+							.git/annex/creds/3ba01384-b195-4696-a200-732ed3b89647
+						git annex enableremote 3ba01384-b195-4696-a200-732ed3b89647
 
 						# TODO manage wanted content:
 						# - git annex get * in all dirs that have some WANTED marker file
@@ -292,7 +322,6 @@ in rec {
 						
 						# TODO manage empty dirs (put .gitkeep in them?)
 						
-						cd /mnt/storage/live/git-annex/rootdir/Hello
 						git annex assist
 
 						# Make the wolk-exposed subdir group-writeable
@@ -471,7 +500,7 @@ in rec {
 			users.git-annex = {
 				uid = 70005; # move to komputiloj.users.git-annex.linux.uid so we can also have a user in thee
 				group = "git-annex";
-				# extraGroups = [ "keys" ]; # later, for rclone config
+				extraGroups = [ "keys" ];
 				isSystemUser = true;
 				# Home is set such that we can with relative path:
 				#   git clone git-annex@gently:Hello

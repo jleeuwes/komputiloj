@@ -7,7 +7,8 @@ let
     esc = escapeShellArg;
     escapeShellArgs = nixpkgsCurrent.lib.strings.escapeShellArgs;
     keys_to_upload = attrValues (mapAttrs (name: value: { inherit name; } // value) machine.nixopsKeys);
-    prepareKeyUploadDirScript = komputiloj.lib.writeCommand {
+    secrets_to_upload = attrValues (mapAttrs (name: value: { inherit name; } // value) machine.secrets);
+    scriptToPrepareKeyUpload = komputiloj.lib.writeCommand {
         name = "pre-receive-keys";
         # The upload dir acts as:
         # 1. A temporary place only root can read while we fiddle with the
@@ -18,7 +19,7 @@ let
             chmod go= /run/keys/upload
         '';
     };
-    receiveKeyScript = key: let
+    scriptToReceiveKey = key: let
         destDir = key.destDir or "/run/keys";
         user = key.user or "root"; # NOTE: we bypass the nixops module system here
         group = key.group or "root"; # NOTE: we bypass the nixops module system here
@@ -33,7 +34,48 @@ let
             mv -- /run/keys/upload/${esc key.name} ${esc destDir}
         '';
     };
-    finishKeyUploadScript = komputiloj.lib.writeCommand {
+    scriptToReceiveMasterKey = komputiloj.lib.writeCommand {
+        name = "receive-masterkey";
+        text = ''
+            rm -f /run/keys/masterkey.new
+            set -o noclobber # makes sure the cat below actually creates the
+                             # file, to prevent writing to any existing file
+                             # (created concurrently somehow) with wrong
+                             # permissions set
+            umask u=rw,go=   # makes sure the file gets the correct permissions
+                             # right away
+            cat > /run/keys/masterkey.new
+            test -s /run/keys/masterkey.new # if something fails on the client
+                             # side, such as a decryption error,
+                             # the cat does not fail but leaves an empty file;
+                             # so we check for that
+            mv /run/keys/masterkey{.new,}
+        '';
+    };
+    scriptToDecryptSecret = secret: let
+        # TODO put this in the activation script instead
+        destDir = secret.destDir or "/run/keys";
+        user = secret.user or "root"; # NOTE: we bypass the nixops module system here
+        group = secret.group or "root"; # NOTE: we bypass the nixops module system here
+        permissions = secret.permissions or "0600"; # NOTE: we bypass the nixops module system here
+    in komputiloj.lib.writeCommand {
+        name = "decrypt-secret-${secret.name}";
+        text = ''
+            mkdir -p -- ${esc destDir}
+            keyfile=${esc destDir}/${esc secret.name}
+            rm -f -- "$keyfile".new
+            set -o noclobber
+            umask u=rw,go=
+            ${nixpkgsCurrent.packages.age}/bin/age --decrypt \
+                -i /run/keys/masterkey \
+                ${nixpkgsCurrent.lib.writeText secret.name secret.encryptedContent} \
+                > "$keyfile".new
+            chown -- ${esc user}:${esc group} "$keyfile".new
+            chmod -- ${esc permissions} "$keyfile".new
+            mv -T -- "$keyfile".new "$keyfile"
+        '';
+    };
+    scriptToFinishKeyUpload = komputiloj.lib.writeCommand {
         name = "post-receive-keys";
         text = ''
             rmdir /run/keys/upload
@@ -52,21 +94,33 @@ in komputiloj.lib.writeCommand {
         [[ -n "$KOMPUTILOJ_PATH" ]]
 
         nix-copy-closure --to ${esc sshTarget} \
-            ${prepareKeyUploadDirScript} \
-            ${finishKeyUploadScript} \
-            ${unwords (map (key: "${receiveKeyScript key}") keys_to_upload)}
+            ${scriptToPrepareKeyUpload} \
+            ${scriptToReceiveMasterKey} \
+            ${scriptToFinishKeyUpload} \
+            ${unwords (map (key: "${scriptToReceiveKey key}") keys_to_upload)} \
+            ${unwords (map (key: "${scriptToDecryptSecret key}") secrets_to_upload)}
         
-        ${sshCmd} ${prepareKeyUploadDirScript}
+        ${sshCmd} ${scriptToPrepareKeyUpload}
         
         (
+        # This part needs a specific working dir for running the keyCommands
         cd -- "$KOMPUTILOJ_PATH"
         ${unlines (map
             (key: "${escapeShellArgs key.keyCommand}"
                 + " | "
-                + "${sshCmd} ${receiveKeyScript key}")
+                + "${sshCmd} ${scriptToReceiveKey key}")
             keys_to_upload)}
         )
+        
+        # WARNING: don't use masterAgeKey in string interpolation,
+        # because it's copied to the nix store if you do
+        ${komputiloj.packages.wachtwoord}/bin/wachtwoord cat \
+            ${toString machine.masterAgeKey.secretKeyFile} \
+            | ${sshCmd} ${scriptToReceiveMasterKey}
+        ${unlines (map
+            (key: "${sshCmd} ${scriptToDecryptSecret key}")
+            secrets_to_upload)}
 
-        ${sshCmd} ${finishKeyUploadScript}
+        ${sshCmd} ${scriptToFinishKeyUpload}
     '';
 }

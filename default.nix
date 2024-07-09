@@ -49,6 +49,7 @@ let
     };
     real_capsules = {
         komputiloj = komputiloj_capsule;
+        privata = sources.komputiloj-privata.value capsules_and_boltons;
         hello-infra = sources.hello-infra.value capsules_and_boltons;
         gorinchemindialoog = sources.gorinchemindialoog.value;
         wolk = (import ./apps/wolk) capsules_and_boltons;
@@ -83,7 +84,7 @@ let
 
                 inherit (packages)
                     writeShellApplication writeShellScript
-                    writeTextFile writeTextDir
+                    writeText writeTextFile writeTextDir
                     symlinkJoin concatScript;
             };
 

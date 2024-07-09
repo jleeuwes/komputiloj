@@ -4,14 +4,31 @@ The intended audience of this document is me;
 it is a public document so I won't loose it,
 but it's not necessarily useful to anyone else.
 
-## age
+## Passwords for personal use
+
+Passwords, tokens, etcetera are encrypted using `wachtwoord`,
+which encrypts secrets with my age key.
+
+The encrypted secrets are stored in the datumoj repository,
+directly in git (not annexed).
+
+These secrets are backed up by virtue of datumoj being duplicated/synchronizated
+between multiple devices,
+as long as:
+
+1. I have access to my age (and gpg) key.
+2. I have access to a datumoj git repo.
+
+See disaster recovery in [README.md](README.md).
+
+### age
 
 On scarif I have an age key (`~/passwords/.age/identity.age`),
 encrypted with a passphrase.
 
 All new passwords made with `wachtwoord new` are encrypted with this age key.
 
-### Backups
+#### Backups
 
 Proper backup of my age key is imperative.
 
@@ -32,7 +49,7 @@ from paper.
 The public key can be derived from the private key,
 so no special care is needed there.
 
-## GPG
+### GPG
 
 Most passwords are still encrypted with GPG
 but I'm phasing this out.
@@ -55,7 +72,7 @@ See [this Debian guide](https://wiki.debian.org/Subkeys) for information about
 removing the primary key from a keyring and using it from another location on
 the removable medium.
 
-### Backups
+#### Backups
 
 Proper backups of my GPG keys is imperative.
 
@@ -83,22 +100,28 @@ in komputiloj to manage access.
 Some private keys may be regarded as secrets as described below.
 TODO not sure, work this out.
 
-## Passwords and other secrets
+## System secrets
 
-Passwords, tokens, etcetera are encrypted using `wachtwoord`,
-which encrypts secrets with my age key.
+We are trying a new scheme here.
+Credentials for use on gently are encrypted with a host-specific
+master age key.
+These encrypted credentials are checked in to git
+and are transfered to gently through the nix store.
 
-Regarding secrets that need to be used my some unattended system process:
-we could encrypt those with a system-specific key.
-We would need to think about managing such keys.
+When deploying, the master key is decrypted and transfered through SSH,
+then the credentials are decypted on the host using the master key.
 
-The encrypted secrets are stored in the datumoj repository if they are for
-personal use, or _(maybe, not yet done)_
-in the komputiloj repository if they must be available for
-unattended use by some device configured in komputiloj.
+Each host has:
 
-Komputiloj being public and datumoj being duplicated/synchronizated between
-multiple devices will make sure these secrets are backed up.
-(But note that we need to ensure we can always access a copy! See
-[README.md](README.md).)
+1. `masterkey.age`: an age secret key encrypted with my personal age key.
+   Generated with `age-keygen | wachtwoord new masterkey.age`.
+2. `masterkey.pub`: the public key corresponding to `masterkey.age`.
 
+Secrets can be encrypted with a masterkey like this:
+
+```
+age -R masterkey.pub -a > secret.age
+```
+
+TODO This should be automated using `encryptedPath` and `encryptedFor`
+in the secret's definition in nix.

@@ -8,3 +8,8 @@
 	url = gitea@thee.radstand.nl:hello/infra.git
 	branch = main
 	update = rebase
+[submodule "sources.d/komputiloj-privata/submodule"]
+	path = sources.d/komputiloj-privata/submodule
+	url = gitea@thee.radstand.nl:jeroen/komputiloj-privata.git
+	branch = main
+	update = rebase
