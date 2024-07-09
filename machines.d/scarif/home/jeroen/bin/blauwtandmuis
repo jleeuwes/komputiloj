@@ -16,7 +16,7 @@ if [[ "$?" -ne 0 ]]; then
 	exit 1
 fi
 
-bluetoothctl remove "$MOUSE_ID"
+bluetoothctl remove "$MOUSE_ID" || echo "Device was already removed" >&2
 bluetoothctl --timeout 5 scan on
 bluetoothctl pair "$MOUSE_ID"
 bluetoothctl connect "$MOUSE_ID"
