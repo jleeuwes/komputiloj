@@ -233,6 +233,11 @@ in {
 
             settings = {
                 default_phone_region = "NL";
+
+                # Tame image previews:
+                preview_max_x = 1024;
+                preview_max_y = 1024;
+                preview_max_filesize_image = 5;
             };
 
             extraOptions = {
