@@ -1,4 +1,4 @@
-{ komputiloj, nixpkgsCurrent, nixpkgsFuture, ... }:
+{ komputiloj, hello-infra, nixpkgsCurrent, nixpkgsFuture, ... }:
 rec {
     nixosSystem = nixpkgsCurrent.lib.nixosSystem {
         system = "x86_64-linux";
@@ -54,6 +54,7 @@ rec {
             [
                 ./hardware-configuration.nix
                 komputiloj.modules.dekstopomveging
+                hello-infra.modules.ssh-client-config
             ];
         
 
