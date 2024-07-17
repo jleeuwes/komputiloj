@@ -325,7 +325,11 @@ in rec {
 						git annex assist
 
 						# Make the wolk-exposed subdir group-writeable
-						find Hello -type d,f -exec chmod g+w {} \;
+						find Hello -type d,f -exec chmod g+w {} \; |& {
+							grep -Ev 'chmod: changing permissions of .*: Operation not permitted' || true
+						}
+						echo "Ownership count:"
+						find Hello -type d,f -exec stat --format %U {} + | sort | uniq --count
 					'';
 					# # Nieuwe setup van een git-annex (niet getest):
 					# cd /mnt/storage/live/git-annex/rootdir
