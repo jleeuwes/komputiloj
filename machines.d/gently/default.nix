@@ -308,7 +308,9 @@ in rec {
 						mkdir -p .git/annex/creds
 						ln -sTf /run/keys/bigstorage1-git-annex-hello-creds \
 							.git/annex/creds/3ba01384-b195-4696-a200-732ed3b89647
-						git annex enableremote 3ba01384-b195-4696-a200-732ed3b89647
+						if ! fgrep 3ba01384-b195-4696-a200-732ed3b89647 .git/config > /dev/null; then
+							git annex enableremote 3ba01384-b195-4696-a200-732ed3b89647
+						fi
 
 						# TODO manage wanted content:
 						# - git annex get * in all dirs that have some WANTED marker file
