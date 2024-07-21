@@ -1,0 +1,7 @@
+[user]
+	email = jeroen@lwstn.eu
+	name = Jeroen Leeuwestein
+[init]
+	defaultBranch = main
+[annex]
+	# debug = true
