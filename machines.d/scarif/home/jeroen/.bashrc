@@ -1,4 +1,9 @@
 
+# Always have an up-to-date NIX_PATH for nix-shell
+# TODO: replace with something less hacky, like a komputiloj shell command
+# that works like nix-shell but with our pinned packages.
+eval $(grep -E '^export NIX_PATH="' /etc/set-environment)
+
 # Make symlinks red, among other things
 eval "$(dircolors --sh ~/.dircolors)"
 
