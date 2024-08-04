@@ -243,6 +243,7 @@ in {
             extraOptions = {
                 # Important for making git-annex shared repos work
                 "localstorage.umask" = "002";
+                "lost_password_link" = "https://sleutel.radstand.nl/wachtwoord-vergeten";
             };
 
             extraApps = {
