@@ -55,6 +55,7 @@ rec {
                 ./hardware-configuration.nix
                 komputiloj.modules.dekstopomveging
                 hello-infra.modules.ssh-client-config
+                komputiloj.modules.librewolf
             ];
         
 
@@ -198,7 +199,7 @@ rec {
             poppler_utils
             qpdf pdftk
 
-            firefox thunderbird
+            firefox thunderbird # librewolf is configured through programs.librewolf
             # isync # for e-mail backups (eigenlijk mbsync)
             chromium
             geany
@@ -226,6 +227,35 @@ rec {
             llvmPackages.bintools # to get ar (to extract .deb files)
             sqlite
         ];
+
+        programs.librewolf = {
+            enable = true;
+
+            languagePacks = [ "nl" "en-US" ];
+
+            policies = {
+                # https://mozilla.github.io/policy-templates/
+                ExtensionSettings = {
+                    "*" = {
+                        blocked_install_message = "Dit moet via Nix.";
+                        installation_mode = "blocked";
+                    };
+                    "gdpr@cavi.au.dk" = {
+                        # TODO figure out how to do updates and/or pinning
+                        install_url = "https://addons.mozilla.org/firefox/downloads/latest/consent-o-matic/latest.xpi";
+                        installation_mode = "force_installed";
+                    };
+                    # ublock origin is included with librewolf,
+                    # but they use Extensions for that, and apparently
+                    # having an ExtensionSettings policy overrides that
+                    # completely. So we need to have ublock here.
+                    "uBlock0@raymondhill.net" = {
+                        install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+                        installation_mode = "force_installed";
+                    };
+                };
+            };
+        };
 
         programs.gnupg.agent = {
             enable = true;
