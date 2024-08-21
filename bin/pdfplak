@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# Requires pdfunite from poppler-utils
+
+set -eu -o pipefail
+
+if [[ $# -eq 0 ]]; then
+	printf 'No input files given.\n' >&2
+	exit 1
+fi
+
+firstfile="$1"
+firstname=$(basename -- "$firstfile" .pdf)
+name=${firstname%.*}
+outputfile="$name".pdf
+
+if [[ -e "$outputfile" ]]; then
+	printf 'Output file %q already exists.\n' "$outputfile" >&2
+	exit 1
+fi
+
+pdfunite -- "$@" "$outputfile"
+
+printf 'United PDFs into: %q\n' "$outputfile" >&2

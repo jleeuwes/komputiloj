@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Requires pdfinfo and pdfseparate from poppler-utils
+
+set -eu -o pipefail
+shopt -s nullglob
+
+errors=0
+
+for file in "$@"; do
+	name=$(basename -- "$file" .pdf)
+	existing=("$name".*.pdf)
+	if [[ ${#existing[@]} -gt 0 ]]; then
+		printf '%q:skipping because %q already exists\n' "$file" "$existing" >&2
+		errors=1
+		break
+	fi
+	pages=$(pdfinfo -- "$file" | grep -E '^Pages:' | grep -Eo '[0-9]+$')
+	page_digits=${#pages}
+	pdfseparate -- "$file" "$name.%0${page_digits}d.pdf"
+done
+
+exit $errors
