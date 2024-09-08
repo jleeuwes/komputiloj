@@ -11,6 +11,7 @@ let
   firefoxVersion = {
     "128.0-2" = "128.0";
     "128.0.3-2" = "128.0.3";
+    "130.0-1" = "130.0";
   }."${pkgs.librewolf.version}"
   or (throw "Unknown librewolf version ${pkgs.librewolf.version}");
 

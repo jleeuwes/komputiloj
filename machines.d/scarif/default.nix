@@ -125,7 +125,8 @@ rec {
                 # symbola heeft mooie zwartwit-emoji op normale grootte.
                 # woooooooot \o/
                 # UPDATE 30 oktober: dit is kapot, ik zie nu kleur-emoji
-                pkgs.symbola
+                # UPDATE 2024: upstream is verdwenen
+                # pkgs.symbola
 
                 pkgs.dejavu_fonts
                 pkgs.ubuntu_font_family
