@@ -15,6 +15,7 @@ in rec {
 	
 	targetHost = "gently.radstand.nl";
 	inherit (privata.machines.gently) masterAgeKey;
+	sshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHmMPh91t1reE1ddLcFYyddQs0hx4v41KcaNBS2UVnEA";
 	nixopsKeys = wolk.nixopsKeys // {
 		"luks-storage" = {
 			keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
