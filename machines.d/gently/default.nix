@@ -248,6 +248,19 @@ in rec {
 						ln -sfT /mnt/storage/live/home/gorinchemindialoog /home/gorinchemindialoog
 					'';
 				};
+				gorinchemindialoog-publish = makeJobWithStorage {
+					serviceConfig = {
+						Type = "simple";
+						User = "gorinchemindialoog";
+					};
+					startAt = "*:*:00,30";
+					path = [ pkgs.rsync ];
+					script = stripTabs ''
+						rsync -a --delete \
+							/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live/ \
+							/srv/http/gorinchemindialoog.nl/
+					'';
+				};
 				gorinchemindialoog-autocommit = makeJobWithStorage {
 					serviceConfig = {
 						Type = "simple";
@@ -643,7 +656,7 @@ in rec {
 				"gorinchemindialoog.nl" = {
 					forceSSL = true;
 					enableACME = true;
-					root = "/mnt/storage/live/sftp/gorinchemindialoog/home/gorinchemindialoog/Website/Live";
+					root = "/srv/http/gorinchemindialoog.nl";
 					extraConfig = stripTabs ''
 						disable_symlinks if_not_owner;
 						add_header Cache-Control "no-cache";
