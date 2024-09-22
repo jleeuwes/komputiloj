@@ -786,6 +786,12 @@ in rec {
 
 			certificateScheme = "acme-nginx"; # let's hope this uses the regular letsencrypt infrastructure of NixOS so it doesn't clash with nginx
 		};
+		systemd.services.postfix = {
+			needsStorageVolume = "requires";
+		};
+		systemd.services.dovecot2 = {
+			needsStorageVolume = "requires";
+		};
 
 		services.radicale = {
 			enable = true;
@@ -804,6 +810,9 @@ in rec {
 					hook = "${komputiloj.packages.radicale-commit-hook}/bin/hook '%(user)s'";
 				};
 			};
+		};
+		systemd.services.radicale = {
+			needsStorageVolume = "requires";
 		};
 
 		environment.systemPackages = with pkgs; [

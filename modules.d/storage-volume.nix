@@ -41,15 +41,9 @@ in {
             # TODO move requiredBy and before to the respective services
             requiredBy = [
                 "btrbk-storage.service" # TODO make requisite
-                "postfix.service"
-                "dovecot2.service"
-                "radicale.service"
             ];
             before = [
                 "btrbk-storage.service"
-                "postfix.service"
-                "dovecot2.service"
-                "radicale.service"
             ];
             path = [ pkgs.cryptsetup pkgs.utillinux pkgs.unixtools.mount pkgs.unixtools.umount ];
             script = ''
