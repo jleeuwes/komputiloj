@@ -103,11 +103,6 @@ let
             # unstable version when it hits the stable channels.  If we would
             # take packages directly from one perpetually updated unstable
             # source, we will never catch up.
-            packages = {
-                git-annex-remote-rclone = override
-                    nixpkgsCurrent.packages.git-annex-remote-rclone
-                    (callPackageWith nixpkgsCurrent.packages ./pkgs/git-annex-remote-rclone {});
-            };
         };
         nextcloud = {
             packages = {
