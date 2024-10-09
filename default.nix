@@ -49,9 +49,9 @@ let
     };
     real_capsules = {
         komputiloj = komputiloj_capsule;
-        privata = sources.komputiloj-privata.value capsules_and_boltons;
-        hello-infra = sources.hello-infra.value capsules_and_boltons;
-        gorinchemindialoog = sources.gorinchemindialoog.value;
+        # privata = sources.komputiloj-privata.value capsules_and_boltons;
+        # hello-infra = sources.hello-infra.value capsules_and_boltons;
+        # gorinchemindialoog = sources.gorinchemindialoog.value;
         wolk = (import ./apps/wolk) capsules_and_boltons;
         thee = (import ./apps/thee) capsules_and_boltons;
     };
