@@ -338,7 +338,7 @@ in rec {
 						
 						# TODO manage empty dirs (put .gitkeep in them?)
 						
-						git annex assist
+						git annex assist --explain
 
 						# Make the wolk-exposed subdir group-writeable
 						find Hello -type d,f -exec chmod g+w {} \; |& {

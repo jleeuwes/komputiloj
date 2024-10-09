@@ -1,5 +1,8 @@
 include "%L"
 
+<Multi_key> <[> <|>			: "⟦"
+<Multi_key> <|> <]>			: "⟧"
+
 # Output of fgrep '<dead_greek>' /nix/store/p4i93n4m7al2anavcz54cybw9hy2pik3-libX11-1.8.7/share/X11/locale/en_US.UTF-8/Compose | sed 's/<dead_greek>/<Multi_key> <G>/'
 <Multi_key> <G> <A>			: "Α"	U0391 # GREEK CAPITAL LETTER ALPHA
 <Multi_key> <G> <a>			: "α"	U03B1 # GREEK SMALL LETTER ALPHA
