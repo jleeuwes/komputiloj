@@ -313,7 +313,14 @@ rec {
         # figured it out with the help of hda-jack-retask from alsaTools
         # but we apply it using systemd instead of using modprobe
         systemd.services.hda-jack-detect-fix = {
-          serviceConfig.Type = "oneshot";
+          serviceConfig = {
+	    Type = "oneshot";
+            Restart = "on-failure";
+            RestartSec = 1;
+            RestartMode = "direct";
+          };
+          # Might still not run in time before the boot is completed? Not sure.
+          # TODO maybe make this run just before starting a graphical session?
           wantedBy = [ "sound.target" ];
           after = [ "sound.target" ];
           requires = [ "sound.target" ];
