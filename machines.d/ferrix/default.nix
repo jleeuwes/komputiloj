@@ -162,7 +162,7 @@ rec {
             poppler_utils
             qpdf pdftk
             
-            # (firefox and librewolr are configured through programs.*)
+            # (firefox and librewolf are configured through programs.*)
             thunderbird
             # isync # for e-mail backups (eigenlijk mbsync)
             # chromium
