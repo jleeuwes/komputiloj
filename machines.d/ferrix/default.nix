@@ -89,6 +89,12 @@ rec {
         };
         i18n = {
             defaultLocale = "nl_NL.UTF-8";
+            supportedLocales = [
+                "C.UTF-8/UTF-8"
+                "en_US.UTF-8/UTF-8"
+                "nl_NL.UTF-8/UTF-8"
+                "nl_BE.UTF-8/UTF-8"
+            ];
         };
 
         # Set your time zone.
