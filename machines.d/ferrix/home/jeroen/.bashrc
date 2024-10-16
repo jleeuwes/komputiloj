@@ -20,6 +20,7 @@ PS_PROMPT_LAST_PART="\n⟫ "
 PS_EXIT=$(__ps_colored "1;34" ":)")
 PS_FIXED_PART="\[\033[$PROMPT_COLOR\]\[\e]0;$PS_WINDOW_TITLE_PART\a\]$PS_PROMPT_BLOCK_PART$PS_PROMPT_LAST_PART\[\033[0m\]"
 PS1="\n$PS_FIXED_PART"
+# TODO handle special shells like nix-shell
 
 __prompt_command_exitcode() {
 	local exitcode=$?
