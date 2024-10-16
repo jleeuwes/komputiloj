@@ -201,7 +201,7 @@ rec {
             komputiloj.packages.wachtwoord # TODO remove if we use dekstopomveging
         ];
 
-        programs.firefox.enable = true;
+        programs.firefox.enable = false;
         programs.librewolf = {
             enable = true;
 
