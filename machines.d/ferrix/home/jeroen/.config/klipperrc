@@ -1,5 +1,7 @@
 [General]
 IgnoreImages=false
 IgnoreSelection=false
+KeepClipboardContents=false
+MaxClipItems=1
 SyncClipboards=true
 Version=6.0.5
