@@ -14,7 +14,7 @@ set -Eeu -o pipefail
 USER_AT_HOST=root@gently.radstand.nl
 
 case "$HOSTNAME" in
-scarif)
+scarif|ferrix)
 	BACKUP_TARGET=/root/backup/storage
 ;;
 *)
