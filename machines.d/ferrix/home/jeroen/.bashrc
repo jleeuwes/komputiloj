@@ -4,32 +4,59 @@
 eval $(grep -E '^export NIX_PATH="' /etc/set-environment)
 
 __ps_colored() {
-	printf '\[\\033[%sm\]%s\[\033[%sm\]' "$1" "$2" "$PROMPT_COLOR"
+	printf '\001\033[%sm\002%s\001\033[0m\002' "$1" "$2"
 }
 
-USER_COLOR="1;37"
-HOST_COLOR="1;31"
-PATH_COLOR="1;37"
-PROMPT_COLOR="0"
-PS_USER_PART="\[\033[${USER_COLOR}m\]\u\[\033[${PROMPT_COLOR}m\]"
-PS_HOST_PART="\[\033[${HOST_COLOR}m\]\h\[\033[${PROMPT_COLOR}m\]"
-PS_PATH_PART="\[\033[${PATH_COLOR}m\]\w\[\033[${PROMPT_COLOR}m\]"
-PS_PROMPT_BLOCK_PART="${PS_USER_PART} in ${PS_PATH_PART} on ${PS_HOST_PART}"
+# TODO window title-stuff fixen? Moet in konsole ook eerst worden ingesteld.
+HOST_COLOR="31"
+PS_PROMPT_BLOCK_PART="$(__ps_colored 1 '\u') in $(__ps_colored 1 '\w') on $(__ps_colored "1;$HOST_COLOR" '\h')"
 PS_WINDOW_TITLE_PART="\u in \h on \w"
 PS_PROMPT_LAST_PART="\n⟫ "
-PS_EXIT=$(__ps_colored "1;34" ":)")
-PS_FIXED_PART="\[\033[$PROMPT_COLOR\]\[\e]0;$PS_WINDOW_TITLE_PART\a\]$PS_PROMPT_BLOCK_PART$PS_PROMPT_LAST_PART\[\033[0m\]"
-PS1="\n$PS_FIXED_PART"
-# TODO handle special shells like nix-shell
+# PS1="\n\$(__ps_exitcode)\n\[\033[0\]\[\e]0;$PS_WINDOW_TITLE_PART\a\]$PS_PROMPT_BLOCK_PART\$(__ps_nixshell)\$(__ps_screen)$PS_PROMPT_LAST_PART\[\033[0m\]"
+PS1="\n\$(__ps_exitcode)\n$PS_PROMPT_BLOCK_PART\$(__ps_nixshell)\$(__ps_screen)$PS_PROMPT_LAST_PART\[\033[0m\]"
 
-__prompt_command_exitcode() {
+__ps_exitcode() {
 	local exitcode=$?
 	if [[ $exitcode -eq 0 ]]; then
-		PS_EXIT=$(__ps_colored "1;34" ":)")
+		__ps_colored "1;34" ":)"
 	else
-		PS_EXIT=$(__ps_colored "1;31" ":( $exitcode")
+		__ps_colored "1;31" ":( $exitcode"
 	fi
-	PS1="\n$PS_EXIT\n$PS_FIXED_PART"
+}
+
+__ps_nixshell() {
+	local pkgs
+	if [[ -v IN_NIX_SHELL ]]; then
+		# # NOTE: for nested nix-shells, only shows packages of the last one
+		pkgs=( $(printf '%s' "$buildInputs" | sed -E 's/\/nix\/store\/[0-9a-z]+-//g') )
+		case ${#pkgs[@]} in
+		0)
+			:
+		;;
+		1)
+			printf '\ninside %s nix-shell with package %s' \
+				"$IN_NIX_SHELL" "$(__ps_colored 1 "${pkgs[0]}")"
+		;;
+		*)
+			printf '\ninside %s nix-shell with packages %s' \
+				"$IN_NIX_SHELL" "$(__ps_colored 1 "${pkgs[*]}")"
+		;;
+		esac
+	fi
+}
+
+__ps_screen() {
+	if [[ -v STY ]]; then
+		printf '\ninside screen session %s' \
+			"$(__ps_colored 1 "$STY")"
+	fi
+}
+
+__ps_shelllevel() {
+	# NOTE: this is not very useful when using screen
+	if [[ $SHLVL -gt 1 ]]; then
+		printf 'inside %d levels of shell\n' $SHLVL
+	fi
 }
 
 export HISTCONTROL=ignoreboth
@@ -46,15 +73,18 @@ __prompt_command_history() {
 # Prevent overwriting of history file if full:
 shopt -s histappend
 
-if [[ -v PROMPT_COMMAND ]]; then
-	echo -n "PROMPT_COMMAND already set! Was: " >&2
-	declare -p PROMPT_COMMAND >&2
-fi
 __prompt_command() {
-	__prompt_command_exitcode # must go first
 	__prompt_command_history
 }
-export PROMPT_COMMAND=__prompt_command
+if [[ ! -v BASHRC_DONE_FOR_SHLVL || $BASHRC_DONE_FOR_SHLVL -lt $SHLVL ]];
+then
+	if [[ -v PROMPT_COMMAND ]]; then
+		echo -n "PROMPT_COMMAND already set! Was: " >&2
+		declare -p PROMPT_COMMAND >&2
+	fi
+	PROMPT_COMMAND=__prompt_command
+	export BASHRC_DONE_FOR_SHLVL=$SHLVL
+fi
 
 export EDITOR=vim
 
