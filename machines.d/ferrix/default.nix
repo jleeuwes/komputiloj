@@ -357,6 +357,14 @@ rec {
           options = "compose:ralt,eurosign:e";
         };
         
+        # DOESN'T WORK in wayland.
+        # Has to be configured through KDE instead.
+        # TODO look at https://github.com/nix-community/plasma-manager?tab=readme-ov-file#supported-versions
+        services.libinput = {
+            touchpad = {
+                tapping = false;
+            };
+        };
 
         # # Screen locker
         # services.physlock = {
