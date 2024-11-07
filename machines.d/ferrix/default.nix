@@ -52,7 +52,31 @@ rec {
         fileSystems."/" = {
             options = [ "compress=lzo" ];
         };
-        
+
+        # Hibernation config
+        # based on https://wiki.archlinux.org/title/Dm-crypt/Swap_encryption#Using_a_swap_file
+        # and https://wiki.archlinux.org/title/Power_management/Suspend_and_hibernate#Configure_the_initramfs
+        # Note that there is some talk about systemd hibernate not needing a
+        # manual resumeOffset when using EFI, but it turns out we actually do need this.
+        # Maybe that is something Arch-specific.
+        fileSystems."/swap" = {
+            device = "/dev/disk/by-uuid/4c1ae7fa-0093-4c6a-8713-c64965d831b0";
+            fsType = "btrfs";
+            # Created by mounting the top-level btrfs device (NOT subvolume @)
+            # and running `btrfs create subvolume @swap` inside.
+            options = [ "subvol=@swap" ];
+        };
+        swapDevices = [{
+            # TODO ideally only swapon just before hibernating;
+            # we don't actually want swap during normal operation
+            device = "/swap/swapfile";
+        }];
+        boot.resumeDevice = "/dev/disk/by-uuid/4c1ae7fa-0093-4c6a-8713-c64965d831b0";
+        # offset determined with `sudo btrfs inspect-internal map-swapfile -r /swap/swapfile`
+        boot.kernelParams = [ "resume_offset=15139505" ];
+        # TODO disable suspend, make hibernate the default lid action,
+        # enable auto-login.
+        # TODO maybe put this hibernation stuff in a neat little module.
 
         # Make sure ~/bin is added to PATH:
         environment.homeBinInPath = true;
