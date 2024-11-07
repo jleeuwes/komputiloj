@@ -88,6 +88,8 @@ fi
 
 export EDITOR=vim
 
+export RCLONE_PASSWORD_COMMAND="wachtwoord cat /home/jeroen/passwords/RCLONE_CONFIG_PASS"
+
 alias webcamshot='fswebcam --no-banner --png 9 webcamshot-"$(date -Iseconds)"'
 alias webcam='vlc v4l2:///dev/video0'
 
