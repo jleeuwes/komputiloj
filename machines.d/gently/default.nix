@@ -458,6 +458,7 @@ in rec {
 				openssh.authorizedKeys.keys = [
 					# Always have a key here, otherwise we can't deploy.
 					komputiloj.users.jeroen.sshKeys.scarif
+					komputiloj.users.jeroen.sshKeys.ferrix
 				];
 			};
 
