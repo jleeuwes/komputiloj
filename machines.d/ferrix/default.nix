@@ -1,4 +1,4 @@
-{ komputiloj, /* hello-infra, */ nixpkgsCurrent, nixpkgsFuture, ... }:
+{ komputiloj, hello-infra, nixpkgsCurrent, nixpkgsFuture, ... }:
 rec {
     nixosSystem = nixpkgsCurrent.lib.nixosSystem {
         system = "x86_64-linux";
@@ -44,7 +44,7 @@ rec {
             [
                 ./hardware-configuration.nix
                 # willen we waarschijnlijk niet as-is: komputiloj.modules.dekstopomveging
-                # hello-infra.modules.ssh-client-config
+                hello-infra.modules.ssh-client-config
                 komputiloj.modules.librewolf
             ];
   
