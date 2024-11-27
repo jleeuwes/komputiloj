@@ -731,6 +731,10 @@ in rec {
 				session = {
 					COOKIE_SECURE = true;
 				};
+				"ssh.minimum_key_sizes" = {
+					# TODO remove when scarif is taken out of commission
+					RSA = 2048;
+				};
 				"cron.git_gc_repos" = {
 					ENABLED = true;
 					SCHEDULE = "@every 72h";
