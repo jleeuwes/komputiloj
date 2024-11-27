@@ -93,7 +93,7 @@ let
 
             do_curl_basic -X DELETE \
                 "${api_base}/users/$THEE_USER/tokens/komputiloj" 1>&2
-            THEE_TOKEN=$(do_curl_basic --fail -X POST \
+            THEE_TOKEN=$(do_curl_basic --fail-with-body -X POST \
                 "${api_base}/users/$THEE_USER/tokens" \
                 --data-raw '{"name": "komputiloj", "scopes": ["write:admin", "write:user"]}' | jq -r .sha1)
             
@@ -106,7 +106,7 @@ let
                 user_processed[$u]=0
             done
             # Now set the value to 1 for each user already existing in gitea:
-            userdump=$(do_curl_bearer --fail "${api_base}/admin/users?limit=50" | jq -c '.[]|.login')
+            userdump=$(do_curl_bearer --fail-with-body "${api_base}/admin/users?limit=50" | jq -c '.[]|.login')
             while IFS= read -r u_json; do
                 u=$(printf '%s' "$u_json" | jq -r) # convert to raw string
                 user_exists[$u]=1
@@ -140,7 +140,7 @@ let
                 echo >&2
                 if [[ ${"\${user_exists[$user]}"} -eq 1 ]]; then
                     echo "User $user exists, should enable -> UPDATE" >&2
-                    do_curl_bearer --fail -X PATCH \
+                    do_curl_bearer --fail-with-body -X PATCH \
                         "${api_base}/admin/users/$user" \
                         -d @"$infodir"/update.json
                 else
@@ -149,7 +149,7 @@ let
                         USER_PASSWORD=$("$infodir"/bin/generate-password) \
                         jq '. += {password: $ENV.USER_PASSWORD}' \
                     |
-                        do_curl_bearer --fail -X POST \
+                        do_curl_bearer --fail-with-body -X POST \
                             "${api_base}/admin/users" \
                             -d @-
                     ) < "$infodir"/create.json
@@ -165,7 +165,7 @@ let
                 echo >&2
                 if [[ ${"\${user_exists[$user]}"} -eq 1 ]]; then
                     echo "User $user exists, should disable -> UPDATE" >&2
-                    do_curl_bearer --fail -X PATCH \
+                    do_curl_bearer --fail-with-body -X PATCH \
                         "${api_base}/admin/users/$user" \
                         -d @"$infodir"/update.json
                 else
@@ -181,13 +181,13 @@ let
                 local key_id
                 local key_json
                 local keydump
-                keydump=$(do_curl_bearer --fail "${api_base}/users/$user/keys?limit=50" | jq -c '.[]')
+                keydump=$(do_curl_bearer --fail-with-body "${api_base}/users/$user/keys?limit=50" | jq -c '.[]')
                 while IFS= read -r key_json; do
                     key_title=$(printf '%s' "$key_json" | jq -r .title)
                     key_id=$(printf '%s' "$key_json" | jq -r .id)
                     if [[ "$key_title" = komputiloj_managed:* ]]; then
                         echo "Deleting managed key for user $user: $key_title" >&2
-                        do_curl_bearer --fail -X DELETE \
+                        do_curl_bearer --fail-with-body -X DELETE \
                             "${api_base}/admin/users/$user/keys/$key_id"
                     else
                         echo "Ignoring non-managed key for user $user: $key_title" >&2
@@ -205,7 +205,7 @@ let
                     
                     echo -n "Adding key for user $user: " >&2
                     printf '%s' "$json" | jq -r .title >&2
-                    do_curl_bearer --fail -X POST \
+                    do_curl_bearer --fail-with-body -X POST \
                         "${api_base}/admin/users/$user/keys" \
                         --data-raw "$json"
                 done
