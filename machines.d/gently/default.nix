@@ -347,6 +347,10 @@ in rec {
 						echo "Ownership count:"
 						find Hello -type d,f -exec stat --format %U {} + | sort | uniq --count
 					'';
+					# Eerste setup git-annex:
+					# 1. Run: ssh-keygen
+					# 2. Add the SSH key to users.trajanus and run thee.activate
+
 					# # Nieuwe setup van een git-annex (niet getest):
 					# cd /mnt/storage/live/git-annex/rootdir
 					# mkdir Hello
@@ -355,6 +359,7 @@ in rec {
 					# sudo -u git-annex bash
 					# cd Hello
 					# git init -b main
+					# git remote add origin gitea@thee.radstand.nl:hello/Hello
 					# git config --global user.name git-annex
 					# git config --global user.email git-annex@radstand.nl
 					# git annex init
@@ -519,7 +524,8 @@ in rec {
 				extraGroups = [ "sftp_only" ];
 			};
 			users.git-annex = {
-				uid = 70005; # move to komputiloj.users.git-annex.linux.uid so we can also have a user in thee
+				# TODO rename the linux user to trajanus?
+				uid = users.trajanus.linux.uid;
 				group = "git-annex";
 				extraGroups = [ "keys" ];
 				isSystemUser = true;
@@ -540,7 +546,7 @@ in rec {
 				];
 			};
 			groups.git-annex = {
-				gid = 70005;
+				gid = users.trajanus.linux.uid;
 			};
 			users.nextcloud.extraGroups = [ "git-annex" ];
 		};
