@@ -14,6 +14,7 @@ export PATH="$DEPS_PATH"
 CMD_AGE=age
 CMD_MKPASSWD=mkpasswd
 CMD_HTPASSWD=htpasswd # from apache httpd
+CMD_COPY="wl-copy --type text/plain --primary"
 
 # Identity to sign with and to always encrypt for:
 ME=jeroen@lwstn.eu
@@ -69,6 +70,9 @@ main() {
 	;;
 	show|cat)
 		do_show plain "$@"
+	;;
+	copy)
+		do_copy "$@"
 	;;
 	hash)
 		# output passwords in /etc/shadow-like format
@@ -148,6 +152,13 @@ main() {
 		exit 1
 	;;
 	esac
+}
+
+do_copy() {
+	if [[ $# -gt 1 ]]; then
+		printf 'Please specify at most one password file.\n' >&2
+	fi
+	do_show plain -n "$@" | $CMD_COPY
 }
 
 do_show() {

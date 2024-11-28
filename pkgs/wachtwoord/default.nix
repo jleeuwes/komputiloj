@@ -1,11 +1,11 @@
-{ boltons, lib, stdenv, makeWrapper, age, apacheHttpd, mkpasswd, coreutils, ...}:
+{ boltons, lib, stdenv, makeWrapper, age, apacheHttpd, mkpasswd, coreutils, wl-clipboard, ...}:
 with boltons;
 
 stdenv.mkDerivation rec {
 	pname = "wachtwoord";
 	version = "0.1";
 	
-	buildInputs = [ age apacheHttpd mkpasswd ];
+	buildInputs = [ age apacheHttpd mkpasswd wl-clipboard ];
 	nativeBuildInputs = [ makeWrapper ];
 
 	unpackPhase = ":";
@@ -17,6 +17,6 @@ stdenv.mkDerivation rec {
 		chmod +x $out/bin/wachtwoord
 		# https://github.com/deepfire/nixos-wiki/blob/master/Nix%20Runtime%20Environment%20Wrapper.page
 		wrapProgram $out/bin/wachtwoord \
-			--set DEPS_PATH ${lib.makeBinPath [ age apacheHttpd mkpasswd coreutils ]}
+			--set DEPS_PATH ${lib.makeBinPath [ age apacheHttpd mkpasswd coreutils wl-clipboard ]}
 	'';
 }
