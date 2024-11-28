@@ -156,7 +156,6 @@ do_show() {
 	local success=0
 	local seen=0
 	local prefix=""
-	local header
 	local content
 	local suppress_last_newline=no
 	local format
@@ -197,7 +196,6 @@ do_show() {
 		fi
 	fi
 	for file in "$@"; do
-		header=$(head -n1 -- "$file")
 		# We let age produce any errors for us and use && to make sure we continue with the other files in case of an error
 		content=$($CMD_AGE --decrypt --identity="$AGE_IDENTITY" -- "$file") && {
 			if [ $success -gt 0 ]; then
