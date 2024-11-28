@@ -31,6 +31,7 @@ rec {
             # - https://nixos.org/nixpkgs/manual/#sec-allow-unfree
             allowUnfreePredicate = pkg:
                 builtins.elem (lib.getName pkg) [
+                    "steam"
                     "steam-run"
                     "steam-original"
                     "android-studio"
@@ -139,8 +140,9 @@ rec {
             # enhance nix-build
             nix-output-monitor
 
-            # for running precompiled games:
-            # steam-run-native
+            # gaming
+            # (steam is installed through programs.steam)
+            lutris
 
             # usefull programs:
             mkpasswd
@@ -225,6 +227,9 @@ rec {
             komputiloj.packages.wachtwoord # TODO remove if we use dekstopomveging
         ];
 
+        programs.steam = {
+            enable = true;
+        };
         programs.firefox.enable = false;
         programs.librewolf = {
             enable = true;
