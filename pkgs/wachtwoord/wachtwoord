@@ -11,7 +11,6 @@ AMBIENT_PATH="$PATH"
 export PATH="$DEPS_PATH"
 ## END SPECIFIC
 
-CMD_GPG=gpg2
 CMD_AGE=age
 CMD_MKPASSWD=mkpasswd
 CMD_HTPASSWD=htpasswd # from apache httpd
@@ -42,7 +41,6 @@ checkpath() {
 	fi
 }
 
-checkpath $CMD_GPG
 checkpath $CMD_AGE
 checkpath $CMD_MKPASSWD
 checkpath $CMD_HTPASSWD
@@ -200,16 +198,8 @@ do_show() {
 	fi
 	for file in "$@"; do
 		header=$(head -n1 -- "$file")
-		if   [[ $header = '-----BEGIN PGP MESSAGE-----' ]]; then
-			cmd="$CMD_GPG --use-agent --batch --decrypt"
-		elif [[ $header = '-----BEGIN AGE ENCRYPTED FILE-----' ]]; then
-			cmd=$(printf '%s --decrypt --identity=%q' "$CMD_AGE" "$AGE_IDENTITY")
-		else
-			echo 'Unrecognized encryption type' >&2
-			exit 1
-		fi
-		# We let gpg/age produce any errors for us and use && to make sure we continue with the other files in case of an error
-		content=$($cmd -- "$file") && {
+		# We let age produce any errors for us and use && to make sure we continue with the other files in case of an error
+		content=$($CMD_AGE --decrypt --identity="$AGE_IDENTITY" -- "$file") && {
 			if [ $success -gt 0 ]; then
 				# This approach gives a messy combination of stdout and stderr,
 				# but it does make sure we never put empty lines on stdout.
