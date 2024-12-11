@@ -1,2 +1,5 @@
 [Libinput][2362][628][PIXA3854:00 093A:0274 Touchpad]
 TapToClick=false
+
+[Libinput][2652][17667][Bluetooth Mouse 4.0]
+MiddleButtonEmulation=true
