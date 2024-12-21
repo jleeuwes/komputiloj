@@ -81,10 +81,22 @@ rec {
 
         # Make sure ~/bin is added to PATH:
         environment.homeBinInPath = true;
-
+        
+        boot.loader.timeout = 2;
         # Use the systemd-boot EFI boot loader.
-        boot.loader.systemd-boot.enable = true;
+        boot.loader.systemd-boot = {
+            enable = true;
+            configurationLimit = 10;
+            # editor = false; # TODO it is recommended to set this to false
+        };
         boot.loader.efi.canTouchEfiVariables = true;
+
+        systemd.sleep.extraConfig = ''
+            AllowSuspend=no
+            AllowHibernation=yes
+            AllowHybridSleep=no
+            AllowSuspendThenHibernate=no
+        '';
 
         # Make /tmp in-memory:
         boot.tmp.useTmpfs = true;
