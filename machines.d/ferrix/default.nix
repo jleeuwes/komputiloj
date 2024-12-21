@@ -321,6 +321,7 @@ rec {
             };
             startAgent = true;
             extraConfig = ''
+                Host *
                 AddKeysToAgent confirm
             '';
         };
