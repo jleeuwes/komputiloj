@@ -106,7 +106,7 @@ rec {
 
         networking = {
             hostName = "ferrix";
-	    networkmanager.enable = true; # wireless through GUI
+            networkmanager.enable = true; # wireless through GUI
             # wireless = {
             #     enable = true;  # Enables wireless support via wpa_supplicant.
             #     # interfaces = [ "wlp4s0" ];
@@ -365,7 +365,7 @@ rec {
         # but we apply it using systemd instead of using modprobe
         systemd.services.hda-jack-detect-fix = {
           serviceConfig = {
-	    Type = "oneshot";
+            Type = "oneshot";
             Restart = "on-failure";
             RestartSec = 1;
             RestartMode = "direct";

@@ -37,7 +37,7 @@ in rec {
 			group = "radicale";
 			permissions = "ug=r,o=";
 		};
-    };
+	};
 	# TODO put decryption in activation script, then we can move these secrets to a nixos module
 	# (the capsule secrets remain, because those also provide information about updating a secret)
 	secrets = {
