@@ -157,6 +157,7 @@ main() {
 do_copy() {
 	if [[ $# -gt 1 ]]; then
 		printf 'Please specify at most one password file.\n' >&2
+		exit 1
 	fi
 	do_show plain -n "$@" | $CMD_COPY
 }
