@@ -3,6 +3,8 @@
 # that works like nix-shell but with our pinned packages.
 eval $(grep -E '^export NIX_PATH="' /etc/set-environment)
 
+export NIX_SHELL_PRESERVE_PROMPT=1
+
 __ps_colored() {
 	printf '\001\033[%sm\002%s\001\033[0m\002' "$1" "$2"
 }
