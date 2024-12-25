@@ -47,6 +47,7 @@ rec {
                 # willen we waarschijnlijk niet as-is: komputiloj.modules.dekstopomveging
                 hello-infra.modules.ssh-client-config
                 komputiloj.modules.librewolf
+                komputiloj.modules.apple-superdrive
             ];
   
         # override some stuff from hardware-configuration:
