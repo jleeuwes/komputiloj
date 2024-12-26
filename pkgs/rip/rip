@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -Eeu
+set -o pipefail
+
+DEVICE="$1"
+DIRNAME=$(date +%Y%m%d%H%M%S)
+
+mkdir -- "$DIRNAME"
+cd -- "$DIRNAME"
+cdda2mp3 dev="$DEVICE" track '--preset insane'
+rename -- -track '' *-track.mp3
+printf '\nCD ripped into %s\n' "$PWD"

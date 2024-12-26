@@ -215,8 +215,11 @@ rec {
             zathura # pdf viewer
             # mindmapping-tools:
             vym freemind
+
+            # media:
             vlc ffmpeg
-            beets
+            # music collection:
+            beets komputiloj.packages.rip
 
             inkscape gimp exiftool
             imagemagick scrot

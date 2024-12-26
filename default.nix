@@ -22,6 +22,7 @@ let
             radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook;
             tipctl = callPackage ./pkgs/tipctl;
             dekstop = callPackage ./pkgs/dekstop;
+            rip = callPackage ./pkgs/rip;
             # git-annex-remote-rclone is not here but in nixpkgsFuture,
             # because we will remove our copy of the package when the
             # desired version is included in nixpkgs
