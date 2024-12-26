@@ -1,0 +1,29 @@
+directory: ~/datumoj/muziek
+library: ~/datumoj/muziek/beets.db
+import:
+    # First, no copying, moving or renaming, just importing.
+    # Then, if everything is imported, we can remove these settings
+    # and do one big `beet move`
+    copy: no
+    move: no
+plugins: inline hook
+item_fields:
+    multidisc: 1 if disctotal > 1 else 0
+    disc_unpadded: |
+        import math
+        return f'%0{math.floor(math.log10(disctotal))}i' % disc
+paths:
+    default: CDs/$albumartist/$album%aunique{}/%if{$multidisc,CD$disc_unpadded/}$track. $title
+    singleton: los/$artist - $title
+    comp: verzamelCDs/$album%aunique{}/$track. $title
+    albumtype:soundtrack: soundtracks/$album/$track. $title
+per_disc_numbering: yes
+hook:
+    hooks:
+        - event: item_moved
+          # FIXME this probably won't work properly if a file is moved from *outside* of the library
+          command: "bash -c 'git rm -- \"$1\"; git annex add -- \"$2\"' '' {source} {destination}"
+        - event: write
+          command: "bash -c 'if [[ -e $1 ]]; then git annex unlock -- \"$1\"; fi' '' {path}"
+        - event: after_write
+          command: "git annex add -- {item.path}"
