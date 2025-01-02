@@ -525,7 +525,7 @@ in rec {
 			};
 			users.git-annex = {
 				# TODO rename the linux user to trajanus?
-				uid = users.trajanus.linux.uid;
+				uid = komputiloj.users.trajanus.linux.uid;
 				group = "git-annex";
 				extraGroups = [ "keys" ];
 				isSystemUser = true;
@@ -546,7 +546,7 @@ in rec {
 				];
 			};
 			groups.git-annex = {
-				gid = users.trajanus.linux.uid;
+				gid = komputiloj.users.trajanus.linux.uid;
 			};
 			users.nextcloud.extraGroups = [ "git-annex" ];
 		};
