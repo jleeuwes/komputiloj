@@ -14,6 +14,9 @@ export PATH="$DEPS_PATH"
 CMD_AGE=age
 CMD_MKPASSWD=mkpasswd
 CMD_HTPASSWD=htpasswd # from apache httpd
+# TODO add --sensitive option if https://github.com/bugaevc/wl-clipboard/pull/214 gets fixed
+# Also, https://bugs.kde.org/show_bug.cgi?id=496331 needs to be released and
+# packaged in nixpkgs to honor this flag.
 CMD_COPY="wl-copy --type text/plain --primary"
 
 # Identity to sign with and to always encrypt for:
