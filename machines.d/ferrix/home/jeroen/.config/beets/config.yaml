@@ -22,7 +22,7 @@ hook:
     hooks:
         - event: item_moved
           # FIXME this probably won't work properly if a file is moved from *outside* of the library
-          command: "bash -c 'git rm -- \"$1\"; git annex add -- \"$2\"' '' {source} {destination}"
+          command: "bash -c 'git rm --ignore-unmatch -- \"$1\"; git annex add -- \"$2\"' '' {source} {destination}"
         - event: write
           command: "bash -c 'if [[ -e $1 ]]; then git annex unlock -- \"$1\"; fi' '' {path}"
         - event: after_write
