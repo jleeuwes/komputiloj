@@ -191,14 +191,15 @@ rec {
             dejsonlz4 # for reading firefox jsonlz4 files
             remarshal # for yaml2json etc
             jq # json manipulation
-            # jetbrains.idea-community
-            # openjdk11 maven visualvm
+            jetbrains.idea-community
+            openjdk21 maven
+            # visualvm
             # love_11
             # arduino
             # haskellPackages.ghc
             
             # unstable.android-studio
-            # apktool dex1jar
+            apktool dex2jar
 
             # LaTeX and PDF:
             # (Not sure if rubber uses the chosen texlive distribution)
@@ -429,7 +430,7 @@ rec {
         # };
 
         # Enable adb group and udev rules and such:
-        # programs.adb.enable = true;
+        programs.adb.enable = true;
 
         # For 32-bit games:
         # hardware.opengl.driSupport32Bit = true;
