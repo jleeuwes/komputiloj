@@ -1,5 +1,7 @@
 { komputiloj, hello-infra, nixpkgsCurrent, nixpkgsFuture, ... }:
 rec {
+    targetHost = "scarif.radstand.nl"; # TODO configure duckdns
+    sshPublicKeys = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFN+m0J0mjJBDho4cTqt9OlnbMUtYuj6OacT7VWi/ahC";
     nixosSystem = nixpkgsCurrent.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [ mainModule ];
@@ -156,7 +158,6 @@ rec {
             gitFull vim file subversionClient pciutils pmount squashfsTools
             parted gparted
             wget rtorrent
-            git-annex nixpkgsFuture.packages.git-annex-remote-rclone rclone
             sshpass
             gnupg paperkey qrencode zbar pwgen
             komputiloj.packages.wachtwoord
@@ -292,7 +293,7 @@ rec {
         services.avahi.enable = false;
 
         # Enable the OpenSSH daemon.
-        # services.openssh.enable = true;
+        services.openssh.enable = true;
         programs.ssh = {
             knownHosts = {
                 "[u362967.your-storagebox.de]:23" = {
@@ -352,7 +353,14 @@ rec {
         # For 32-bit games:
         hardware.opengl.driSupport32Bit = true;
         hardware.opengl.driSupport = true; # is actually the default
-
+        
+        users.users.root = {
+			openssh.authorizedKeys.keys = [
+			    # Always have a key here, otherwise we can't deploy.
+				komputiloj.users.jeroen.sshKeys.ferrix
+			];
+            
+        };
         # Define a user account. Don't forget to set a password with ‘passwd’.
         users.extraUsers.jeroen = {
             uid = komputiloj.users.jeroen.linux.uid;
