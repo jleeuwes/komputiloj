@@ -55,8 +55,7 @@ rec {
         imports =
             [
                 ./hardware-configuration.nix
-                komputiloj.modules.dekstopomveging
-                hello-infra.modules.ssh-client-config
+                komputiloj.modules.ssh-client-config
                 komputiloj.modules.librewolf
             ];
         

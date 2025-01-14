@@ -93,6 +93,7 @@ in rec {
 			komputiloj.modules.hetzner_vps
 			komputiloj.modules.systemd-failure-mailer
 			komputiloj.modules.storage-volume
+			komputiloj.modules.ssh-client-config
 			nixpkgsCurrent.modules.mailserver
 			hello.modules."70004-backup"
 			hello.modules."70004-autocommit"
@@ -425,15 +426,6 @@ in rec {
 				# is not placed arbitrarily in the last Match block
 				Match User xxxxxxxxxxxxxxxxxxxx
 			'';
-		};
-		programs.ssh = {
-			knownHosts = {
-				"thee.radstand.nl" = {
-					# Needed for gorinchemindialoog autocommit.
-					# I guess this key is regenerated on gitea install, so we'll have to update this if rebuilding.
-					publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHmMPh91t1reE1ddLcFYyddQs0hx4v41KcaNBS2UVnEA";
-				};
-			};
 		};
 		programs.screen = {
 			enable = true;
