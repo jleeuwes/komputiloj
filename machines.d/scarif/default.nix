@@ -340,11 +340,13 @@ rec {
         };
 
         # Screen locker
-        services.physlock = {
-            enable = true;
-            # nog niet beschikbaar (eens updaten!)
-            # allowAnyUser = true; # of moeten we rechten via systemd regelen?
+        services.xserver.enable = true;
+        services.displayManager = {
+            sddm = {
+                enable = true;
+            };
         };
+        services.desktopManager.plasma6.enable = true;
 
         # Enable adb group and udev rules and such:
         programs.adb.enable = true;
@@ -369,14 +371,10 @@ rec {
                 "lp" # for scanning with Canon
             ];
         };
-        users.extraUsers.speel = {
-            # A dedicated user account to play untrusted game binaries.
-            uid = 1001; # clashes with gorinchemindialoog.
-                        # Fortunately, it's unlikely that we will have speel on our
-                        # servers or gorinchemindialoog on this laptop.
+        users.users.karin = {
+            uid = hello-infra.users.karin.linux.uid;
             isNormalUser = true;
-            description = "Speel Spelletjes";
-            extraGroups = [ "video" "audio" ];
+            description = hello-infra.users.karin.fullName;
         };
 
         # The NixOS release to be compatible with for stateful data such as databases.
