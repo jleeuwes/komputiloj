@@ -1,6 +1,7 @@
-{ komputiloj, hello-infra, nixpkgsCurrent, nixpkgsFuture, ... }:
+{ komputiloj, privata, hello-infra, nixpkgsCurrent, nixpkgsFuture, ... }:
 rec {
     targetHost = "scarif.radstand.nl"; # TODO configure duckdns
+    inherit (privata.machines.scarif) masterAgeKey;
     sshPublicKeys = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFN+m0J0mjJBDho4cTqt9OlnbMUtYuj6OacT7VWi/ahC";
     nixosSystem = nixpkgsCurrent.lib.nixosSystem {
         system = "x86_64-linux";
