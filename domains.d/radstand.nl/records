@@ -4,7 +4,8 @@
 @	3600	IN	A	157.90.156.122
 
 gently	3600	IN	A	157.90.156.122
-gently2	3600	IN	A	157.90.156.122
+
+scarif	3600	IN	CNAME	scarif-radstand.duckdns.org.
 
 mail	3600	IN	A	157.90.156.122
 
