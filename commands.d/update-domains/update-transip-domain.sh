@@ -12,7 +12,8 @@ get_access_token() {
 	}
 	EOF
 	)
-	
+
+	mkdir -p -- "$(dirname -- "$TIPCTL_CFG")"
 	touch "$TIPCTL_CFG"
 	chmod go-r "$TIPCTL_CFG"
 	jq -n "$jq_script" > "$TIPCTL_CFG"
@@ -41,7 +42,7 @@ get_access_token_without_tipctl() {
 		--config <(
 			printf -- '-H "Signature: %s"\n' "$signature"
 		) \
-		--fail \
+		--fail-with-body \
 		--data-raw "$auth_payload" \
 		"$TRANSIP_URL"/auth
 }
@@ -68,6 +69,6 @@ curl -X PUT \
 	--config <(
 		printf -- '-H "Authorization: Bearer %s"\n' "$TRANSIP_TOKEN"
 	) \
-	--fail \
+	--fail-with-body \
 	--data-raw "$payload" \
 	"$TRANSIP_URL"/domains/"$domain"/dns
