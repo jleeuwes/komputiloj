@@ -1,4 +1,3 @@
-# TODO this file should become the anchor point for all komputiloj operations
 let boltons = import ./lib/boltons.nix;
 in with boltons;
 let
