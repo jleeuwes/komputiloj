@@ -99,7 +99,7 @@ let
         nixpkgsFuture = let
             override = old: new: trace ("🕑🕐🕛 nixpkgsFuture: Replacing " + old.name + " with " + new.name) new;
         in {
-            # NOTE: Each this we use something from unstable, we should pin
+            # NOTE: Each time we use something from unstable, we should pin
             # that exact source. That way, we can someday move away from the
             # unstable version when it hits the stable channels.  If we would
             # take packages directly from one perpetually updated unstable
