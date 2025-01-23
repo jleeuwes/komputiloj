@@ -16,7 +16,7 @@ let
         versio = updateVersioDomain;
         transip = updateTransipDomain;
     };
-    recordsFile = domain: nixpkgsCurrent.lib.writeTextFile {
+    recordsFile = domain: nixpkgsCurrent.packages.writeTextFile {
         name = "records";
         text = domain.records;
     };

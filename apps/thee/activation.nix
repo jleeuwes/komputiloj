@@ -2,7 +2,7 @@
 with boltons;
 with nixpkgsCurrent.lib.strings;
 let
-    inherit (nixpkgsCurrent.lib) writeShellApplication writeTextDir symlinkJoin;
+    inherit (nixpkgsCurrent.packages) writeShellApplication writeTextDir symlinkJoin;
     url_base = "https://thee.radstand.nl";
     api_base = "${url_base}/api/v1";
 

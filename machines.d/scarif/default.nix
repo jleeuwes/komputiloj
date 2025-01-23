@@ -23,7 +23,7 @@ rec {
             # Don't do ${<nixpkgs>}, because that makes a weird non-working copy of
             # our sources.nix in the nix-store. With toString the literal path is
             # used instead.
-            "nixpkgs=${nixpkgsCurrent.nixPath}"
+            "nixpkgs=${nixpkgsCurrent}"
             # I don't think we need these during normal operation:
             # "komputiloj=${builtins.toString <komputiloj>}"
             # "nixos-config=${builtins.toString <nixos-config>}"

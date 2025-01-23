@@ -68,7 +68,7 @@ let
             umask u=rw,go=
             ${nixpkgsCurrent.packages.age}/bin/age --decrypt \
                 -i /run/keys/masterkey \
-                ${nixpkgsCurrent.lib.writeText secret.name secret.encryptedContent} \
+                ${nixpkgsCurrent.packages.writeText secret.name secret.encryptedContent} \
                 > "$keyfile".new
             chown -- ${esc user}:${esc group} "$keyfile".new
             chmod -- ${esc permissions} "$keyfile".new

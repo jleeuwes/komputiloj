@@ -5,8 +5,8 @@ let
     default_nixos = "nixos_24_05"; # defines default nixos used by all of komputiloj
     default_nixos_source = getAttr default_nixos sources;
     default_mailserver_source = sources.mailserver_24_05; # defined here to not forget updating nixos and mailserver together
-    nixpkgsLib = import (default_nixos_source.nix_path + "/lib");
-    callPackageWith = nixpkgsLib.callPackageWith;
+    callPackageWith = capsules.nixpkgsCurrent.lib.callPackageWith;
+    fake_flakes = import ./lib/fake-flakes.nix;
     komputiloj_capsule = {
         users = importDir ./users.d;
 
@@ -28,15 +28,16 @@ let
         };
 
         lib = {
+            # TODO this is a 'metapackage', not a lib, because its system-dependent!
             writeCommand = args: let
                 # TODO somehow enhance writeShellApplication to produce a clean PATH inside the script
                 # Currently it is too easy to rely on some undeclared dependency.
-                scriptDir = capsules.nixpkgsCurrent.lib.writeShellApplication {
+                scriptDir = capsules.nixpkgsCurrent.packages.writeShellApplication {
                     name = "script";
                     runtimeInputs = args.runtimeInputs or [];
                     text = args.text;
                 };
-            in capsules.nixpkgsCurrent.lib.concatScript args.name [ "${scriptDir}/bin/script" ];
+            in capsules.nixpkgsCurrent.packages.concatScript args.name [ "${scriptDir}/bin/script" ];
         };
 
         modules = importDirAndApply ./modules.d capsules_and_boltons;
@@ -65,30 +66,31 @@ let
     };
     fake_capsules = rec {
         nixpkgsCurrent = let
-            nixpkgs = default_nixos_source.value {};
+            nixpkgs = default_nixos_source.value.outputs { self = nixpkgs; }
+                // {
+                    # If you import the outPath, it should result in 'old' nixpkgs. See https://stackoverflow.com/a/74465514
+                    outPath = default_nixos_source.nix_path;
+                    
+                    # Fake some stuff to make lib/flake-version-info.nix return the same values
+                    # as before we used the flake. Because we're not _really_ using flakes (yet),
+                    # the flake version info otherwise gives a weird store path
+                    # (like nixos-system-ferrix-24.05.19700101.dirty).
+                    # See https://nix.dev/manual/nix/2.24/command-ref/new-cli/nix3-flake.html#flake-references
+                    # for some of these 'magic' attrs that the flakes system usually sets.
+                    inherit
+                        (fake_flakes.info_from_nixpkgs default_nixos_source.nix_path)
+                        rev shortRev lastModifiedDate;
+                };
         in rec {
-            nixPath = default_nixos_source.nix_path;
+            outPath = nixpkgs.outPath;
+            
+            # TODO move closer to flakes by having packages.x86_64-linux
+            packages = nixpkgs.legacyPackages.x86_64-linux;
 
-            # NOTE: This is actually very wrong:
-            # nixpkgs {} is impure and selects the architecture of the current
-            # system. So these packages won't be good for other hosts than
-            # scarif. Currently we get away with it because gently and scarif
-            # have the same architecture (x86_64).
-            packages = nixpkgs; # TODO remove libs and other non-package stuff
-
-            lib = nixpkgs.lib // {
-                # We need to distribute callPackageWith to imported files. Is this really the best way to do that?
-                inherit callPackageWith;
-
-                nixosSystem = import (default_nixos_source.nix_path + "/nixos/lib/eval-config.nix");
-
-                inherit (packages)
-                    writeShellApplication writeShellScript
-                    writeText writeTextFile writeTextDir
-                    symlinkJoin concatScript;
-            };
-
-            modules = {
+            inherit (nixpkgs) lib;
+            
+            # TODO call this nixosModules
+            modules = nixpkgs.nixosModules // {
                 # Is it wise to put extra stuff in this capsule?
                 # We do it because the mailserver is closely linked to the NixOS
                 # (i.e. nixpkgs) version.

@@ -22,6 +22,6 @@ cat > default.nix <<-EOF
 	        url    = "$current_url";
 	        sha256 = "$current_sha";
 	    };
-	    value = import nix_path;
+	    value = import (nix_path + "/flake.nix");
 	}
 EOF
