@@ -46,6 +46,7 @@ JQ_RELEASE_FILTER='(.isNightly|not) and (.version|contains("-")|not)'
 				  url     = "$current_url";
 				  sha256  = "$current_sha";
 				  license = "$license";
+				  unpack = true;
 				}
 			EOF
 		)
