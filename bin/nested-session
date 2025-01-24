@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# export $(dbus-launch)
+dbus-run-session kwin_wayland --socket wayland-1 kwrite
+
