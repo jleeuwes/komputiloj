@@ -1,0 +1,8 @@
+[user]
+	email = jeroen@lwstn.eu
+	name = Jeroen Leeuwestein
+[init]
+	defaultBranch = main
+[push]
+	default = simple
+	autoSetupRemote = true
