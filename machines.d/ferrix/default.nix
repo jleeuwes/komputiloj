@@ -32,6 +32,7 @@ rec {
             allowUnfreePredicate = pkg:
                 builtins.elem (lib.getName pkg) [
                     "steam"
+                    "steam-unwrapped"
                     "steam-run"
                     "steam-original"
                     "android-studio"
