@@ -447,6 +447,21 @@ rec {
                 # "lp" # for scanning with Canon
             ];
         };
+        # users.users.harpocrates = {
+        #     isSystemUser = true;
+        #     description = "Keeper of secrets";
+        # };
+        # security.sudo = {
+        #     extraRules = [
+        #         {
+        #             users = [ "jeroen" ];
+        #             runAs = "harpocrates";
+        #             commands = [{
+        #                 command = "age";
+        #                 options = [ "CHROOT=/var/lib/harpocrates" "NOSETENV" "NOPASSWD" ];
+        #             }]
+        #     ];
+        # };
         users.extraUsers.speel = {
             # A dedicated user account to play untrusted game binaries.
             uid = 1001; # clashes with gorinchemindialoog.
