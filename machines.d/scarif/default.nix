@@ -28,6 +28,9 @@ rec {
             # "komputiloj=${builtins.toString <komputiloj>}"
             # "nixos-config=${builtins.toString <nixos-config>}"
         ];
+        
+        # Get rid of dependency on whole nixpkgs source tree (400MB)
+        nix.registry = lib.mkForce {};
 
         nixpkgs.config = {
             # Selectively allow some unfree packages

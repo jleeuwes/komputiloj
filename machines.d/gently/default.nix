@@ -106,6 +106,9 @@ in rec {
 			komputiloj.overlays.undesired-packages
 		];
 
+		# Get rid of dependency on whole nixpkgs source tree (400MB)
+		nix.registry = lib.mkForce {};
+
 		
 		# WARNING this setting is ignored by nixops.
 		# Instead, nixops determines the stateVersion at first deploy based on the NixOS version it encounters.
