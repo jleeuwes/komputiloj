@@ -171,6 +171,7 @@ rec {
             openssl
             nmap
             tree
+            # losslesscut-bin # simpele videobewerking
 
             # pamix pavucontrol alsaUtils # not sure what we need for pipewire
             zstd # for unpacking arch packages
