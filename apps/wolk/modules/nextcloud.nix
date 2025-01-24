@@ -238,6 +238,9 @@ in {
                 preview_max_x = 1024;
                 preview_max_y = 1024;
                 preview_max_filesize_image = 5;
+
+                # https://docs.nextcloud.com/server/30/admin_manual/configuration_server/background_jobs_configuration.html#maintenance-window-start
+                maintenance_window_start = 1;
                 
                 # Important for making git-annex shared repos work
                 "localstorage.umask" = "002";
