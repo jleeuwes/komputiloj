@@ -750,6 +750,9 @@ in rec {
 		systemd.services.forgejo = {
 			needsStorageVolume = "requires";
 		};
+		systemd.services.forgejo-secrets = {
+			needsStorageVolume = "requires";
+		};
 		users.users.gitea = {
 			# Taken from https://github.com/NixOS/nixpkgs/blob/nixos-23.11/nixos/modules/services/misc/forgejo.nix
 			home = config.services.forgejo.stateDir; # needed to make authorized_keys work
