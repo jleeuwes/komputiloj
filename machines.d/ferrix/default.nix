@@ -447,15 +447,15 @@ rec {
                 # "lp" # for scanning with Canon
             ];
         };
-        # users.extraUsers.speel = {
-        #     # A dedicated user account to play untrusted game binaries.
-        #     uid = 1001; # clashes with gorinchemindialoog.
-        #                 # Fortunately, it's unlikely that we will have speel on our
-        #                 # servers or gorinchemindialoog on this laptop.
-        #     isNormalUser = true;
-        #     description = "Speel Spelletjes";
-        #     extraGroups = [ "video" "audio" ];
-        # };
+        users.extraUsers.speel = {
+            # A dedicated user account to play untrusted game binaries.
+            uid = 1001; # clashes with gorinchemindialoog.
+                        # Fortunately, it's unlikely that we will have speel on our
+                        # servers or gorinchemindialoog on this laptop.
+            isNormalUser = true;
+            description = "Speel Spelletjes";
+            extraGroups = [ "video" "audio" ];
+        };
 
         # The NixOS release to be compatible with for stateful data such as databases.
         system.stateVersion = "24.05";
