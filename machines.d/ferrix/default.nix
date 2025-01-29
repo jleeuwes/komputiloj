@@ -25,6 +25,9 @@ rec {
             # "komputiloj=${builtins.toString <komputiloj>}"
             # "nixos-config=${builtins.toString <nixos-config>}"
         ];
+        nix.settings = {
+            experimental-features = [ "nix-command" "flakes" ];
+        };
 
         nixpkgs.config = {
             # Selectively allow some unfree packages
