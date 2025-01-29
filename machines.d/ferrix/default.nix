@@ -49,6 +49,7 @@ rec {
                 komputiloj.modules.ssh-client-config
                 komputiloj.modules.librewolf
                 komputiloj.modules.apple-superdrive
+                komputiloj.modules.build-for-raspberry
             ];
   
         # override some stuff from hardware-configuration:

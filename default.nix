@@ -112,6 +112,14 @@ let
                 apps = sources.nextcloud_30_apps.value nixpkgsCurrent.packages;
             };
         };
+        raspberry-pi-nix = (sources.flake-compat.value {
+            # warning: raspberry-pi-nix will use its own version of nixpkgs as
+            # defined in its flake.lock file because of how flake-compat works
+            # TODO switch to flakes ourselves so we can upgrade nixpkgs,
+            # or, if that takes too long, hack on flake-compat so we can pass
+            # our own nixpkgs
+            src = sources.raspberry-pi-nix.nix_path;
+        }).outputs;
     };
     capsules = real_capsules // fake_capsules // { all = all_capsule; };
     capsules_and_boltons = capsules // { inherit boltons; };
