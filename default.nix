@@ -22,9 +22,6 @@ let
             tipctl = callPackage ./pkgs/tipctl;
             dekstop = callPackage ./pkgs/dekstop;
             rip = callPackage ./pkgs/rip;
-            # git-annex-remote-rclone is not here but in nixpkgsFuture,
-            # because we will remove our copy of the package when the
-            # desired version is included in nixpkgs
         };
 
         lib = {
@@ -84,8 +81,11 @@ let
         in rec {
             outPath = nixpkgs.outPath;
             
-            # TODO move closer to flakes by having packages.x86_64-linux
-            packages = nixpkgs.legacyPackages.x86_64-linux;
+            # TODO move closer to flakes by getting rid of x64_64-linux default
+            packages = nixpkgs.legacyPackages.x86_64-linux // {
+                x86_64-linux = nixpkgs.legacyPackages.x86_64-linux;
+                aarch64-linux = nixpkgs.legacyPackages.aarch64-linux;
+            };
 
             inherit (nixpkgs) lib;
             
@@ -105,6 +105,14 @@ let
             # unstable version when it hits the stable channels.  If we would
             # take packages directly from one perpetually updated unstable
             # source, we will never catch up.
+
+            packages.aarch64-linux = let
+                callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages.aarch64-linux pkg;
+            in {
+                ebusd = override
+                    nixpkgsCurrent.packages.aarch64-linux.ebusd
+                    (callPackage ./pkgs/ebusd {});
+            };
         };
         nextcloud = {
             packages = {
