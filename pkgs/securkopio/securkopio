@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+need() {
+	[[ $# -eq 1 ]]
+	local varname
+	varname="$1"
+	if [[ ! -v $varname || -z ${!varname} ]]; then
+		printf '%q needs to be set to a non-empty value.\n' "$varname" >&2
+		return 1
+	fi
+}
+
+do_backup_latest() {
+	need BTRBK_CONFIG_FILE
+	need GIT_ANNEX_DIR
+	[[ $# -eq 1 ]]
+	local snapshot_name
+	snapshot_name="$1"
+
+	printf 'Determining latest snapshot of %q\n' "$snapshot_name" >&2
+	line=$(btrbk --config="$BTRBK_CONFIG_FILE" list latest --format=raw -- "$snapshot_name")
+	
+	if [[ $(printf '%s\n' "$line" | wc -l) -ne 1 ]]; then
+		printf 'ACTION REQUIRED. Excepted exactly 1 line, but got: %q\n' "$line" >&2
+		printf "Is btrbk list latest broken?\n" >&2
+		return 1
+	elif ! printf '%s\n' "$line" | egrep '^format="latest".*'"snapshot_subvolume='" > /dev/null; then
+		printf 'ACTION REQUIRED. Could not parse line: %q\n' "$line" >&2
+		printf 'Is btrbk list latest broken?\n' >&2
+		return 1
+	fi
+
+	snapshot_path=${line##*snapshot_subvolume=\'}
+	snapshot_path=${snapshot_path%%\'*}
+	
+	cd -- "$GIT_ANNEX_DIR"
+	mkdir -p -- "$snapshot_name"
+	cd -- "$snapshot_name"
+	
+	printf 'Making a tarball of %q\n' "$snapshot_path" >&2
+	tar --create --gzip --file=next.tar.gz --directory="$snapshot_path" .
+
+	if [[ -e previous ]]; then
+		git rm previous.tar.gz
+	fi
+	if [[ -e latest ]]; then
+		git mv latest.tar.gz previous.tar.gz
+	fi
+	mv next.tar.gz latest.tar.gz
+	
+	printf 'Syncing with git-annex...\n' >&2
+	git annex add latest.tar.gz
+	git annex sync --content
+	git annex unused
+	git annex dropunused all --force
+	# git annex unused --from=remoterepository
+	# git annex dropunused all --force --from=remoterepository
+	
+	printf 'Done with backup of %q\n' "$snapshot_name" >&2
+}
+
+main() {
+	if [[ $# -eq 0 ]]; then
+		printf 'No subcommand given.\n' >&2
+		exit 1
+	fi
+	local cmd
+	cmd="$1"
+	shift
+	case "$cmd" in
+		backup-latest)
+			for name in "$@"; do
+				do_backup_latest "$name"
+			done
+		;;
+		*)
+			printf 'Unknown subcommand %q\n' "$cmd" >&2
+			return 1
+		;;
+	esac
+}
+
+main "$@"
