@@ -53,6 +53,7 @@ rec {
                 komputiloj.modules.librewolf
                 komputiloj.modules.apple-superdrive
                 komputiloj.modules.build-for-raspberry
+                komputiloj.modules.ludanto
             ];
   
         # override some stuff from hardware-configuration:
@@ -414,6 +415,8 @@ rec {
             };
         };
         services.desktopManager.plasma6.enable = true;
+        
+
         services.xserver.xkb = {
           layout = "us";
           options = "compose:ralt,eurosign:e";
@@ -451,15 +454,6 @@ rec {
                 # "adbusers"
                 # "lp" # for scanning with Canon
             ];
-        };
-        users.extraUsers.speel = {
-            # A dedicated user account to play untrusted game binaries.
-            uid = 1001; # clashes with gorinchemindialoog.
-                        # Fortunately, it's unlikely that we will have speel on our
-                        # servers or gorinchemindialoog on this laptop.
-            isNormalUser = true;
-            description = "Speel Spelletjes";
-            extraGroups = [ "video" "audio" ];
         };
 
         # The NixOS release to be compatible with for stateful data such as databases.
