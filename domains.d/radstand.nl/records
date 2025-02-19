@@ -14,5 +14,6 @@ knol	3600	IN	CNAME	gently.radstand.nl.
 radicale	3600	IN	CNAME	gently.radstand.nl.
 wolk	3600	IN	CNAME	gently.radstand.nl.
 thee	3600	IN	CNAME	gently.radstand.nl.
+notie	3600	IN	CNAME	gently.radstand.nl.
 meel	3600	IN	CNAME	gently.radstand.nl.
 

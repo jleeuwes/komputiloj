@@ -52,6 +52,7 @@ let
         gorinchemindialoog = sources.gorinchemindialoog.value;
         wolk = (import ./apps/wolk) capsules_and_boltons;
         thee = (import ./apps/thee) capsules_and_boltons;
+        notie = (import ./apps/notie) capsules_and_boltons;
     };
     all_capsule = let
         cs = attrValues (real_capsules // fake_capsules);

@@ -1,4 +1,5 @@
-{ boltons, nixpkgsCurrent, komputiloj, privata, gorinchemindialoog, hello-infra, wolk, ...  }:
+{ boltons, nixpkgsCurrent, komputiloj, privata, gorinchemindialoog, hello-infra,
+  wolk, notie, ...  }:
 with boltons;
 let
 	nixpkgs            = nixpkgsCurrent.packages;
@@ -100,6 +101,7 @@ in rec {
 			hello.modules."70004-ingest-data"
 			hello.modules."70004-known-host"
 			wolk.modules.all_in_one
+			notie.modules.all_in_one
 		];
 
 		nixpkgs.overlays = [
