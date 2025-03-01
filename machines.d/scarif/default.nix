@@ -202,9 +202,15 @@ rec {
         services.displayManager = {
             sddm = {
                 enable = true;
+                autoLogin.relogin = true;
+            };
+            autoLogin = {
+                enable = true;
+                user = "karin";
             };
         };
         services.desktopManager.plasma6.enable = true;
+        
 
         # Enable adb group and udev rules and such:
         programs.adb.enable = true;
