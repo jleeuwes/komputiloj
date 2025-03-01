@@ -76,6 +76,8 @@ rec {
             audacity
             
             zip unzip
+
+            kdePackages.krfb
         ];
 
         programs.firefox = {
