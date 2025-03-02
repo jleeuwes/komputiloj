@@ -1,5 +1,5 @@
 { boltons, nixpkgsCurrent, komputiloj, privata, gorinchemindialoog, hello-infra,
-  wolk, notie, ...  }:
+  wolk, thee, notie, ...  }:
 with boltons;
 let
 	nixpkgs            = nixpkgsCurrent.packages;
@@ -102,6 +102,7 @@ in rec {
 			hello.modules."70004-known-host"
 			wolk.modules.all_in_one
 			notie.modules.all_in_one
+			thee.modules.all_in_one
 		];
 
 		nixpkgs.overlays = [
@@ -469,15 +470,6 @@ in rec {
 			# Warning: changing uids here after a user has been created has no effect!
 			# (I think - the note here was about containers.)
 			# You have to rm /var/lib/nixos/uid-map and userdel the user.
-			users.gitea = {
-				uid = 70001;
-				group = "gitea";
-				isSystemUser = true;
-				# The rest of the configuration is near the gitea/forgejo config
-			};
-			groups.gitea = {
-				gid = 70001;
-			};
 			users.vmail = {
 				uid = 70002;
 				group = "vmail";
@@ -596,13 +588,6 @@ in rec {
 				# careful with the default server, otherwise every subdomain
 				# might end up with HTST enabled.
 
-				"thee.radstand.nl" = {
-					forceSSL = true;
-					enableACME = true;
-					locations."/" = {
-						proxyPass = "http://localhost:3000/";
-					};
-				};
 				"knol.radstand.nl" = {
 					forceSSL = true;
 					enableACME = true;
@@ -690,77 +675,6 @@ in rec {
 			};
 		};
 
-		services.gitea.enable = false;
-		services.forgejo = {
-			enable = true;
-
-			user = "gitea";
-			group = "gitea";
-
-			# NOTE: after changing the stateDir, regenerate gitea's authorized_keys file through the admin webinterface.
-			stateDir = "/mnt/storage/live/gitea/rootdir";
-
-			database = {
-				type = "sqlite3";
-				createDatabase = false;
-				path = "/mnt/storage/live/gitea/rootdir/data/gitea.db";
-			};
-
-			# mailerPasswordFile = ...;
-			settings = {
-				server = {
-					ROOT_URL = "https://thee.radstand.nl/";
-					DOMAIN = "thee.radstand.nl";
-				};
-				mailer = {
-					ENABLED = true;
-					FROM = "thee@radstand.nl";
-					# https://docs.gitea.io/en-us/config-cheat-sheet/#mailer-mailer
-					SMTP_ADDR = "localhost";
-					SMTP_PORT = "25";
-					FORCE_TRUST_SERVER_CERT = true; # this is okay, as long as it's localhost
-					# https://github.com/NixOS/nixpkgs/issues/103446
-					# MAILER_TYPE = "sendmail"; # not sure which of...
-					# PROTOCOL = "sendmail";    # ...these two we need
-					# SENDMAIL_PATH = "${pkgs.system-sendmail}/bin/sendmail";
-				};
-				service = {
-					DISABLE_REGISTRATION = true;
-					ENABLE_NOTIFY_MAIL = true;
-				};
-				log = {
-					LEVEL = "Info";
-				};
-				session = {
-					COOKIE_SECURE = true;
-				};
-				"ssh.minimum_key_sizes" = {
-					# TODO remove when scarif is taken out of commission
-					RSA = 2048;
-				};
-				"cron.git_gc_repos" = {
-					ENABLED = true;
-					SCHEDULE = "@every 72h";
-					TIMEOUT = "15m";
-					NOTICE_ON_SUCCESS = true;
-				};
-				other = {
-					SHOW_FOOTER_VERSION = false;
-				};
-			};
-		};
-		systemd.services.forgejo = {
-			needsStorageVolume = "requires";
-		};
-		systemd.services.forgejo-secrets = {
-			needsStorageVolume = "requires";
-		};
-		users.users.gitea = {
-			# Taken from https://github.com/NixOS/nixpkgs/blob/nixos-23.11/nixos/modules/services/misc/forgejo.nix
-			home = config.services.forgejo.stateDir; # needed to make authorized_keys work
-			useDefaultShell = true;
-		};
-
 		mailserver = {
 			enable = true;
 			
@@ -836,28 +750,7 @@ in rec {
 			gitAndTools.git-annex
 			btdu # btrfs disk usage profiler
 
-			# This makes the gitea CLI available
-			# TODO put this somewhere else
-			# (TODO add it to the gitea module someday)
-			(pkgs.writeShellApplication {
-				name = "gitea";
-				runtimeInputs = [ forgejo ];
-				text = stripTabs ''
-					if [[ $# -eq 0 ]]; then
-						echo "gitea without arguments would run the web app." >&2
-						echo "It's highly unlikely that you want to run the web app this way." >&2
-						echo "Please give a command." >&2
-						exit 1
-					fi
-					
-					# not sure which of these gets picked up:
-					export GITEA_CUSTOM=/mnt/storage/live/gitea/rootdir/custom
-					export FORGEJO_CUSTOM=/mnt/storage/live/gitea/rootdir/custom
-
-					# TODO we probably also need to set GITEA_WORK_DIR
-					sudo --preserve-env=GITEA_CUSTOM,FORGEJO_CUSTOM -u gitea gitea "$@"
-				'';
-			})
+			thee.packages.forgejo-cli
 		];
 	};
 }
