@@ -1,5 +1,5 @@
 { boltons, nixpkgsCurrent, komputiloj, privata, gorinchemindialoog, hello-infra,
-  wolk, thee, notie, ...  }:
+  sleutel, wolk, thee, notie, ...  }:
 with boltons;
 let
 	nixpkgs            = nixpkgsCurrent.packages;
@@ -100,6 +100,7 @@ in rec {
 			hello.modules."70004-autocommit"
 			hello.modules."70004-ingest-data"
 			hello.modules."70004-known-host"
+			sleutel.modules.all_in_one
 			wolk.modules.all_in_one
 			notie.modules.all_in_one
 			thee.modules.all_in_one

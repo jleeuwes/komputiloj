@@ -1,6 +1,15 @@
 # boltons: utilities and stuff missing from builtins.
 with builtins;
 builtins // rec {
+    
+    dedup_strings = list_of_strings: attrNames (listToAttrs (map (s: { name = s;
+                    value = "whatever"; }) list_of_strings));
+    
+    # Given an attrset of attrsets, make sure each attrsets has a name attribute.
+    # If an attrset already has a name attribute, it is kept as-is.
+    # Otherwise, name is set to the name to with the attrset is assigned in the
+    # outer attrset.
+    named = mapAttrs (name: value: { name = name; } // value);
 
     attrsToList = (attrs: map (key: {name = key; value = getAttr key attrs;}) (attrNames attrs));
     

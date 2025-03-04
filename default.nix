@@ -18,6 +18,7 @@ let
             callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages pkg capsules_and_boltons;
         in rec {
             wachtwoord = callPackage ./pkgs/wachtwoord;
+            sleutel = callPackage ./pkgs/sleutel;
             radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook;
             tipctl = callPackage ./pkgs/tipctl;
             dekstop = callPackage ./pkgs/dekstop;
@@ -50,6 +51,7 @@ let
         privata = sources.komputiloj-privata.value capsules_and_boltons;
         hello-infra = sources.hello-infra.value capsules_and_boltons;
         gorinchemindialoog = sources.gorinchemindialoog.value;
+        sleutel = (import ./apps/sleutel) capsules_and_boltons;
         wolk = (import ./apps/wolk) capsules_and_boltons;
         thee = (import ./apps/thee) capsules_and_boltons;
         notie = (import ./apps/notie) capsules_and_boltons;
@@ -137,10 +139,11 @@ in {
     default_nixos = default_nixos; # extracted by komputiloj script
     sources = sources;
     capsules = capsules;
-    apps.thee = import ./apps/thee {
-        inherit boltons;
-        inherit capsules;
-    };
+    # waarom staat dit hier?
+    # apps.thee = import ./apps/thee {
+    #     inherit boltons;
+    #     inherit capsules;
+    # };
     commands = let
         meta_commands = {};
         capsule_commands = capsuleName: capsule: mapNames (commandName: "${capsuleName}.${commandName}") (capsule.commands or {});

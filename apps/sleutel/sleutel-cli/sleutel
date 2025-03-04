@@ -1,0 +1,100 @@
+#!/bin/bash
+# Self-service management command for radstand users.
+# Meant to be used as a forced SSH command that runs as
+# a dedicated 'sleutel' user.
+
+set -Eeu
+set -o pipefail
+
+usage() {
+	printf 'Usage: %q USERNAME\n' "$0"
+}
+
+banner() {
+	# made with toilet, font future
+	cat <<-EOF
+		   ┏━┓╻  ┏━╸╻ ╻╺┳╸┏━╸╻
+		╺━╸┗━┓┃  ┣╸ ┃ ┃ ┃ ┣╸ ┃  ╺━╸
+		   ┗━┛┗━╸┗━╸┗━┛ ╹ ┗━╸┗━╸
+	EOF
+}
+
+main() {
+	if [[ $# -ne 1 ]]; then
+		usage >&2
+		exit 1
+	fi
+	SLEUTEL_USER="$1"
+
+	banner
+	printf '\n'
+	printf 'Welkom %s. Wat wil je doen?\n' "$SLEUTEL_USER"
+	printf '\n'
+	printf 'w of p: Wachtwoord wijzigen.\n'
+	printf 'q: Afsluiten.\n'
+	printf '\n'
+
+	read -r -n1 -p 'Keuze: ' CHOICE
+	printf '\n'
+
+	case "$CHOICE" in
+	w|p)
+		do_change_password
+	;;
+	q||)
+		return 0
+	;;
+	*)
+		printf 'Onbekende optie: %q.\n' "$CHOICE"
+		return 1
+		# TODO loop
+	;;
+	esac
+}
+
+do_change_password() {
+	local NEW_PASSWORD
+	local CONFIRM_NEW_PASSWORD
+	read -r -s -p 'Nieuw wachtwoord: ' NEW_PASSWORD
+	echo
+	read -r -s -p 'Herhaal nieuw wachtwoord: ' CONFIRM_NEW_PASSWORD
+	echo
+	if [[ $NEW_PASSWORD != $CONFIRM_NEW_PASSWORD ]]; then
+		printf 'De wachtwoorden komen niet overeen.\n'
+		return 0
+	fi
+
+	(
+		mkdir_and_go_there ~/users/"$SLEUTEL_USER"
+		local newdir
+		newdir=password."$RANDOM"
+		mkdir -- "$newdir"
+
+		# do all hash types
+		printf '%s' "$NEW_PASSWORD" |
+			mkpasswd --method=bcrypt --stdin \
+			> "$newdir"/password.bcrypt
+		# (add more hash types here as needed)
+		
+		# do stateful password switches
+		OC_PASS="$NEW_PASSWORD" sudo --preserve-env=OC_PASS \
+			nextcloud-occ user:resetpassword --password-from-env -- "$SLEUTEL_USER"
+		# TODO thee: build support for env variable first:
+		# NEW_PASSWORD="$NEW_PASSWORD" ${thee.packages.forgejo-cli} \
+		# 	admin user change-password -u jeroen --must-change-password=false
+
+		if [[ -e password ]]; then
+			mv password password.old
+		fi
+		mv -- "$newdir" password
+		rm -rf password.old # don't end with / because that would follow a symlink and delete the target dir
+	)
+	sudo systemctl start --no-block sleutel-process-passwords.service
+}
+
+mkdir_and_go_there() {
+	mkdir -p -- "$1"
+	cd -- "$1"
+}
+
+main "$@"

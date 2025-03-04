@@ -32,9 +32,8 @@
             services.nginx.virtualHosts."notie.radstand.nl" = {
                 forceSSL = true;
                 enableACME = true;
-                basicAuth = {
-                    user = "TODO-SET-PASSWORD";
-                };
+                # NOTE: nginx does not depend on mounted storage; what does this do if the basicAuthFile is not available?
+                basicAuthFile = "/mnt/storage/live/sleutel/rootdir/apps/notie/notie/auth";
                 locations = {
                     "/" = {
                         proxyPass = "http://localhost:3010/";

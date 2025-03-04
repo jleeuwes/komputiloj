@@ -9,6 +9,12 @@ rec {
     apps.wolk = {
         bigstorage = true;
     };
+    apps.notie = {
+        spaces = [ "notie" ];
+    };
+    apps.knol = { # will replace radicale.users
+        enable = true;
+    };
     linux.uid = 1000;
     email = "jeroen@lwstn.eu";
     isHuman = true;
