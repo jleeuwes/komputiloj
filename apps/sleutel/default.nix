@@ -65,6 +65,26 @@ in {
                         fi
                         mv -- "$newfile" auth
                     )
+
+                    update_gitea_user() {
+                        local user
+                        local password_hash
+                        local algo
+                        user="$0"
+                        if ! printf '%s' "$user" | grep -E '^[a-z0-9_-]+$' > /dev/null; then
+                            printf 'Refusing to work with username %q\n' "$user" >&2
+                            return 1
+                        fi
+                        password_hash=$(head -n1 -- ~/users/"$user"/password/password.bcrypt)
+                        if ! printf '%s' "$password_hash" | grep -E '^[A-Za-z0-9/.$]+$' > /dev/null; then
+                            printf 'Refusing to work with password hash of user %q\n' "$user" >&2
+                            return 1
+                        fi
+                        algo=(grep -Eo '^\$2[ab]\$[0-9]+' | sed -E 's/\$2[ab]$/bcrypt$/')
+                        
+                        sqlite3 /mnt/storage/live/gitea/rootdir/data/gitea.db \
+                            "update user set passwd='$password_hash', passwd_hash_algo='$algo', must_change_password=0 where name='$user'"
+                    }
                     
                     ${unlines (map (space:
                         "mkauthfile notie/${escapeShellArg space.name} " +
@@ -72,6 +92,10 @@ in {
                         (attrValues notie.spaces))}
                     
                     mkauthfile knol ${escapeShellArgs (map (user: user.name) knol.users)}
+                    
+                    for user in ${escapeShellArgs (map (user: user.name) thee.users)}; do
+                        update_gitea_user "$user"
+                    done
                 '';
             };
         };
