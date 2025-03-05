@@ -46,7 +46,8 @@ in {
                         mkdir -p ~/apps/"$appdir"
                         cd ~/apps/"$appdir"
                         newfile=auth."$RANDOM"
-                        touch -- "$newfile" # TODO CHECK IF EMPTY FILE IS OKAY
+                        touch -- "$newfile" # nginx handles an empty file correctly (noone has access)
+                                            # TODO check for radicale, ...
                         for user in "$@"; do
                             userfile=~/users/"$user"/password/password.bcrypt
                             if [[ -e $userfile ]]; then
@@ -58,6 +59,10 @@ in {
                                     "$user" "$appdir" >&2
                             fi
                         done
+                        if grep -E ':$' -- "$newfile"; then
+                            printf 'Refusing to install broken password file %q\n' "$newfile" >&2
+                            return 1
+                        fi
                         mv -- "$newfile" auth
                     )
                     
