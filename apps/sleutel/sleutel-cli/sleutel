@@ -77,9 +77,12 @@ do_change_password() {
 		# (add more hash types here as needed)
 		
 		# do stateful password switches
+		# TODO investigate if we can do this in the service
+		#      (e.g. by pumping the hash directly into the database)
 		OC_PASS="$NEW_PASSWORD" sudo --preserve-env=OC_PASS \
 			nextcloud-occ user:resetpassword --password-from-env -- "$SLEUTEL_USER"
 		# TODO thee: build support for env variable first:
+		# (no need, we'll directly pump the new hash into the database, see service)
 		# NEW_PASSWORD="$NEW_PASSWORD" ${thee.packages.forgejo-cli} \
 		# 	admin user change-password -u jeroen --must-change-password=false
 
