@@ -2,6 +2,8 @@
 with boltons;
 let
     inherit (nixpkgsCurrent.lib.strings) escapeShellArg escapeShellArgs;
+    # TODO we shouldn't depend on all apps here.
+    # Instead, offer nixos configuration options that can be filled by the apps.
     notie = rec {
         # not necessarily existing spaces, but good enough for generating access lists
         space_names = dedup_strings (concatMap (user: user.apps.notie.spaces or []) (attrValues all.users));
