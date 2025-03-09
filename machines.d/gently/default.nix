@@ -22,10 +22,6 @@ in rec {
 			keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
 		};
 		"nextcloud-admin" = wolk.nixopsKeys.nextcloud-admin;
-		"account-gorinchemindialoog-bcrypt" = {
-			destDir = "/run/keys/persist";
-			keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
-		};
 	};
 	# TODO put decryption in activation script, then we can move these secrets to a nixos module
 	# (the capsule secrets remain, because those also provide information about updating a secret)
@@ -498,7 +494,7 @@ in rec {
 				createHome = false;
 				home = "/home/gorinchemindialoog"; # must exist both inside and outside the sftp_only chroot
 				uid = gorinchemindialoog.users.gorinchemindialoog.linux.uid;
-				hashedPasswordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
+				hashedPasswordFile = "/mnt/storage/live/sleutel/rootdir/users/gorinchemindialoog/password/password.bcrypt";
 				extraGroups = [ "sftp_only" ];
 			};
 			users.git-annex = {
@@ -682,7 +678,7 @@ in rec {
 			loginAccounts = {
 				"info@gorinchemindialoog.nl" = {
 					# name = "gorinchemindialoog"; # not sure what this does
-					hashedPasswordFile = "/run/keys/persist/account-gorinchemindialoog-bcrypt";
+					hashedPasswordFile = "/mnt/storage/live/sleutel/rootdir/users/gorinchemindialoog/password/password.bcrypt";
 				};
 			};
 			forwards = mapNames (name : name + "@gorinchemindialoog.nl") gorinchemindialoog.forwards // {
