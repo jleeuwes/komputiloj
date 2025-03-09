@@ -26,18 +26,6 @@ in rec {
 			destDir = "/run/keys/persist";
 			keyCommand = [ "wachtwoord" "hash-with-bcrypt" "-n" "secrets/gorinchemindialoog@radstand.nl" ];
 		};
-		"radicale-auth" = {
-			destDir = "/run/keys/persist";
-			keyCommand = [ "sh" "-c"
-				"wachtwoord hash-with-bcrypt ${escapeShellArgs
-					(map (username: "secrets/${username}@knol.radstand.nl")
-						hello.radicale.users
-				)} | sed -E 's/^secrets\\/([^@]*)@[^:]*/\\1/'"
-			];
-			user = "radicale";
-			group = "radicale";
-			permissions = "ug=r,o=";
-		};
 	};
 	# TODO put decryption in activation script, then we can move these secrets to a nixos module
 	# (the capsule secrets remain, because those also provide information about updating a secret)
@@ -482,7 +470,7 @@ in rec {
 			users.radicale = {
 				uid = komputiloj.users.radicale.linux.uid;
 				group = "radicale";
-				extraGroups = [ "keys" ];
+				extraGroups = [ "sleutel" ];
 				isSystemUser = true;
 				home = "/mnt/storage/live/home/radicale";
 				createHome = false;
@@ -727,7 +715,7 @@ in rec {
 				};
 				auth = {
 					type = "htpasswd";
-					htpasswd_filename = "/run/keys/persist/radicale-auth";
+					htpasswd_filename = "/mnt/storage/live/sleutel/rootdir/apps/knol/auth";
 					htpasswd_encryption = "bcrypt";
 				};
 				storage = {
