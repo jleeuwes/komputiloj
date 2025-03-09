@@ -16,9 +16,12 @@ let
     knol = {
         users = filter (user: user.apps.knol.enable or false) (attrValues all.users);
     };
-in {
+    sleutel_users = filter (user: user.apps.sleutel.enable or false) (attrValues all.users);
+in rec {
     packages = {
-        sleutel-cli = nixpkgsCurrent.lib.callPackageWith nixpkgsCurrent.packages (import ./sleutel-cli) {};
+        sleutel-cli = nixpkgsCurrent.lib.callPackageWith nixpkgsCurrent.packages (import ./sleutel-cli) {
+            inherit boltons;
+        };
     };
 
     modules = rec {
@@ -75,13 +78,19 @@ in {
                 '';
             };
         };
-        users = {
+        users = { pkgs, ... }: {
             users.users.sleutel = {
                 uid = 70007;
                 group = "sleutel";
                 isSystemUser = true;
                 home = "/mnt/storage/live/sleutel/rootdir";
                 createHome = false;
+                shell = pkgs.bashInteractive;
+                openssh.authorizedKeys.keys = let
+                    user_keys = user: map (user_key user) (attrValues user.ssh.publicKeys or []);
+                    user_key  = user: key: 
+                        "command=\"${packages.sleutel-cli}/bin/sleutel ${escapeShellArg user.name}\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-user-rc,restrict,pty ${key}";
+                in concatMap user_keys sleutel_users;
             };
             users.groups.sleutel.gid = 70007;
 

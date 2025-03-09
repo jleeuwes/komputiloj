@@ -15,6 +15,9 @@ rec {
     apps.knol = { # will replace radicale.users
         enable = true;
     };
+    apps.sleutel = {
+        enable = true;
+    };
     linux.uid = 1000;
     email = "jeroen@lwstn.eu";
     isHuman = true;

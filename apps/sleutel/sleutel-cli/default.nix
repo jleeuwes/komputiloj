@@ -1,6 +1,5 @@
 { boltons, lib, stdenv, makeWrapper, coreutils, mkpasswd, ...}:
 with boltons;
-
 stdenv.mkDerivation rec {
     pname = "sleutel";
     version = "0.1";
@@ -10,7 +9,7 @@ stdenv.mkDerivation rec {
 
     unpackPhase = ":";
     
-    installPhase = stripTabs ''
+    installPhase = ''
         mkdir -p $out/bin
         cp ${./sleutel} $out/bin/sleutel
         chmod +x $out/bin/sleutel
