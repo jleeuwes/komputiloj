@@ -119,26 +119,6 @@ in rec {
 					mailOnFailure = true;
 				};
 				
-				make-spare-keys = makeJobWithStorage {
-					# Makes copies of keys on our storage volume in case we need to
-					# restore them without having access to our deployment tooling.
-					# Only semi-secrets (such as hashed passwords) should be persisted this way.
-					# Restoring is manual at the moment: just copy the spare keys to /run/keys/persist
-					serviceConfig.Type = "simple";
-					startAt = "*:5,20,35,55";
-					script = stripTabs ''
-						SPAREDIR=/mnt/storage/live/komputiloj/spare-keys
-						if [[ ! -d "$SPAREDIR" ]]; then
-							# Don't use mkdir -p so we don't put spare-keys on the root
-							# fs in the (rare) case that the storage volume is not
-							# correctly mounted.
-							mkdir -m 0750 -- "$SPAREDIR"
-							chown root:keys -- "$SPAREDIR"
-						fi
-						cp -a /run/keys/persist/* -- "$SPAREDIR"
-					'';
-				};
-
 				dagelijks-rapport = makeJob {
 					serviceConfig.Type = "simple";
 					startAt = "05:00 Europe/Amsterdam";
