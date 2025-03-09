@@ -21,7 +21,6 @@ in rec {
 		"luks-storage" = {
 			keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
 		};
-		"nextcloud-admin" = wolk.nixopsKeys.nextcloud-admin;
 	};
 	# TODO put decryption in activation script, then we can move these secrets to a nixos module
 	# (the capsule secrets remain, because those also provide information about updating a secret)
