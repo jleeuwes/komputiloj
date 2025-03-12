@@ -68,7 +68,7 @@ do_change_password() {
 		mkdir_and_go_there ~/users/"$SLEUTEL_USER"
 		local newdir
 		newdir=password."$RANDOM"
-		mkdir -- "$newdir"
+		mkdir --mode=u=rwx,g=rx,o= -- "$newdir"
 
 		# do all hash types
 		printf '%s' "$NEW_PASSWORD" |

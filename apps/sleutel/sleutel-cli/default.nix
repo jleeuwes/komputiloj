@@ -13,7 +13,8 @@ stdenv.mkDerivation rec {
         mkdir -p $out/bin
         cp ${./sleutel} $out/bin/sleutel
         chmod +x $out/bin/sleutel
+        # the /run/wrappers/bin is for sudo
         wrapProgram $out/bin/sleutel \
-            --set PATH ${lib.makeBinPath [ coreutils mkpasswd ]}
+            --set PATH ${lib.makeBinPath [ coreutils mkpasswd ]}:/run/wrappers/bin
     '';
 }
