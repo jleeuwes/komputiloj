@@ -473,7 +473,7 @@ in rec {
 				createHome = false;
 				home = "/home/gorinchemindialoog"; # must exist both inside and outside the sftp_only chroot
 				uid = gorinchemindialoog.users.gorinchemindialoog.linux.uid;
-				hashedPasswordFile = "/mnt/storage/live/sleutel/rootdir/users/gorinchemindialoog/password/password.bcrypt";
+				passwordManagedBySleutel = true;
 				extraGroups = [ "sftp_only" ];
 			};
 			users.git-annex = {
