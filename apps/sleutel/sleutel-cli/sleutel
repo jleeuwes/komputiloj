@@ -30,26 +30,29 @@ main() {
 	printf '\n'
 	printf 'Welkom %s. Wat wil je doen?\n' "$SLEUTEL_USER"
 	printf '\n'
-	printf 'w of p: Wachtwoord wijzigen.\n'
-	printf 'q: Afsluiten.\n'
-	printf '\n'
+	while true; do
+		printf 'w of p: Wachtwoord wijzigen.\n'
+		printf 'q: Afsluiten.\n'
+		printf '\n'
 
-	read -r -n1 -p 'Keuze: ' CHOICE
-	printf '\n'
+		read -r -n1 -p 'Keuze: ' CHOICE
+		printf '\n'
 
-	case "$CHOICE" in
-	w|p)
-		do_change_password
-	;;
-	q||)
-		return 0
-	;;
-	*)
-		printf 'Onbekende optie: %q.\n' "$CHOICE"
-		return 1
-		# TODO loop
-	;;
-	esac
+		case "$CHOICE" in
+		w|p)
+			do_change_password
+		;;
+		q||)
+			return 0
+		;;
+		*)
+			printf 'Onbekende optie: %q.\n' "$CHOICE"
+		;;
+		esac
+		printf '\n'
+		printf 'Wat wil je nu doen?\n'
+		printf '\n'
+	done
 }
 
 do_change_password() {
@@ -92,7 +95,14 @@ do_change_password() {
 		mv -- "$newdir" password
 		rm -rf password.old # don't end with / because that would follow a symlink and delete the target dir
 	)
-	sudo systemctl start --no-block sleutel-process-passwords.service
+	printf 'Het nieuwe wachtwoord is ingesteld.\n'
+	# Achter sudo hieronder moet het exacte commando staan wat is geconfigureerd in sudoers!
+	sudo -n "$CMD_SYSTEMCTL" start --no-block sleutel-process-passwords.service &> /dev/null
+	if [[ $? -ne 0 ]]; then
+		# Triggeren van het verwerkingsproces lukte om een of andere reden niet,
+		# maar het verwerkingsproces loopt ook periodiek, dus dat komt goed.
+		printf 'Het kan tot 15 minuten duren totdat dit wachtwoord volledig is doorgevoerd in alle applicaties.\n'
+	fi
 }
 
 mkdir_and_go_there() {

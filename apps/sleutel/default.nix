@@ -185,6 +185,14 @@ in rec {
             users.groups.sleutel.gid = 70007;
 
             users.users.nginx.extraGroups = [ "sleutel" ];
+
+            security.sudo.extraRules = [ {
+                users = [ "sleutel" ];
+                commands = [ {
+                    command = "${pkgs.systemd}/bin/systemctl start --no-block sleutel-process-passwords.service";
+                    options = [ "NOPASSWD" ];
+                } ];
+            } ];
         };
     };
 }
