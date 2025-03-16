@@ -43,6 +43,12 @@ rec {
         };
         nixpkgs.overlays = [
             komputiloj.overlays.undesired-packages
+            (final: prev: {
+                beets = prev.beets.override {
+                    # embedart plugin has a broken test
+                    pluginOverrides = { embedart.enable = false; };
+                };
+            })
         ];
 
         imports =
