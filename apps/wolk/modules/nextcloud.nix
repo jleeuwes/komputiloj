@@ -1,6 +1,5 @@
 { boltons, nextcloud, nixpkgsCurrent, users, ... }:
 with boltons;
-{ ... }:
 let
     escapeShellArg = nixpkgsCurrent.lib.strings.escapeShellArg;
     bigstorageService = rec {
@@ -11,9 +10,9 @@ let
         };
         needsStorageVolume = "requires";
         wants = [
-            "bigstorage1-wolk-webdav-pass-key.service"
-            "bigstorage1-wolk-crypt-pass-key.service"
-            "bigstorage1-wolk-crypt-salt-key.service"
+            "secret-bigstorage1-wolk-webdav-pass.service"
+            "secret-bigstorage1-wolk-crypt-pass.service"
+            "secret-bigstorage1-wolk-crypt-salt.service"
         ];
         after = wants;
         mailOnFailure = true;
@@ -224,7 +223,7 @@ in {
 
             config = {
                 adminuser = "admin";
-                adminpassFile = "/run/keys/nextcloud-admin";
+                adminpassFile = "/run/keys/nextcloud-admin-password";
                 
                 dbtype = "sqlite"; # let's start simple
             };
@@ -256,16 +255,17 @@ in {
             mount-nextcloud-bigstorage = bigstorageService;
 
             # Augment nextcloud's own services:
-            # TODO wants nextcloud-admin key (setup only?)
             nextcloud-cron = {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
                 wants = bindmountServicesAsDeps;
                 after = bindmountServicesAsDeps;
             };
-            nextcloud-setup = {
+            nextcloud-setup = rec {
                 needsStorageVolume = "requires";
                 mailOnFailure = true;
+                wants = ["secret-nextcloud-admin-password.service"];
+                after = wants;
             };
             nextcloud-update-plugins = {
                 needsStorageVolume = "requires";

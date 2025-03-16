@@ -1,36 +1,41 @@
-{ boltons, nextcloud, nixpkgsCurrent, all, ... }:
+{ boltons, nextcloud, nixpkgsCurrent, privata, all, ... }:
 {
-    modules = {
-        all_in_one = (import ./modules/nextcloud.nix) {
+    modules = rec {
+        all_in_one = {
+            imports = [ nextcloud_module secrets_module ];
+        };
+        nextcloud_module = (import ./modules/nextcloud.nix) {
             inherit boltons nextcloud nixpkgsCurrent;
             users = all.users;
         };
+        secrets_module = {
+            secrets = {
+                nextcloud-admin-password = {
+                    encryptedContent = privata.secrets.nextcloud-admin-password.encryptedContent;
+                    user = "nextcloud";
+                    group = "nextcloud";
+                    permissions = "ug=r,o=";
+                };
+                bigstorage1-wolk-webdav-pass = {
+                    encryptedContent = privata.secrets.bigstorage1-wolk-webdav-pass.encryptedContent;
+                    user = "nextcloud";
+                    group = "nextcloud";
+                    permissions = "ug=r,o=";
+                };
+                bigstorage1-wolk-crypt-pass = {
+                    encryptedContent = privata.secrets.bigstorage1-wolk-crypt-pass.encryptedContent;
+                    user = "nextcloud";
+                    group = "nextcloud";
+                    permissions = "ug=r,o=";
+                };
+                bigstorage1-wolk-crypt-salt = {
+                    encryptedContent = privata.secrets.bigstorage1-wolk-crypt-salt.encryptedContent;
+                    user = "nextcloud";
+                    group = "nextcloud";
+                    permissions = "ug=r,o=";
+                };
+            };
+        };
     };
     
-    nixopsKeys = {
-        "nextcloud-admin" = {
-            keyCommand = [ "wachtwoord" "cat" "-n" "secrets/admin@wolk.radstand.nl" ];
-            user = "nextcloud";
-            group = "nextcloud";
-            permissions = "ug=r,o=";
-        };
-        "bigstorage1-wolk-webdav-pass" = {
-            keyCommand = [ "wachtwoord" "cat" "-n" "secrets/bigstorage1-wolk@hetzner" ];
-            user = "nextcloud";
-            group = "nextcloud";
-            permissions = "ug=r,o=";
-        };
-        "bigstorage1-wolk-crypt-pass" = {
-            keyCommand = [ "wachtwoord" "cat" "-n" "secrets/bigstorage1-wolk-crypt-pass@hetzner" ];
-            user = "nextcloud";
-            group = "nextcloud";
-            permissions = "ug=r,o=";
-        };
-        "bigstorage1-wolk-crypt-salt" = {
-            keyCommand = [ "wachtwoord" "cat" "-n" "secrets/bigstorage1-wolk-crypt-salt@hetzner" ];
-            user = "nextcloud";
-            group = "nextcloud";
-            permissions = "ug=r,o=";
-        };
-    };
 }

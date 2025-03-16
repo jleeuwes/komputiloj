@@ -17,7 +17,6 @@ in rec {
 	targetHost = "gently.radstand.nl";
 	inherit (privata.machines.gently) masterAgeKey;
 	sshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHmMPh91t1reE1ddLcFYyddQs0hx4v41KcaNBS2UVnEA";
-	nixopsKeys = wolk.nixopsKeys;
 	# TODO move the secrets from here to below (nixos config)
 	# (the capsule secrets remain, because those also provide information about updating a secret)
 	secrets = {
@@ -36,12 +35,6 @@ in rec {
 		system = "x86_64-linux";
 		modules = [
 			mainModule
-
-			{
-				imports = [ komputiloj.modules.nixops-keys ];
-				deployment.keys = nixopsKeys;
-				networking.extraHosts = "\n"; # makes built system identical to the nixops one
-			}
 		];
 	};
 
