@@ -78,6 +78,7 @@ in rec {
 			komputiloj.modules.systemd-failure-mailer
 			komputiloj.modules.storage-volume
 			komputiloj.modules.ssh-client-config
+			komputiloj.modules.secrets
 			nixpkgsCurrent.modules.mailserver
 			hello.modules."70004-backup"
 			hello.modules."70004-autocommit"
@@ -88,6 +89,8 @@ in rec {
 			notie.modules.all_in_one
 			thee.modules.all_in_one
 		];
+
+		secrets = secrets; # SEE ABOVE
 
 		nixpkgs.overlays = [
 			komputiloj.overlays.undesired-packages
