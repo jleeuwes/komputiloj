@@ -35,8 +35,8 @@ in {
                 RemainAfterExit = true;
             };
             mailOnFailure = false; # not useful to set this to true; postfix depends on this service
-            wants = [ "luks-storage-key.service" ];
-            after    = [ "luks-storage-key.service" ];
+            wants = [ "secret-luks-storage-key.service" ];
+            after    = [ "secret-luks-storage-key.service" ];
             wantedBy = [ "multi-user.target" ];
             # TODO move requiredBy and before to the respective services
             requiredBy = [
@@ -55,7 +55,7 @@ in {
                     echo "LUKS mapping already opened."
                 else
                     echo "Opening LUKS mapping..."
-                    cryptsetup open UUID=6c8d5be7-ae46-4e51-a270-fd5bdce46f3b storage --type luks --key-file /run/keys/luks-storage
+                    cryptsetup open UUID=6c8d5be7-ae46-4e51-a270-fd5bdce46f3b storage --type luks --key-file /run/keys/luks-storage-key
                 fi
                 echo "Mounting..."
                 mkdir -p /mnt/storage

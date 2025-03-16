@@ -17,14 +17,13 @@ in rec {
 	targetHost = "gently.radstand.nl";
 	inherit (privata.machines.gently) masterAgeKey;
 	sshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHmMPh91t1reE1ddLcFYyddQs0hx4v41KcaNBS2UVnEA";
-	nixopsKeys = wolk.nixopsKeys // {
-		"luks-storage" = {
-			keyCommand = [ "wachtwoord" "cat" "-n" "secrets/luks-storage@hetzner" ];
-		};
-	};
-	# TODO put decryption in activation script, then we can move these secrets to a nixos module
+	nixopsKeys = wolk.nixopsKeys;
+	# TODO move the secrets from here to below (nixos config)
 	# (the capsule secrets remain, because those also provide information about updating a secret)
 	secrets = {
+		luks-storage-key = {
+			encryptedContent = privata.secrets.luks-storage-key.encryptedContent;
+		};
 		bigstorage1-git-annex-hello-creds = {
 			encryptedContent = hello.secrets.bigstorage1-git-annex-hello-creds.encryptedContent;
 			user = "git-annex";
