@@ -266,6 +266,8 @@ in rec {
 					};
 					startAt = "*:*:00";
 					wantedBy = [ "multi-user.target" ];
+					wants = [ "secret-bigstorage1-git-annex-hello-creds.service" ];
+					after = [ "secret-bigstorage1-git-annex-hello-creds.service" ];
 					path = [
 						# basics:
 						pkgs.gitMinimal pkgs.git-annex pkgs.openssh
