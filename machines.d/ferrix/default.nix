@@ -29,18 +29,9 @@ rec {
             experimental-features = [ "nix-command" "flakes" ];
         };
 
-        nixpkgs.config = {
-            # Selectively allow some unfree packages
-            # - https://nixos.org/nixpkgs/manual/#sec-allow-unfree
-            allowUnfreePredicate = pkg:
-                builtins.elem (lib.getName pkg) [
-                    "steam"
-                    "steam-unwrapped"
-                    "steam-run"
-                    "steam-original"
-                    "android-studio"
-                ];
-        };
+        nixpkgsAllowUnfreePackages = [
+            "android-studio"
+        ];
         nixpkgs.overlays = [
             komputiloj.overlays.undesired-packages
             (final: prev: {
@@ -60,6 +51,7 @@ rec {
                 komputiloj.modules.apple-superdrive
                 komputiloj.modules.build-for-raspberry
                 komputiloj.modules.ludanto
+                komputiloj.modules.unfree
             ];
   
         # override some stuff from hardware-configuration:
@@ -165,10 +157,6 @@ rec {
             # enhance nix-build
             nix-output-monitor
 
-            # gaming
-            # (steam is installed through programs.steam)
-            lutris
-
             # usefull programs:
             mkpasswd
             unicode-paracode
@@ -257,9 +245,6 @@ rec {
             komputiloj.packages.wachtwoord # TODO remove if we use dekstopomveging
         ];
 
-        programs.steam = {
-            enable = true;
-        };
         programs.firefox.enable = false;
         programs.librewolf = {
             enable = true;
@@ -446,10 +431,6 @@ rec {
 
         # Enable adb group and udev rules and such:
         programs.adb.enable = true;
-
-        # For 32-bit games:
-        # hardware.opengl.driSupport32Bit = true;
-        # hardware.opengl.driSupport = true; # is actually the default
 
         # Define a user account. Don't forget to set a password with ‘passwd’.
         users.users.jeroen = {

@@ -15,7 +15,20 @@ in {
         isNormalUser = true;
         description = "Ludanto de Videoludoj";
         extraGroups = [ "video" "audio" ];
+        packages = [ pkgs.lutris ];
     };
+    
+    # NOTE: don't know how to limit this to user ludanto
+    programs.steam = {
+        enable = true;
+    };
+    
+    nixpkgsAllowUnfreePackages = [
+        "steam"
+        "steam-unwrapped"
+        "steam-run"
+        "steam-original"
+    ];
 
     systemd.services."getty@tty6" = {
         serviceConfig = {
