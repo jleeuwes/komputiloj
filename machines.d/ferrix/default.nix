@@ -348,13 +348,16 @@ rec {
         # services.gvfs.enable = true;
         # services.gvfs.package = pkgs.xfce.gvfs;
         
+        # For 32-bit games/applications:
+        hardware.graphics.enable32Bit = true;
+        
         # Enable sound with pipewire
         hardware.pulseaudio.enable = false;
         security.rtkit.enable = true;
         services.pipewire = {
           enable = true;
           alsa.enable = true;
-          alsa.support32Bit = true;
+          alsa.support32Bit = true; # for 32-bit games/applications
           pulse.enable = true;
           # If you want to use JACK applications, uncomment this
           #jack.enable = true;
