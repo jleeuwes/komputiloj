@@ -116,6 +116,13 @@ let
                     nixpkgsCurrent.packages.aarch64-linux.ebusd
                     (callPackage ./pkgs/ebusd {});
             };
+            packages.x86_64-linux = let
+                callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages.x86_64-linux pkg;
+            in {
+                silverbullet = override
+                    nixpkgsCurrent.packages.x86_64-linux.silverbullet
+                    (callPackage ./pkgs/silverbullet {});
+            };
         };
         nextcloud = {
             packages = {
