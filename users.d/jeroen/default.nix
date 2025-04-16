@@ -10,7 +10,7 @@ rec {
         bigstorage = true;
     };
     apps.notie = {
-        spaces = [ "notie" ];
+        spaces = [ "hello" ];
     };
     apps.knol = { # will replace radicale.users
         enable = true;
