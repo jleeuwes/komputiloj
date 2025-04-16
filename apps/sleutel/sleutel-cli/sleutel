@@ -75,7 +75,7 @@ do_change_password() {
 
 		# do all hash types
 		printf '%s' "$NEW_PASSWORD" |
-			mkpasswd --method=bcrypt --rounds=13 --stdin \
+			mkpasswd --method=bcrypt --rounds=10 --stdin \
 			> "$newdir"/password.bcrypt
 		# (add more hash types here as needed)
 		
