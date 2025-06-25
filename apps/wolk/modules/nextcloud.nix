@@ -234,6 +234,8 @@ in {
                 default_phone_region = "NL";
 
                 # Tame image previews:
+                # After changing this, delete all previews or they linger!
+                # Then, run `nextcloud-occ files:scan-app-data`
                 preview_max_x = 1024;
                 preview_max_y = 1024;
                 preview_max_filesize_image = 5;
