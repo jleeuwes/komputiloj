@@ -111,11 +111,20 @@ in rec {
                             return 1
                         fi
                     )
+                    mkappdir() {
+                        local dir
+                        dir="$1"
+                        if [[ -d "$dir" ]]; then
+                            printf "%q already exists. Trouble during previous run? Cleaning up...\n" "$dir"
+                            rm -rf -- "$dir"
+                        fi
+                        mkdir --mode=u=rwx,g=rx,o= -- "$dir"
+                    }
 
                     mkdir -p ~/apps
                     
                     # app: notie
-                    mkdir --mode=u=rwx,g=rx,o= ~/apps/notie.new
+                    mkappdir ~/apps/notie.new
                     ${unlines (map (space:
                         "mkdir ~/apps/notie.new/${escapeShellArg space.name}; " +
                         "mkauthfile ~/apps/notie.new/${escapeShellArg space.name}/auth " +
@@ -128,7 +137,7 @@ in rec {
                     rm -rf ~/apps/notie.old
                    
                     # app: knol
-                    mkdir --mode=u=rwx,g=rx,o= ~/apps/knol.new
+                    mkappdir ~/apps/knol.new
                     mkauthfile ~/apps/knol.new/auth ${escapeShellArgs (map (user: user.name) knol.users)}
                     if [[ -e ~/apps/knol ]]; then
                         mv ~/apps/knol ~/apps/knol.old
@@ -137,7 +146,7 @@ in rec {
                     rm -rf ~/apps/knol.old
                     
                     # linux shadow file nixos stuff
-                    mkdir --mode=u=rwx,g=rx,o= /var/lib/sleutel/shadow.new
+                    mkappdir /var/lib/sleutel/shadow.new
                     mkauthfile /var/lib/sleutel/shadow.new/auth ${escapeShellArgs (map (user: user.name) (managed_linux_users config))}
                     mkdir /var/lib/sleutel/shadow.new/users
                     ${unlines (map (user: "mknixosuserfile /var/lib/sleutel/shadow.new/users/${escapeShellArg user.name} ${escapeShellArg user.name}")
