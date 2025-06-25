@@ -171,6 +171,7 @@ rec {
             openssl
             nmap
             tree
+            wl-clipboard
             # losslesscut-bin # simpele videobewerking
 
             # pamix pavucontrol alsaUtils # not sure what we need for pipewire
