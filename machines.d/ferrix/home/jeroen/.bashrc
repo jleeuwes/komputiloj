@@ -33,7 +33,8 @@ __ps_nixshell() {
 		pkgs=( $(printf '%s' "$buildInputs" | sed -E 's/\/nix\/store\/[0-9a-z]+-//g') )
 		case ${#pkgs[@]} in
 		0)
-			:
+			printf '\ninside %s nix-shell' \
+				"$IN_NIX_SHELL"
 		;;
 		1)
 			printf '\ninside %s nix-shell with package %s' \
