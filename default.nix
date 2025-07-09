@@ -102,6 +102,13 @@ let
         };
         nixpkgsFuture = let
             override = old: new: trace ("🕑🕐🕛 nixpkgsFuture: Replacing " + old.name + " with " + new.name) new;
+            unstable = sources.nixos_unstable.value.outputs { self = unstable; }
+                // {
+                    outPath = sources.nixos_unstable.nix_path;
+                    inherit
+                        (fake_flakes.info_from_nixpkgs sources.nixos_unstable.nix_path)
+                        rev shortRev lastModifiedDate;
+                };
         in {
             # NOTE: Each time we use something from unstable, we should pin
             # that exact source. That way, we can someday move away from the
@@ -122,6 +129,10 @@ let
                 silverbullet = override
                     nixpkgsCurrent.packages.x86_64-linux.silverbullet
                     (callPackage ./pkgs/silverbullet {});
+                ollama = override
+                    nixpkgsCurrent.packages.x86_64-linux.ollama
+                    unstable.legacyPackages.x86_64-linux.ollama;
+
             };
         };
         nextcloud = {

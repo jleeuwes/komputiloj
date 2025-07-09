@@ -244,6 +244,9 @@ rec {
             sqlite
             
             komputiloj.packages.wachtwoord # TODO remove if we use dekstopomveging
+
+            # AI stuff
+            nixpkgsFuture.packages.${pkgs.system}.ollama
         ];
 
         programs.firefox.enable = false;
