@@ -712,6 +712,8 @@ in rec {
 			btdu # btrfs disk usage profiler
 
 			thee.packages.forgejo-cli
+
+			sqlite
 		];
 	};
 }
