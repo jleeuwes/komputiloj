@@ -249,6 +249,10 @@ rec {
             nixpkgsFuture.packages.${pkgs.system}.ollama
         ];
 
+        environment.wordlist = {
+            enable = true;
+        };
+
         programs.firefox.enable = false;
         programs.librewolf = {
             enable = true;
