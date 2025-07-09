@@ -20,6 +20,7 @@ let
     "136.0.1-1" = "136.0.1";
     "137.0.2-1" = "137.0.2";
     "138.0.1-2" = "138.0.1";
+    "139.0.4-1" = "139.0.4"; # niet gecheckt
   }."${pkgs.librewolf.version}"
   or (throw "Unknown librewolf version ${pkgs.librewolf.version}");
 
