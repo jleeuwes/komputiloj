@@ -2,9 +2,9 @@ let boltons = import ./lib/boltons.nix;
 in with boltons;
 let
     sources = importDir ./sources.d;
-    default_nixos = "nixos_24_11"; # defines default nixos used by all of komputiloj
+    default_nixos = "nixos_25_05"; # defines default nixos used by all of komputiloj
     default_nixos_source = getAttr default_nixos sources;
-    default_mailserver_source = sources.mailserver_24_11; # defined here to not forget updating nixos and mailserver together
+    default_mailserver_source = sources.mailserver_25_05; # defined here to not forget updating nixos and mailserver together
     callPackageWith = capsules.nixpkgsCurrent.lib.callPackageWith;
     fake_flakes = import ./lib/fake-flakes.nix;
     komputiloj_capsule = {
