@@ -137,8 +137,8 @@ let
         };
         nextcloud = {
             packages = {
-                nextcloud = nixpkgsCurrent.packages.nextcloud30;
-                apps = sources.nextcloud_30_apps.value nixpkgsCurrent.packages;
+                nextcloud = nixpkgsCurrent.packages.nextcloud31;
+                apps = sources.nextcloud_31_apps.value nixpkgsCurrent.packages;
             };
         };
         raspberry-pi-nix = (sources.flake-compat.value {

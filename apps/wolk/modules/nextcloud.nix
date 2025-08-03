@@ -228,6 +228,8 @@ in {
                 dbtype = "sqlite"; # let's start simple
             };
 
+            phpOptions."opcache.interned_strings_buffer" = "16";
+
             settings = {
                 overwriteprotocol = "https";
 
