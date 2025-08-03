@@ -52,6 +52,7 @@ rec {
                 komputiloj.modules.build-for-raspberry
                 komputiloj.modules.ludanto
                 komputiloj.modules.unfree
+                komputiloj.modules.ai
             ];
   
         # override some stuff from hardware-configuration:
@@ -244,9 +245,6 @@ rec {
             sqlite
             
             komputiloj.packages.wachtwoord # TODO remove if we use dekstopomveging
-
-            # AI stuff
-            nixpkgsFuture.packages.${pkgs.system}.ollama
         ];
 
         environment.wordlist = {
