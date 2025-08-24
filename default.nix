@@ -18,6 +18,7 @@ let
             callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages pkg capsules_and_boltons;
         in rec {
             wachtwoord = callPackage ./pkgs/wachtwoord;
+            moz-recover-as-bookmarks = callPackage ./pkgs/moz-recover-as-bookmarks;
             sleutel = callPackage ./pkgs/sleutel;
             radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook;
             tipctl = callPackage ./pkgs/tipctl;

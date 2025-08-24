@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [[ $1 = --help ]]; then
+	echo "Give me a ~/.librewolf/some.profile/sessionstore-backups/previous.jsonlz4" \
+		"and I will output HTML that can be imported as bookmarks." \
+		"Made for a very specific situation after which librewolf did not" \
+		"restore my previous session and ignored any manipulation I tried of" \
+		"the various session files." \
+		"So you probably need to fiddle a bit with this in a new situation." \
+		"\nGood luck!"
+	exit 0
+fi
+
+set -Eeu -o pipefail
+mozlz4a --decompress -- "$1" | jq -r '
+	._closedWindows[] | {
+		windowtitle: .title,
+		links: .tabs |
+			map(.entries[] | { title: .title, url: .url }) |
+			unique_by(.url)
+	} |
+		@html "<h2>\(.windowtitle)</h2>\n<ul>"
+		+ (
+			.links|map (
+				@html "<li><a href=\"\(.url)\">\(.title)</a></li>\n")|
+				add
+		) + "</ul>"
+'

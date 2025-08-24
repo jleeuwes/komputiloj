@@ -167,7 +167,6 @@ rec {
             git-annex git-annex-remote-rclone rclone
             sshpass
             gnupg paperkey qrencode zbar pwgen
-            komputiloj.packages.wachtwoord
             inetutils # for ftp for the nas
             openssl
             nmap
@@ -212,6 +211,7 @@ rec {
             qpdf pdftk
             
             # (firefox and librewolf are configured through programs.*)
+            komputiloj.packages.moz-recover-as-bookmarks
             thunderbird
             # isync # for e-mail backups (eigenlijk mbsync)
             # chromium
