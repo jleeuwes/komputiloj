@@ -93,6 +93,23 @@ in {
                     locations."/" = {
                         proxyPass = "http://localhost:3000/";
                     };
+                    locations."= /robots.txt" = {
+                        # TODO remove this when we have whatever version that includes https://codeberg.org/forgejo/forgejo/pulls/7387
+                        root = dirOf ./robots.txt;
+                        tryFiles = "/robots.txt =404";
+                    };
+                    locations."= /bot402.html" = {
+                        # don't use an @ location for this because it will act
+                        # weird with POST
+                        root = dirOf ./bot402.html;
+                        tryFiles = "/bot402.html =404";
+                    };
+                    locations."~ ^/[^/]+/[^/]+/archive/" = {
+                        extraConfig = ''
+                            deny all;
+                            error_page 403 =402 /bot402.html;
+                        '';
+                    };
                 };
             };
         };
