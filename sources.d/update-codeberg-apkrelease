@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -Eeu -o pipefail
+
+codeberg_repo=$(cat codeberg_repo)
+codeberg_owner=${codeberg_repo%/*}
+codeberg_reponame=${codeberg_repo##*/}
+
+# assumption: the newest release is alway present on the first page
+curl "https://codeberg.org/api/v1/repos/$codeberg_repo/releases?draft=false&pre-release=false" \
+	-H 'accept: application/json' | \
+	jq 'sort_by(.published_at)|last' > release.json
+
+# assumption: there is exactly one asset
+current_url=$(jq -r .assets[0].browser_download_url < release.json)
+
+current_sha=$(nix-prefetch-url "$current_url")
+nix_path=$(nix-prefetch-url "$current_url" "$current_sha" | tail)
+apksigner verify --verbose --print-certs -- "$nix_path" | egrep -v '^WARNING: META-INF/' > apk-verification-result
+# TODO compare with expected
+cat > default.nix <<-EOF
+	# GENERATED
+	{ fetchurl }:
+	rec {
+	    nix_path = fetchurl {
+	        url    = "$current_url";
+	        sha256 = "$current_sha";
+	    };
+	}
+EOF
