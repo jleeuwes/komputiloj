@@ -6,6 +6,7 @@ RightButton;NoModifier=org.kde.contextmenu
 
 [Containments][1]
 ItemGeometries-1024x768=
+ItemGeometries-1440x810=
 ItemGeometries-1440x960=
 ItemGeometriesHorizontal=
 activityId=55b00e13-c843-4e40-8b76-aa3468e5198d
@@ -19,6 +20,9 @@ wallpaperplugin=org.kde.image
 [Containments][1][ConfigDialog]
 DialogHeight=540
 DialogWidth=720
+
+[Containments][1][General]
+positions={"1440x960":[]}
 
 [Containments][1][Wallpaper][org.kde.image][General]
 Image=/nix/store/21nkzhzxpwiy14xql0zx9nwsimrksc4j-plasma-workspace-wallpapers-6.2.5/share/wallpapers/SafeLanding/
@@ -77,6 +81,10 @@ global=Alt+F1
 immutability=1
 plugin=org.kde.plasma.pager
 
+[Containments][2][Applets][4][Configuration][ConfigDialog]
+DialogHeight=540
+DialogWidth=720
+
 [Containments][2][Applets][5]
 immutability=1
 plugin=org.kde.plasma.icontasks
@@ -111,6 +119,9 @@ wallpaperplugin=org.kde.image
 [Containments][24][ConfigDialog]
 DialogHeight=540
 DialogWidth=720
+
+[Containments][24][General]
+positions={"1280x1440":[],"2560x1440":[]}
 
 [Containments][24][Wallpaper][org.kde.image][General]
 Image=/nix/store/21nkzhzxpwiy14xql0zx9nwsimrksc4j-plasma-workspace-wallpapers-6.2.5/share/wallpapers/SafeLanding/
@@ -151,11 +162,14 @@ immutability=1
 plugin=org.kde.plasma.notifications
 
 [Containments][8][Applets][13][Configuration]
-PreloadWeight=55
+PreloadWeight=65
 
 [Containments][8][Applets][14]
 immutability=1
 plugin=org.kde.kscreen
+
+[Containments][8][Applets][14][Configuration]
+PreloadWeight=100
 
 [Containments][8][Applets][15]
 immutability=1
@@ -184,21 +198,21 @@ immutability=1
 plugin=org.kde.plasma.battery
 
 [Containments][8][Applets][21][Configuration]
-PreloadWeight=100
+PreloadWeight=65
 
 [Containments][8][Applets][22]
 immutability=1
 plugin=org.kde.plasma.brightness
 
 [Containments][8][Applets][22][Configuration]
-PreloadWeight=12
+PreloadWeight=0
 
 [Containments][8][Applets][23]
 immutability=1
 plugin=org.kde.plasma.networkmanagement
 
 [Containments][8][Applets][23][Configuration]
-PreloadWeight=92
+PreloadWeight=100
 
 [Containments][8][Applets][23][Configuration][General]
 currentDetailsTab=details
@@ -208,7 +222,7 @@ immutability=1
 plugin=org.kde.plasma.bluetooth
 
 [Containments][8][Applets][25][Configuration]
-PreloadWeight=45
+PreloadWeight=100
 
 [Containments][8][Applets][26]
 immutability=1
