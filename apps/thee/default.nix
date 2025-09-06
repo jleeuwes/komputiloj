@@ -63,6 +63,9 @@ in {
                     TIMEOUT = "15m";
                     NOTICE_ON_SUCCESS = true;
                 };
+                # security = {
+                #     PASSWORD_HASH_ALGO = "bcrypt$12";
+                # };
                 other = {
                     SHOW_FOOTER_VERSION = false;
                 };
