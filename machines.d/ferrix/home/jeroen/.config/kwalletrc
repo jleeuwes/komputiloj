@@ -1,3 +1,6 @@
+[Auto Deny]
+kdewallet=Chromium
+
 [Wallet]
 Close When Idle=false
 Close on Screensaver=false
