@@ -1,4 +1,5 @@
-{ boltons, nixpkgsCurrent, komputiloj, privata, gorinchemindialoog, hello-infra,
+{ boltons, nixpkgsCurrent, mailserver_25_05, komputiloj,
+  privata, gorinchemindialoog, hello-infra,
   sleutel, wolk, thee, notie, ...  }:
 with boltons;
 let
@@ -71,7 +72,7 @@ in rec {
 			komputiloj.modules.storage-volume
 			komputiloj.modules.ssh-client-config
 			komputiloj.modules.secrets
-			nixpkgsCurrent.modules.mailserver
+			mailserver_25_05.nixosModules.mailserver
 			hello.modules."70004-backup"
 			hello.modules."70004-autocommit"
 			hello.modules."70004-ingest-data"

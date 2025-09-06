@@ -3,8 +3,6 @@ in with boltons;
 let
     sources = importDir ./sources.d;
     default_nixos = "nixos_25_05"; # defines default nixos used by all of komputiloj
-    default_nixos_source = getAttr default_nixos sources;
-    default_mailserver_source = sources.mailserver_25_05; # defined here to not forget updating nixos and mailserver together
     callPackageWith = capsules.nixpkgsCurrent.lib.callPackageWith;
     fake_flakes = import ./lib/fake-flakes.nix;
     komputiloj_capsule = {
@@ -58,6 +56,7 @@ let
         notie = (import ./apps/notie) capsules_and_boltons;
     };
     all_capsule = let
+        # TODO how do new capsules fit into this, if at all?
         cs = attrValues (real_capsules // fake_capsules);
     in {
         # special capsule which aggregates stuff from all other capsules
@@ -65,42 +64,21 @@ let
         lib = mergeAttrsets (catAttrs "lib" cs);
         domains = mergeAttrsets (catAttrs "domains" cs);
     };
+    new_capsules = {
+        nixos_25_05 = import ./sources.d/nixos_25_05/capsule.nix;
+        mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix;
+    };
     fake_capsules = rec {
-        nixpkgsCurrent = let
-            nixpkgs = default_nixos_source.value.outputs { self = nixpkgs; }
-                // {
-                    # If you import the outPath, it should result in 'old' nixpkgs. See https://stackoverflow.com/a/74465514
-                    outPath = default_nixos_source.nix_path;
-                    
-                    # Fake some stuff to make lib/flake-version-info.nix return the same values
-                    # as before we used the flake. Because we're not _really_ using flakes (yet),
-                    # the flake version info otherwise gives a weird store path
-                    # (like nixos-system-ferrix-24.05.19700101.dirty).
-                    # See https://nix.dev/manual/nix/2.24/command-ref/new-cli/nix3-flake.html#flake-references
-                    # for some of these 'magic' attrs that the flakes system usually sets.
-                    inherit
-                        (fake_flakes.info_from_nixpkgs default_nixos_source.nix_path)
-                        rev shortRev lastModifiedDate;
-                };
-        in rec {
-            outPath = nixpkgs.outPath;
-            
-            # TODO move closer to flakes by getting rid of x64_64-linux default
-            packages = nixpkgs.legacyPackages.x86_64-linux // {
-                x86_64-linux = nixpkgs.legacyPackages.x86_64-linux;
-                aarch64-linux = nixpkgs.legacyPackages.aarch64-linux;
-            };
+        # TODO get rid of this backwards compatible abomination
+        nixpkgsCurrent = let nixpkgs = getAttr default_nixos new_capsules; in
+            nixpkgs // {
+                # TODO move closer to flakes by getting rid of x64_64-linux default
+                #      (i.e. the part before the // operator)
+                packages = nixpkgs.packages.x86_64-linux // nixpkgs.packages;
 
-            inherit (nixpkgs) lib;
-            
-            # TODO call this nixosModules
-            modules = nixpkgs.nixosModules // {
-                # Is it wise to put extra stuff in this capsule?
-                # We do it because the mailserver is closely linked to the NixOS
-                # (i.e. nixpkgs) version.
-                mailserver = default_mailserver_source.value;
+                # TODO remove this and use nixosModules everywhere instead
+                modules = nixpkgs.nixosModules;
             };
-        };
         nixpkgsFuture = let
             override = old: new: trace ("🕑🕐🕛 nixpkgsFuture: Replacing " + old.name + " with " + new.name) new;
             unstable = sources.nixos_unstable.value.outputs { self = unstable; }
@@ -155,7 +133,7 @@ let
             src = sources.raspberry-pi-nix.nix_path;
         }).outputs;
     };
-    capsules = real_capsules // fake_capsules // { all = all_capsule; };
+    capsules = new_capsules // real_capsules // fake_capsules // { all = all_capsule; };
     capsules_and_boltons = capsules // { inherit boltons; };
 in {
     boltons = boltons;
