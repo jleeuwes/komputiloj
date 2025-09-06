@@ -43,12 +43,16 @@ let
             undesired-packages = import ./overlays/undesired-packages.nix { inherit boltons; };
         };
         
-        machines = importDirAndApply ./machines.d capsules_and_boltons;
+        machines = importDirAndApply ./machines.d (capsules_and_boltons // {
+            inherit (new_capsules) nixos_25_05 mailserver_25_05;
+        });
     };
     real_capsules = {
         komputiloj = komputiloj_capsule;
         privata = sources.komputiloj-privata.value capsules_and_boltons;
-        hello-infra = sources.hello-infra.value capsules_and_boltons;
+        hello-infra = sources.hello-infra.value (capsules_and_boltons // {
+            inherit (new_capsules) nixos_25_05;
+        });
         gorinchemindialoog = sources.gorinchemindialoog.value;
         sleutel = (import ./apps/sleutel) capsules_and_boltons;
         wolk = (import ./apps/wolk) capsules_and_boltons;
@@ -56,10 +60,10 @@ let
         notie = (import ./apps/notie) capsules_and_boltons;
     };
     all_capsule = let
-        # TODO how do new capsules fit into this, if at all?
         cs = attrValues (real_capsules // fake_capsules);
     in {
         # special capsule which aggregates stuff from all other capsules
+        # TODO how do new capsules fit into this, if at all?
         users = mergeAttrsets (catAttrs "users" cs);
         lib = mergeAttrsets (catAttrs "lib" cs);
         domains = mergeAttrsets (catAttrs "domains" cs);
@@ -133,13 +137,16 @@ let
             src = sources.raspberry-pi-nix.nix_path;
         }).outputs;
     };
-    capsules = new_capsules // real_capsules // fake_capsules // { all = all_capsule; };
-    capsules_and_boltons = capsules // { inherit boltons; };
+    sloppy_capsules = real_capsules // fake_capsules // { all = all_capsule; };
+    capsules = new_capsules // sloppy_capsules;
+    # TODO get rid of passing capsules_and_boltons everywhere.
+    # work towards an explicit dependency order
+    capsules_and_boltons = sloppy_capsules // { inherit boltons; };
 in {
     boltons = boltons;
     default_nixos = default_nixos; # extracted by komputiloj script
     sources = sources;
-    capsules = capsules;
+    capsules = capsules_mess;
     # waarom staat dit hier?
     # apps.thee = import ./apps/thee {
     #     inherit boltons;
