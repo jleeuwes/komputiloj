@@ -46,6 +46,35 @@ let
         };
         
         machines = importDirAndApply ./machines.d capsules_and_boltons;
+
+        git-annex-networks = {
+            securkopio = {
+                repositories = {
+                    thee = {
+                        git = true;
+                        annex = false;
+                        remote = {
+                            url = "gitea@thee.radstand.nl:jeroen/securkopio";
+                        };
+                    };
+                    gently-outbox = {
+                        git = true;
+                        annex = true;
+                        # path = "/mnt/storage/backups/outbox";
+                    };
+                    storagebox = {
+                        git = false;
+                        annex = true;
+                        specialremote = {
+                            type = "rsync";
+                            url = "u362967-sub88@u362967.your-storagebox.de:/home/";
+                            encryption = "shared";
+                            annex-rsync-transport = "ssh -p 23";
+                        };
+                    };
+                };
+            };
+        };
     };
     real_capsules = {
         komputiloj = komputiloj_capsule;
