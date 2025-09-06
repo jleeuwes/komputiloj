@@ -6,7 +6,7 @@ import:
     # and do one big `beet move`
     copy: no
     move: no
-plugins: inline hook
+plugins: inline hook edit
 item_fields:
     multidisc: 1 if disctotal > 1 else 0
     disc_unpadded: |
