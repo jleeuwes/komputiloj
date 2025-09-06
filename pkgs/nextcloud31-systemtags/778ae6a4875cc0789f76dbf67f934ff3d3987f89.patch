@@ -1,0 +1,289 @@
+diff --git a/apps/systemtags/appinfo/info.xml b/apps/systemtags/appinfo/info.xml
+index e2e84cce1c8..56b2974d8e6 100644
+--- a/apps/systemtags/appinfo/info.xml
++++ b/apps/systemtags/appinfo/info.xml
+@@ -25,6 +25,11 @@
+ 	<dependencies>
+ 		<nextcloud min-version="31" max-version="31"/>
+ 	</dependencies>
++	<commands>
++		<command>OCA\SystemTags\Command\Files\Add</command>
++		<command>OCA\SystemTags\Command\Files\Delete</command>
++		<command>OCA\SystemTags\Command\Files\DeleteAll</command>
++	</commands>
+ 	<settings>
+ 		<admin>OCA\SystemTags\Settings\Admin</admin>
+ 	</settings>
+diff --git a/apps/systemtags/composer/composer/autoload_classmap.php b/apps/systemtags/composer/composer/autoload_classmap.php
+index e6c60728ff6..450a387cd72 100644
+--- a/apps/systemtags/composer/composer/autoload_classmap.php
++++ b/apps/systemtags/composer/composer/autoload_classmap.php
+@@ -12,6 +12,9 @@ return array(
+     'OCA\\SystemTags\\Activity\\Setting' => $baseDir . '/../lib/Activity/Setting.php',
+     'OCA\\SystemTags\\AppInfo\\Application' => $baseDir . '/../lib/AppInfo/Application.php',
+     'OCA\\SystemTags\\Capabilities' => $baseDir . '/../lib/Capabilities.php',
++    'OCA\\SystemTags\\Command\\Files\\Add' => $baseDir . '/../lib/Command/Files/Add.php',
++    'OCA\\SystemTags\\Command\\Files\\Delete' => $baseDir . '/../lib/Command/Files/Delete.php',
++    'OCA\\SystemTags\\Command\\Files\\DeleteAll' => $baseDir . '/../lib/Command/Files/DeleteAll.php',
+     'OCA\\SystemTags\\Controller\\LastUsedController' => $baseDir . '/../lib/Controller/LastUsedController.php',
+     'OCA\\SystemTags\\Listeners\\BeforeSabrePubliclyLoadedListener' => $baseDir . '/../lib/Listeners/BeforeSabrePubliclyLoadedListener.php',
+     'OCA\\SystemTags\\Listeners\\BeforeTemplateRenderedListener' => $baseDir . '/../lib/Listeners/BeforeTemplateRenderedListener.php',
+diff --git a/apps/systemtags/composer/composer/autoload_static.php b/apps/systemtags/composer/composer/autoload_static.php
+index 3d61ea1a1c1..a86e63edc53 100644
+--- a/apps/systemtags/composer/composer/autoload_static.php
++++ b/apps/systemtags/composer/composer/autoload_static.php
+@@ -27,6 +27,9 @@ class ComposerStaticInitSystemTags
+         'OCA\\SystemTags\\Activity\\Setting' => __DIR__ . '/..' . '/../lib/Activity/Setting.php',
+         'OCA\\SystemTags\\AppInfo\\Application' => __DIR__ . '/..' . '/../lib/AppInfo/Application.php',
+         'OCA\\SystemTags\\Capabilities' => __DIR__ . '/..' . '/../lib/Capabilities.php',
++        'OCA\\SystemTags\\Command\\Files\\Add' => __DIR__ . '/..' . '/../lib/Command/Files/Add.php',
++        'OCA\\SystemTags\\Command\\Files\\Delete' => __DIR__ . '/..' . '/../lib/Command/Files/Delete.php',
++        'OCA\\SystemTags\\Command\\Files\\DeleteAll' => __DIR__ . '/..' . '/../lib/Command/Files/DeleteAll.php',
+         'OCA\\SystemTags\\Controller\\LastUsedController' => __DIR__ . '/..' . '/../lib/Controller/LastUsedController.php',
+         'OCA\\SystemTags\\Listeners\\BeforeSabrePubliclyLoadedListener' => __DIR__ . '/..' . '/../lib/Listeners/BeforeSabrePubliclyLoadedListener.php',
+         'OCA\\SystemTags\\Listeners\\BeforeTemplateRenderedListener' => __DIR__ . '/..' . '/../lib/Listeners/BeforeTemplateRenderedListener.php',
+diff --git a/apps/systemtags/lib/Command/Files/Add.php b/apps/systemtags/lib/Command/Files/Add.php
+new file mode 100644
+index 00000000000..237feb748a4
+--- /dev/null
++++ b/apps/systemtags/lib/Command/Files/Add.php
+@@ -0,0 +1,90 @@
++<?php
++
++declare(strict_types = 1);
++
++/**
++ * SPDX-FileCopyrightText: Nextcloud GmbH and Nextcloud contributors
++ * SPDX-License-Identifier: AGPL-3.0-or-later
++ */
++
++namespace OCA\SystemTags\Command\Files;
++
++use OC\Core\Command\Info\FileUtils;
++use OCP\SystemTag\ISystemTagManager;
++use OCP\SystemTag\ISystemTagObjectMapper;
++use OCP\SystemTag\TagAlreadyExistsException;
++use Symfony\Component\Console\Command\Command;
++use Symfony\Component\Console\Input\InputArgument;
++use Symfony\Component\Console\Input\InputInterface;
++use Symfony\Component\Console\Output\OutputInterface;
++
++class Add extends Command {
++
++	public function __construct(
++		private FileUtils $fileUtils,
++		private ISystemTagManager $systemTagManager,
++		private ISystemTagObjectMapper $systemTagObjectMapper,
++	) {
++		parent::__construct();
++	}
++
++	protected function configure(): void {
++		$this->setName('tag:files:add')
++			->setDescription('Add a system-tag to a file or folder')
++			->addArgument('target', InputArgument::REQUIRED, 'file id or path')
++			->addArgument('tags', InputArgument::REQUIRED, 'Name of the tag(s) to add, comma separated')
++			->addArgument('access', InputArgument::REQUIRED, 'access level of the tag (public, restricted or invisible)');
++	}
++
++	public function execute(InputInterface $input, OutputInterface $output): int {
++		$targetInput = $input->getArgument('target');
++		$tagsInput = $input->getArgument('tags');
++
++		if ($tagsInput === '') {
++			$output->writeln('<error>`tags` can\'t be empty</error>');
++			return 3;
++		}
++
++		$tagNameArray = explode(',', $tagsInput);
++
++		$access = $input->getArgument('access');
++		switch ($access) {
++			case 'public':
++				$userVisible = true;
++				$userAssignable = true;
++				break;
++			case 'restricted':
++				$userVisible = true;
++				$userAssignable = false;
++				break;
++			case 'invisible':
++				$userVisible = false;
++				$userAssignable = false;
++				break;
++			default:
++				$output->writeln('<error>`access` property is invalid</error>');
++				return 1;
++		}
++
++		$targetNode = $this->fileUtils->getNode($targetInput);
++
++		if (! $targetNode) {
++			$output->writeln("<error>file $targetInput not found</error>");
++			return 1;
++		}
++
++		foreach ($tagNameArray as $tagName) {
++			try {
++				$tag = $this->systemTagManager->createTag($tagName, $userVisible, $userAssignable);
++				$output->writeln("<info>$access</info> tag named <info>$tagName</info> created.");
++			} catch (TagAlreadyExistsException $e) {
++				$tag = $this->systemTagManager->getTag($tagName, $userVisible, $userAssignable);
++			}
++
++			$this->systemTagObjectMapper->assignTags((string)$targetNode->getId(), 'files', $tag->getId());
++			$output->writeln("<info>$access</info> tag named <info>$tagName</info> added.");
++		}
++
++		return 0;
++	}
++}
+diff --git a/apps/systemtags/lib/Command/Files/Delete.php b/apps/systemtags/lib/Command/Files/Delete.php
+new file mode 100644
+index 00000000000..b24135664d7
+--- /dev/null
++++ b/apps/systemtags/lib/Command/Files/Delete.php
+@@ -0,0 +1,88 @@
++<?php
++
++declare(strict_types = 1);
++
++/**
++ * SPDX-FileCopyrightText: Nextcloud GmbH and Nextcloud contributors
++ * SPDX-License-Identifier: AGPL-3.0-or-later
++ */
++
++namespace OCA\SystemTags\Command\Files;
++
++use OC\Core\Command\Info\FileUtils;
++use OCP\SystemTag\ISystemTagManager;
++use OCP\SystemTag\ISystemTagObjectMapper;
++use OCP\SystemTag\TagNotFoundException;
++use Symfony\Component\Console\Command\Command;
++use Symfony\Component\Console\Input\InputArgument;
++use Symfony\Component\Console\Input\InputInterface;
++use Symfony\Component\Console\Output\OutputInterface;
++
++class Delete extends Command {
++
++	public function __construct(
++		private FileUtils $fileUtils,
++		private ISystemTagManager $systemTagManager,
++		private ISystemTagObjectMapper $systemTagObjectMapper,
++	) {
++		parent::__construct();
++	}
++
++	protected function configure(): void {
++		$this->setName('tag:files:delete')
++			->setDescription('Delete a system-tag from a file or folder')
++			->addArgument('target', InputArgument::REQUIRED, 'file id or path')
++			->addArgument('tags', InputArgument::REQUIRED, 'Name of the tag(s) to delete, comma separated')
++			->addArgument('access', InputArgument::REQUIRED, 'access level of the tag (public, restricted or invisible)');
++	}
++
++	public function execute(InputInterface $input, OutputInterface $output): int {
++		$targetInput = $input->getArgument('target');
++		$tagsInput = $input->getArgument('tags');
++
++		if ($tagsInput === '') {
++			$output->writeln('<error>`tags` can\'t be empty</error>');
++			return 3;
++		}
++
++		$tagNameArray = explode(',', $tagsInput);
++
++		$access = $input->getArgument('access');
++		switch ($access) {
++			case 'public':
++				$userVisible = true;
++				$userAssignable = true;
++				break;
++			case 'restricted':
++				$userVisible = true;
++				$userAssignable = false;
++				break;
++			case 'invisible':
++				$userVisible = false;
++				$userAssignable = false;
++				break;
++			default:
++				$output->writeln('<error>`access` property is invalid</error>');
++				return 1;
++		}
++
++		$targetNode = $this->fileUtils->getNode($targetInput);
++
++		if (! $targetNode) {
++			$output->writeln("<error>file $targetInput not found</error>");
++			return 1;
++		}
++
++		foreach ($tagNameArray as $tagName) {
++			try {
++				$tag = $this->systemTagManager->getTag($tagName, $userVisible, $userAssignable);
++				$this->systemTagObjectMapper->unassignTags((string)$targetNode->getId(), 'files', $tag->getId());
++				$output->writeln("<info>$access</info> tag named <info>$tagName</info> removed.");
++			} catch (TagNotFoundException $e) {
++				$output->writeln("<info>$access</info> tag named <info>$tagName</info> does not exist!");
++			}
++		}
++
++		return 0;
++	}
++}
+diff --git a/apps/systemtags/lib/Command/Files/DeleteAll.php b/apps/systemtags/lib/Command/Files/DeleteAll.php
+new file mode 100644
+index 00000000000..59ebb741b88
+--- /dev/null
++++ b/apps/systemtags/lib/Command/Files/DeleteAll.php
+@@ -0,0 +1,49 @@
++<?php
++
++declare(strict_types = 1);
++
++/**
++ * SPDX-FileCopyrightText: Nextcloud GmbH and Nextcloud contributors
++ * SPDX-License-Identifier: AGPL-3.0-or-later
++ */
++
++namespace OCA\SystemTags\Command\Files;
++
++use OC\Core\Command\Info\FileUtils;
++use OCP\SystemTag\ISystemTagObjectMapper;
++use Symfony\Component\Console\Command\Command;
++use Symfony\Component\Console\Input\InputArgument;
++use Symfony\Component\Console\Input\InputInterface;
++use Symfony\Component\Console\Output\OutputInterface;
++
++class DeleteAll extends Command {
++
++	public function __construct(
++		private FileUtils $fileUtils,
++		private ISystemTagObjectMapper $systemTagObjectMapper,
++	) {
++		parent::__construct();
++	}
++
++	protected function configure(): void {
++		$this->setName('tag:files:delete-all')
++			->setDescription('Delete all system-tags from a file or folder')
++			->addArgument('target', InputArgument::REQUIRED, 'file id or path');
++	}
++
++	public function execute(InputInterface $input, OutputInterface $output): int {
++		$targetInput = $input->getArgument('target');
++		$targetNode = $this->fileUtils->getNode($targetInput);
++
++		if (! $targetNode) {
++			$output->writeln("<error>file $targetInput not found</error>");
++			return 1;
++		}
++
++		$tags = $this->systemTagObjectMapper->getTagIdsForObjects([$targetNode->getId()], 'files');
++		$this->systemTagObjectMapper->unassignTags((string)$targetNode->getId(), 'files', $tags[$targetNode->getId()]);
++		$output->writeln('<info>all tags removed.</info>');
++
++		return 0;
++	}
++}
