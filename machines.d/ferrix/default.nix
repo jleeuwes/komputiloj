@@ -199,6 +199,7 @@ rec {
             # love_11
             # arduino
             # haskellPackages.ghc
+            godot
             
             # unstable.android-studio
             apktool dex2jar
