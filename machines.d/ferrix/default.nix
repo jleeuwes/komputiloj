@@ -456,7 +456,7 @@ rec {
             uid = komputiloj.users.jeroen.linux.uid;
             description = komputiloj.users.jeroen.fullName;
             extraGroups = [ "wheel"
-                # "adbusers"
+                "adbusers"
                 # "lp" # for scanning with Canon
             ];
         };
