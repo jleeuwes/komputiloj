@@ -1,6 +1,6 @@
-{ komputiloj, hello-infra, nixpkgsCurrent, nixpkgsFuture, ... }:
+{ komputiloj, hello-infra, nixos_25_05, ... }:
 rec {
-    nixosSystem = nixpkgsCurrent.lib.nixosSystem {
+    nixosSystem = nixos_25_05.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [ mainModule ];
     };
@@ -20,7 +20,7 @@ rec {
             # Don't do ${<nixpkgs>}, because that makes a weird non-working copy of
             # our sources.nix in the nix-store. With toString the literal path is
             # used instead.
-            "nixpkgs=${nixpkgsCurrent}"
+            "nixpkgs=${nixos_25_05}"
             # I don't think we need these during normal operation:
             # "komputiloj=${builtins.toString <komputiloj>}"
             # "nixos-config=${builtins.toString <nixos-config>}"

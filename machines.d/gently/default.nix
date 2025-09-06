@@ -1,11 +1,11 @@
-{ boltons, nixpkgsCurrent, mailserver_25_05, komputiloj,
+{ boltons, nixos_25_05, mailserver_25_05, komputiloj,
   privata, gorinchemindialoog, hello-infra,
   sleutel, wolk, thee, notie, ...  }:
 with boltons;
 let
-	nixpkgs            = nixpkgsCurrent.packages;
-	hello              = hello-infra;
-	inherit (nixpkgs.lib.strings) escapeShellArgs;
+	hello   = hello-infra; # TODO why this alias?
+	                       # should the hello-infra capsule be renamed?
+	inherit (nixos_25_05.lib.strings) escapeShellArgs;
 in rec {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
@@ -32,7 +32,7 @@ in rec {
 		};
 	};
 	
-	nixosSystem = nixpkgsCurrent.lib.nixosSystem {
+	nixosSystem = nixos_25_05.lib.nixosSystem {
 		system = "x86_64-linux";
 		modules = [
 			mainModule

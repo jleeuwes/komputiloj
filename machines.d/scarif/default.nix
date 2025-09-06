@@ -1,9 +1,9 @@
-{ komputiloj, privata, hello-infra, nixpkgsCurrent, nixpkgsFuture, ... }:
+{ komputiloj, privata, hello-infra, nixos_25_05, ... }:
 rec {
     targetHost = "scarif.radstand.nl";
     inherit (privata.machines.scarif) masterAgeKey;
     sshPublicKeys = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFN+m0J0mjJBDho4cTqt9OlnbMUtYuj6OacT7VWi/ahC";
-    nixosSystem = nixpkgsCurrent.lib.nixosSystem {
+    nixosSystem = nixos_25_05.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [ mainModule ];
     };
@@ -16,7 +16,7 @@ rec {
             # Don't do ${<nixpkgs>}, because that makes a weird non-working copy of
             # our sources.nix in the nix-store. With toString the literal path is
             # used instead.
-            "nixpkgs=${nixpkgsCurrent}"
+            "nixpkgs=${nixos_25_05}"
         ];
         
         # Get rid of dependency on whole nixpkgs source tree (400MB)
