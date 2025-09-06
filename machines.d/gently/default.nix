@@ -710,6 +710,7 @@ in rec {
 			gitMinimal
 			gitAndTools.git-annex
 			btdu # btrfs disk usage profiler
+			zip unzip
 
 			thee.packages.forgejo-cli
 
