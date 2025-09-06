@@ -25,8 +25,8 @@ DialogWidth=720
 positions={"1440x960":[]}
 
 [Containments][1][Wallpaper][org.kde.image][General]
-Image=/nix/store/21nkzhzxpwiy14xql0zx9nwsimrksc4j-plasma-workspace-wallpapers-6.2.5/share/wallpapers/SafeLanding/
-PreviewImage=/nix/store/21nkzhzxpwiy14xql0zx9nwsimrksc4j-plasma-workspace-wallpapers-6.2.5/share/wallpapers/SafeLanding/
+Image=/home/jeroen/Afbeeldingen/Louie Mantia - rebel-alliance.jpg
+PreviewImage=/home/jeroen/Afbeeldingen/Louie Mantia - rebel-alliance.jpg
 SlidePaths=/nix/store/5la157c0ia4wdpv1rjrxr4dzz63f59x5-breeze-6.2.5/share/wallpapers/,/run/current-system/sw/share/wallpapers/
 
 [Containments][2]
