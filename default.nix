@@ -69,7 +69,12 @@ let
         domains = mergeAttrsets (catAttrs "domains" cs);
     };
     new_capsules = {
-        nixos_25_05 = import ./sources.d/nixos_25_05/capsule.nix;
+        platform = {
+            localSystem = builtins.currentSystem; # IMPURE. Make this a pin?
+        };
+        nixos_25_05 = import ./sources.d/nixos_25_05/capsule.nix {
+            inherit (new_capsules) platform;
+        };
         mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix;
     };
     fake_capsules = rec {
