@@ -59,6 +59,18 @@ in {
     #             because we have no hope on passing those all the way
     #             through nixpkgs. they are meant for packages in our
     #             own capsules.
+    #             buildTools should be directly buildable derivations,
+    #             not functions! we call those buildRecipes.
+    # (the name buildTools is inspired by
+    # https://github.com/NixOS/nixpkgs/issues/28327#issuecomment-879815573;
+    # we don't use components, which is a good name for a dependency declaration
+    # but too broad a name for a thing that is can be used. also packages
+    # is adequate for this and has more or less the same meaning as in flakes,
+    # so it's okay to reuse that name)
+    # recipes: functions that return packages
+    # buildRecipes: functions that return buildTools
+    # TODO: the term recipes come from a talk, but I'm not sure, maybe
+    # it was a different term. hopefully I can find back the talk someday.
 
     buildTools = {
         # the only buildTools we can provide unemulated are those for the
