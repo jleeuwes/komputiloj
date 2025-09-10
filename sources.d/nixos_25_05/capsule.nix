@@ -80,6 +80,42 @@ in {
         # echte aarch64-linux gaat niet lukken zolang we via de nixpkgs-flake
         # gaan, want die stelt localPlatform en crossPlatform gelijk
     };
+
+    buildRecipes = {
+        # TODO reuse pkgs in the nixosSystem calls
+        ${localSystem} = {
+            nixosSystem = { modules }: nixpkgs.lib.nixosSystem {
+                system = null;
+                lib = nixpkgs.lib;
+                modules = args.modules ++ [{
+                    nixpkgs.buildPlatform.system = localSystem;
+                    nixpkgs.hostPlatform.system  = localSystem;
+                }];
+            };
+        };
+        aarch64-linux-emulated = {
+            # NOT YET TESTED
+            nixosSystem = { modules }: nixpkgs.lib.nixosSystem {
+                system = null;
+                lib = nixpkgs.lib;
+                modules = modules ++ [{
+                    nixpkgs.buildPlatform.system = "aarch64-linux";
+                    nixpkgs.hostPlatform.system  = "aarch64-linux";
+                }];
+            };
+        };
+        aarch64-linux-cross = {
+            # NOT YET TESTED
+            nixosSystem = { modules }: nixpkgs.lib.nixosSystem {
+                system = null;
+                lib = nixpkgs.lib;
+                modules = modules ++ [{
+                    nixpkgs.buildPlatform.system = localSystem;
+                    nixpkgs.hostPlatform.system  = "aarch64-linux";
+                }];
+            };
+        };
+    };
     
     packages = {
         # this is okay as long as we only build things on x86_64-linux.
@@ -95,6 +131,12 @@ in {
         aarch64-linux = nixpkgs.legacyPackages.aarch64-linux;
     };
 
-    inherit (nixpkgs) lib nixosModules;
+    lib = nixpkgs.lib // {
+        nixosSystem = warn
+            "DO NOT USE nixpkgs.lib.nixosSystem. Use \${nixosCapsule}.buildRecipes.${hostSystem}.nixosSystem instead."
+            nixpkgs.lib.nixosSystem;
+    };
+
+    inherit (nixpkgs) nixosModules;
     
 }

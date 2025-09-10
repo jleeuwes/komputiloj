@@ -1,7 +1,6 @@
 { komputiloj, hello-infra, nixos_25_05, ... }:
 rec {
-    nixosSystem = nixos_25_05.lib.nixosSystem {
-        system = "x86_64-linux";
+    nixosSystem = nixos_25_05.buildRecipes.x86_64-linux.nixosSystem {
         modules = [ mainModule ];
     };
 
