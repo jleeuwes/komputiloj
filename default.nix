@@ -146,7 +146,7 @@ in {
     boltons = boltons;
     default_nixos = default_nixos; # extracted by komputiloj script
     sources = sources;
-    capsules = capsules_mess;
+    capsules = capsules;
     # waarom staat dit hier?
     # apps.thee = import ./apps/thee {
     #     inherit boltons;
