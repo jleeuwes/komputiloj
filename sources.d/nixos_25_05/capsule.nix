@@ -54,40 +54,49 @@ in {
     #           (caching of build outputs, leaky cross compilation maybe)
     #           so we should NOT put emulated in the names here
     # buildTools: system is the system for which we are building.
-    #             buildTools are built and run on the local system.
-    #             note that they are not used within this capsule,
-    #             because we have no hope on passing those all the way
-    #             through nixpkgs. they are meant for packages in our
-    #             own capsules.
-    #             buildTools should be directly buildable derivations,
-    #             not functions! we call those buildRecipes.
-    # (the name buildTools is inspired by
-    # https://github.com/NixOS/nixpkgs/issues/28327#issuecomment-879815573;
-    # we don't use components, which is a good name for a dependency declaration
-    # but too broad a name for a thing that is can be used. also packages
-    # is adequate for this and has more or less the same meaning as in flakes,
-    # so it's okay to reuse that name)
-    # recipes: functions that return packages
-    # buildRecipes: functions that return buildTools
-    # TODO: the term recipes come from a talk, but I'm not sure, maybe
-    # it was a different term. hopefully I can find back the talk someday.
+    #           buildTools are built and run on the local system.
+    #           note that they are not used used by nixpgks/nixos,
+    #           because we have no hope on passing those all the way
+    #           through nixpkgs. they are meant for packages in our
+    #           own capsules.
+    #           buildTools should be directly buildable derivations,
+    #           not functions! we call those recipes.
+    #           (the name buildTools is inspired by
+    #           https://github.com/NixOS/nixpkgs/issues/28327#issuecomment-879815573;
+    #           we don't use components, which is a good name for a dependency declaration
+    #           but too broad a name for a thing that is can be used. also packages
+    #           is adequate for this and has more or less the same meaning as in flakes,
+    #           so it's okay to reuse that name)
+    # recipes: functions returning a derivation
+    #           the term recipes come from
+    #           https://archive.fosdem.org/2024/schedule/event/fosdem-2024-3107-units-of-composition-recipes-overlays-and-packages/
+    #           (some discussion I have not read at
+    #           https://discourse.nixos.org/t/new-reader-finding-documentation-unnecessarily-confusing/40722/6
 
     buildTools = {
-        # the only buildTools we can provide unemulated are those for the
-        # system komputiloj runs on
+        # the only buildTools we can provide unemulated are
+        # those for the system komputiloj runs on
         ${localSystem} = nixpkgs.legacyPackages.${localSystem};
         aarch64-linux-emulated = nixpkgs.legacyPackages.aarch64-linux;
         # echte aarch64-linux gaat niet lukken zolang we via de nixpkgs-flake
         # gaan, want die stelt localPlatform en crossPlatform gelijk
     };
-
-    buildRecipes = {
+    
+    # buildRecipes is a bad name.
+    # buildRecipes suggest that the results are buildTools.
+    # but the nixosSystem does not run on the build system, so the build prefix
+    # would not mean the same as in buildTools.
+    # also, nixosSystem does not even return a derivation and can't be 'run'.
+    # (I don't think we even need a buildRecipes output, even if it would
+    # contain the correct things; recipes should be enough for everything I
+    # would think)
+    shouldNotBeCalled_buildRecipes = {
         # TODO reuse pkgs in the nixosSystem calls
         ${localSystem} = {
             nixosSystem = { modules }: nixpkgs.lib.nixosSystem {
                 system = null;
                 lib = nixpkgs.lib;
-                modules = args.modules ++ [{
+                modules = modules ++ [{
                     nixpkgs.buildPlatform.system = localSystem;
                     nixpkgs.hostPlatform.system  = localSystem;
                 }];
@@ -123,18 +132,24 @@ in {
         # raspberry pi, this would result in emulation
         x86_64-linux = nixpkgs.legacyPackages.x86_64-linux;
         
-        # this is where the choice is made to do an emulated
-        # build on non-aarch64 (vs a cross compile)
-        # maybe emulation vs cross should be an option that this capsule
-        # receives? we would have to go through nixpkgs proper to do cross
-        # compilation
+        # these packages are built using emulation
+        # on non-aarch64 (versus cross compiled).
+        # this is what flakes do in their packages output,
+        # let's not deviate from that in flakes-defined outputs.
+        # we have a separate crossPackages output for cross compilation.
         aarch64-linux = nixpkgs.legacyPackages.aarch64-linux;
     };
 
+    crossPackages = {
+        aarch64-linux = {
+            # TODO buildPlatform = localSystem, hostPlatform = aarch64-linux
+        };
+    };
+
     lib = nixpkgs.lib // {
-        nixosSystem = warn
-            "DO NOT USE nixpkgs.lib.nixosSystem. Use \${nixosCapsule}.buildRecipes.${hostSystem}.nixosSystem instead."
-            nixpkgs.lib.nixosSystem;
+        nixosSystem = args:
+            # system should not default to impure currentSystem but it does :|
+            nixpkgs.lib.nixosSystem (args // { extraModules = []; });
     };
 
     inherit (nixpkgs) nixosModules;
