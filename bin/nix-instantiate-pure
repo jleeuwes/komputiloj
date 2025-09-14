@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# adapted from https://github.com/NixOS/nix/issues/9329
+# Maar die werkt niet, zie https://discourse.nixos.org/t/nix-build-and-pure-eval-issues/11203/5
+# Een heel gedoe om in pure evaluation mode te kunnen runnen.
+# Kan momenteel alleen al gecommitte stuff aan. En geen git-submodules.
+# We kunnen waarschijnlijk recursief alles in een tar smijten en fetchTarball
+# doen, maar dat vind ik wat eng want dan moeten we uitkijken dat we geen
+# gevoelige dingen hebben rondslingeren.
+
+# This is emulating flake's pure evaluation mode
+purePathExpr() {
+  local arg=$1
+  if [[ -f "$arg" ]]; then
+    root=$(dirname "$arg")
+  else
+    root=$arg
+  fi
+
+  if gitdir=$(git -C "$root" rev-parse --show-toplevel 2>/dev/null); then
+    commit=$(git -C "$root" rev-parse HEAD)
+    subpath=$(realpath "$arg" --relative-to="$gitdir")
+    safe_gitdir=$(nix-instantiate --eval --argstr value "$gitdir" -E "{value}: value")
+    safe_subpath=$(nix-instantiate --eval --argstr value "$subpath" -E "{value}: value")
+    echo "import (
+        builtins.fetchGit {
+            url = $safe_gitdir;
+            rev = \"$commit\";
+        } + \"/\" + $safe_subpath
+    )"
+  else
+    echo "Can only handle git stuff"
+    exit 1
+  fi
+}
+
+args=("--pure-eval")
+
+# This is all just messy and incomplete argument parsing
+# to turn all paths into --expr's with purePathExpr
+hasSomething=
+while [[ "$#" != 0 ]]; do
+  arg=$1
+  shift
+  if [[ "$arg" == "--expr" || "$arg" == "-E" ]]; then
+    hasSomething=1
+    args+=("$arg" "$1")
+    shift
+  elif [[ "$arg" == "-A" ]]; then
+    args+=("$arg" "$1")
+    shift
+  elif [[ ! "$arg" =~ ^- ]]; then
+    hasSomething=1
+    args+=("--expr" "$(purePathExpr "$arg")")
+  else
+    args+=("$arg")
+  fi
+done
+
+if [[ -z "$hasSomething" ]]; then
+  args+=("--expr" "$(purePathExpr "$PWD")")
+fi
+
+
+set -x
+nix-instantiate "${args[@]}"
+
