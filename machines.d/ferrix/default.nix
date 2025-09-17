@@ -402,6 +402,38 @@ rec {
             echo 1 > /sys/class/sound/hwC1D0/reconfig
           '';
         };
+        
+        systemd.user.timers.librewolf-backup = {
+            wantedBy = [ "timers.target" ];
+            timerConfig = {
+                Persistent = true;
+                OnCalendar = "hourly";
+                RandomizedDelaySec = 60;
+            };
+        };
+        systemd.user.services.librewolf-backup = {
+            unitConfig.ConditionUser = "jeroen";
+            serviceConfig = {
+                Type = "simple";
+            };
+            path = with pkgs; [ mozlz4a jq git git-annex ];
+            script = ''
+                cd ~/.librewolf/*.default # fails (by design) if there would be multiple default profiles
+                cd bookmarkbackups
+                newest=$(find -name 'bookmarks-*.jsonlz4' | sort | tail -n 1)
+                mozlz4a --decompress -- "$newest" | jq > ~/datumoj/bookmarks.json
+
+                # The code below would commit the change on whatever branch the user is currently on.
+                # That's too much interference. Better would be to use a separate checkout specifically
+                # for automated commits.
+                # For now, assume the user will notice the change and commit it at some point.
+                #   cd ~/datumoj
+                #   git annex add --force-small bookmarks.json
+                #   if ! git diff-index --cached --quiet HEAD bookmarks.json; then
+                #       git commit -m "Update bookmarks from librewolf" bookmarks.json
+                #   fi
+            '';
+        };
 
         hardware.bluetooth = {
             enable = true;
