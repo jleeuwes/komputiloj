@@ -1,7 +1,7 @@
 { boltons, ... }:
+with boltons.lib;
 # proper module starts here
 { pkgs, config, lib, ... }:
-with boltons.lib;
 let
   package = pkgs.librewolf;
 

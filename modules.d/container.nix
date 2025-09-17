@@ -1,4 +1,4 @@
-{ boltons, komputiloj, ... }:
+{ komputiloj, ... }:
 # Common configuration to import into every container.
 # Maybe make this module export a function that creates/finishes
 # a container so we can also put stuff like autoStart and privateNetwork here

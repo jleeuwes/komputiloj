@@ -37,7 +37,12 @@ let
             in capsules.nixpkgsCurrent.packages.concatScript args.name [ "${scriptDir}/bin/script" ];
         };
 
-        modules = importDirAndApply ./modules.d capsules_and_boltons;
+        modules = importDirAndApply ./modules.d {
+            # NEVER pass new_capsules as a whole
+            # The capsules we inherit in each output (modules, packages, ...)
+            # will be the dependencies of the proper komputiloj capsule.
+            inherit (new_capsules) boltons komputiloj-privata hello-infra;
+        };
 
         overlays = rec {
             undesired-packages = import ./overlays/undesired-packages.nix { inherit boltons; };
@@ -49,7 +54,7 @@ let
     };
     real_capsules = {
         komputiloj = komputiloj_capsule;
-        privata = sources.komputiloj-privata.value capsules_and_boltons;
+        privata = new_capsules.komputiloj-privata; # alias, TODO get rid of it
         hello-infra = sources.hello-infra.value (capsules_and_boltons // {
             inherit (new_capsules) nixos_25_05;
         });
@@ -69,6 +74,7 @@ let
         domains = mergeAttrsets (catAttrs "domains" cs);
     };
     new_capsules = {
+        # Keep STRICT dependency order here and ONLY take from new_capsules!
         boltons = {
             lib = boltons;
         };
@@ -79,6 +85,9 @@ let
             inherit (new_capsules) platform boltons;
         };
         mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix;
+        komputiloj-privata = sources.komputiloj-privata.value {
+            inherit (new_capsules) boltons;
+        };
     };
     fake_capsules = rec {
         # TODO get rid of this backwards compatible abomination

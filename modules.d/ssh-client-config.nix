@@ -1,4 +1,4 @@
-{ privata, hello-infra, ... }:
+{ komputiloj-privata, hello-infra, ... }:
 # proper module starts here
 { pkgs, config, lib, ... }:
 {
@@ -6,7 +6,7 @@
     _file = __curPos.file;
 
     imports = [
-        privata.modules.ssh-client-config
+        komputiloj-privata.modules.ssh-client-config
         hello-infra.modules.ssh-client-config
     ];
     

@@ -62,7 +62,9 @@ with builtins;
             # brightnessctl
             unclutter-xfixes # hides the mouse if unused
             
-            komputiloj.packages.dekstop # must be in PATH for our xmonad config!
+            # NOTE I don't think we can use config.nixpkgs.hostPlatform here but we could try.
+            # NOTE we're hardcoding the choice for native/emulated compilation here
+            komputiloj.packages.${pkgs.stdenv.hostPlatform.system}.dekstop # must be in PATH for our xmonad config!
         
             xsel
 

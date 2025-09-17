@@ -1,4 +1,4 @@
-{ boltons, komputiloj, ... }:
+{ komputiloj, ... }:
 { modulesPath, ... }: {
 	imports = [
 		(modulesPath + "profiles/qemu-guest")

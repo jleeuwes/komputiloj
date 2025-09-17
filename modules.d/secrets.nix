@@ -1,5 +1,5 @@
 { boltons, ... }:
-with boltons;
+with boltons.lib;
 { config, pkgs, lib, ... }:
 with lib;
 let

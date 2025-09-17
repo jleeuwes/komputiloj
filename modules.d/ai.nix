@@ -1,4 +1,4 @@
-{ nixpkgsFuture, ... }:
+{ ... }:
 # proper module starts here
 { pkgs, config, ... }:
 {
