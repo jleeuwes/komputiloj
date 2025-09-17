@@ -2,8 +2,8 @@
 with builtins;
 rec {
     nix_path = fetchTarball {
-        url    = "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/53007af63fade28853408370c4c600a63dd97f41/nixos-mailserver-53007af63fade28853408370c4c600a63dd97f41.tar.gz";
-        sha256 = "0jpp086m839dz6xh6kw5r8iq0cm4nd691zixzy6z11c4z2vf8v85";
+        url    = "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/f5936247dbdb8501221978562ab0b302dd75456c/nixos-mailserver-f5936247dbdb8501221978562ab0b302dd75456c.tar.gz";
+        sha256 = "1qn5fg0h62r82q7xw54ib9wcpflakix2db2mahbicx540562la1y";
     };
     value = import nix_path;
 }

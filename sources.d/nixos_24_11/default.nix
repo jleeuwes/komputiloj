@@ -6,4 +6,5 @@ rec {
         sha256 = "189lwv8l10bm9fnksfkzy05pm86gmziy9z3bdn13zc8d636ylchj";
     };
     value = import (nix_path + "/flake.nix");
+    value_nonflake = import nix_path;
 }
