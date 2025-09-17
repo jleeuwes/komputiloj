@@ -93,10 +93,15 @@ in rec {
             };
         };
     };
-    
+
     crossLegacyPackages = {
-        aarch64-linux = {
-            # TODO buildPlatform = localSystem, hostPlatform = aarch64-linux
+        aarch64-linux = nixpkgs_nonflake {
+            system = localSystem;
+            crossSystem = "aarch64-linux";
+            config = {
+                allowUnfreePredicate = pkg:
+                    elem (nixpkgs_lib.getName pkg) allowedUnfreePackages;
+            };
         };
     };
 
