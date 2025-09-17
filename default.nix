@@ -149,7 +149,10 @@ let
     capsules = new_capsules // sloppy_capsules;
     # TODO get rid of passing capsules_and_boltons everywhere.
     # work towards an explicit dependency order
-    capsules_and_boltons = sloppy_capsules // { inherit boltons; };
+    capsules_and_boltons = sloppy_capsules // {
+        # make boltons.lib already work in sloppy capsules
+        boltons = boltons // { lib = boltons; };
+    };
 in {
     boltons = boltons;
     default_nixos = default_nixos; # extracted by komputiloj script

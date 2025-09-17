@@ -1,29 +1,11 @@
-{ ... }:
+{ boltons, ... }:
 # proper module starts here
 { pkgs, config, lib, ... }:
-
+with boltons.lib;
 let
   package = pkgs.librewolf;
 
-  # The firefox version is in src.json in the librewolf package,
-  # but we can't get to it here.
-  # TODO: make this less hacky.
-  firefoxVersion = {
-    "128.0-2" = "128.0";
-    "128.0.3-2" = "128.0.3";
-    "130.0-1" = "130.0";
-    "131.0.2-1" = "131.0.2";
-    "134.0-1" = "134.0";
-    "134.0.1-1" = "134.0.1";
-    "136.0-1" = "136.0";
-    "136.0-2" = "136.0";
-    "136.0.1-1" = "136.0.1";
-    "137.0.2-1" = "137.0.2";
-    "138.0.1-2" = "138.0.1";
-    "139.0.4-1" = "139.0.4"; # not checked!
-    "140.0.2-1" = "140.0.2"; # not checked!
-  }."${pkgs.librewolf.version}"
-  or (throw "Unknown librewolf version ${pkgs.librewolf.version}");
+  firefoxVersion = replaceRegex "-[0-9]+$" "" pkgs.librewolf.version;
 
   cfg = config.programs.librewolf;
 
