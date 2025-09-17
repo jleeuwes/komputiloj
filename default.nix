@@ -69,11 +69,14 @@ let
         domains = mergeAttrsets (catAttrs "domains" cs);
     };
     new_capsules = {
+        boltons = {
+            lib = boltons;
+        };
         platform = {
             localSystem = builtins.currentSystem; # IMPURE. Make this a pin?
         };
         nixos_25_05 = import ./sources.d/nixos_25_05/capsule.nix {
-            inherit (new_capsules) platform;
+            inherit (new_capsules) platform boltons;
         };
         mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix;
     };
@@ -83,7 +86,7 @@ let
             nixpkgs // {
                 # TODO move closer to flakes by getting rid of x64_64-linux default
                 #      (i.e. the part before the // operator)
-                packages = nixpkgs.packages.x86_64-linux // nixpkgs.packages;
+                packages = nixpkgs.legacyPackages.x86_64-linux // nixpkgs.legacyPackages;
 
                 # TODO remove this and use nixosModules everywhere instead
                 modules = nixpkgs.nixosModules;

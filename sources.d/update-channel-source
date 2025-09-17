@@ -23,5 +23,6 @@ cat > default.nix <<-EOF
 	        sha256 = "$current_sha";
 	    };
 	    value = import (nix_path + "/flake.nix");
+	    value_nonflake = import nix_path;
 	}
 EOF

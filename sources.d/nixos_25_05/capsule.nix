@@ -1,34 +1,19 @@
-with builtins;
+{ platform, boltons }:
+with boltons.lib;
 let
+    localSystem = platform.localSystem;
+    allowedUnfreePackages = [
+        "steam" "steam-unwrapped" "steam-run" "steam-original"
+        "android-studio"
+    ];
     source = import ./.;
-    flake_info = let
-        versionSuffix = readFile (source.nix_path + "/.version-suffix");
-        versionParts = filter (part: part != []) (split "\\." versionSuffix);
-        number = elemAt versionParts 1;
-        shortRevision = elemAt versionParts 2;
-        fullRevision = readFile (source.nix_path + "/.git-revision");
-        in {
-            rev = fullRevision;
-            shortRev = shortRevision;
-            lastModifiedDate = number;
-        };
-    nixpkgs = source.value.outputs { self = nixpkgs; } // {
-        # If you import the outPath, it should result in 'old' nixpkgs. See https://stackoverflow.com/a/74465514
-        outPath = source.nix_path;
-        
-        # Fake some stuff to make lib/flake-version-info.nix return the same values
-        # as before we used the flake. Because we're not _really_ using flakes (yet),
-        # the flake version info otherwise gives a weird store path
-        # (like nixos-system-ferrix-24.05.19700101.dirty).
-        # See https://nix.dev/manual/nix/2.24/command-ref/new-cli/nix3-flake.html#flake-references
-        # for some of these 'magic' attrs that the flakes system usually sets.
-        inherit (flake_info) rev shortRev lastModifiedDate;
-    };
-in
-{ platform }:
-let localSystem = platform.localSystem;
-in {
-    outPath = nixpkgs.outPath;
+    nixpkgs_nonflake = source.value_nonflake;
+    nixpkgs_lib = import (source.nix_path + "/lib");
+    nixpkgs_nixos_lib_eval-config = import (source.nix_path + "/nixos/lib/eval-config.nix");
+in rec {
+    # If you import the outPath, it should result in 'old' nixpkgs. See https://stackoverflow.com/a/74465514
+    # (not sure if still applicable when not going through flake)
+    outPath = source.nix_path;
     
     pins.nixpkgs = {
         # Pins are a capsule output that aims to make our pinning mechanisme
@@ -73,71 +58,60 @@ in {
     #           (some discussion I have not read at
     #           https://discourse.nixos.org/t/new-reader-finding-documentation-unnecessarily-confusing/40722/6
 
+    # TODO uitsplitsen in buildTools, crossBuildTools and emulatedBuildTools?
     buildTools = {
         # the only buildTools we can provide unemulated are
         # those for the system komputiloj runs on
-        ${localSystem} = nixpkgs.legacyPackages.${localSystem};
-        aarch64-linux-emulated = nixpkgs.legacyPackages.aarch64-linux;
+        ${localSystem} = legacyPackages.${localSystem};
+        aarch64-linux-emulated = legacyPackages.aarch64-linux;
         # echte aarch64-linux gaat niet lukken zolang we via de nixpkgs-flake
         # gaan, want die stelt localPlatform en crossPlatform gelijk
     };
     
-    # buildRecipes is a bad name.
-    # buildRecipes suggest that the results are buildTools.
-    # but the nixosSystem does not run on the build system, so the build prefix
-    # would not mean the same as in buildTools.
-    # also, nixosSystem does not even return a derivation and can't be 'run'.
-    # (I don't think we even need a buildRecipes output, even if it would
-    # contain the correct things; recipes should be enough for everything I
-    # would think)
-    shouldNotBeCalled_buildRecipes = {
-        # TODO reuse pkgs in the nixosSystem calls
-        ${localSystem} = {
-            nixosSystem = { modules }: nixpkgs.lib.nixosSystem {
-                system = null;
-                lib = nixpkgs.lib;
-                modules = modules ++ [{
-                    nixpkgs.buildPlatform.system = localSystem;
-                    nixpkgs.hostPlatform.system  = localSystem;
-                }];
+    legacyPackages = {
+        # this is okay as long as we only build things on x86_64-linux.
+        # in the unlikely event that we were to run komputiloj on, say, a
+        # raspberry pi, this would result in emulation
+        x86_64-linux = nixpkgs_nonflake {
+            system = "x86_64-linux";
+            config = {
+                allowUnfreePredicate = pkg:
+                    elem (nixpkgs_lib.getName pkg) allowedUnfreePackages;
             };
         };
-        aarch64-linux-emulated = {
-            # NOT YET TESTED
-            nixosSystem = { modules }: nixpkgs.lib.nixosSystem {
-                system = null;
-                lib = nixpkgs.lib;
-                modules = modules ++ [{
-                    nixpkgs.buildPlatform.system = "aarch64-linux";
-                    nixpkgs.hostPlatform.system  = "aarch64-linux";
-                }];
-            };
-        };
-        aarch64-linux-cross = {
-            # NOT YET TESTED
-            nixosSystem = { modules }: nixpkgs.lib.nixosSystem {
-                system = null;
-                lib = nixpkgs.lib;
-                modules = modules ++ [{
-                    nixpkgs.buildPlatform.system = localSystem;
-                    nixpkgs.hostPlatform.system  = "aarch64-linux";
-                }];
+        
+        # these packages are built using emulation
+        # on non-aarch64 (versus cross compiled).
+        # this is what flakes do in their legacyPackages output,
+        # let's not deviate from that in flakes-defined outputs.
+        # we have a separate crossLegacyPackages output for cross compilation.
+        aarch64-linux = nixpkgs_nonflake {
+            system = "aarch64-linux";
+            config = {
+                allowUnfreePredicate = pkg:
+                    elem (nixpkgs_lib.getName pkg) allowedUnfreePackages;
             };
         };
     };
     
-    packages = {
-        # this is okay as long as we only build things on x86_64-linux.
-        # in the unlikely event that we were to run komputiloj on, say, a
-        # raspberry pi, this would result in emulation
-        x86_64-linux = nixpkgs.legacyPackages.x86_64-linux;
-        
-        # these packages are built using emulation
-        # on non-aarch64 (versus cross compiled).
-        # this is what flakes do in their packages output,
-        # let's not deviate from that in flakes-defined outputs.
-        # we have a separate crossPackages output for cross compilation.
-        aarch64-linux = nixpkgs.legacyPackages.aarch64-linux;
+    crossLegacyPackages = {
+        aarch64-linux = {
+            # TODO buildPlatform = localSystem, hostPlatform = aarch64-linux
+        };
+    };
+
+    packages = let
+        # TODO: discover packages in attrsets and flatten them?
+        #       remember: we only want to expose packages.${system}.${pkgname}, nothing deeper!
+        # TODO: put functions that return a derivation in recipes? (this is hard to detect.)
+        # TODO: do this at pin update time, because it is costly
+        realPackages = pkgs: let
+            select = attr: let tried = tryEval (nixpkgs_lib.isDerivation attr.value); in tried.success && tried.value;
+        in filterAttrs select pkgs;
+    in {
+        # same notes about emulation vs cross-compilations apply as those with legacyPackages
+        x86_64-linux = realPackages legacyPackages.x86_64-linux;
+        aarch64-linux = realPackages legacyPackages.aarch64-linux;
     };
 
     crossPackages = {
@@ -146,12 +120,24 @@ in {
         };
     };
 
-    lib = nixpkgs.lib // {
-        nixosSystem = args:
-            # system should not default to impure currentSystem but it does :|
-            nixpkgs.lib.nixosSystem (args // { extraModules = []; });
+    lib = nixpkgs_lib // {
+        nixosSystem = { modules, pkgs }:
+            nixpkgs_nixos_lib_eval-config {
+                system = null;
+                lib = nixpkgs_lib; # don't let eval-config.nix reimport lib
+                extraModules = []; # disable some env-dependent stuff
+                modules = modules ++ [{
+                    # We want nixosSystem to always get an explicit pkgs parameter.
+                    # But we pass it modularly because the pkgs parameter of eval-config.nix is sort of deprecated.
+                    nixpkgs.pkgs = pkgs;
+                    
+                    # TODO: check that nixpkgs checks the system of pkgs against nixpkgs.hostPlatform (usually in hardware-configuration.nix)
+                    # If not, maybe this will help to produce a nice module option conflict error:
+                    # nixpkgs.hostPlatform = pkgs.stdenv.hostPlatform.system;
+                }];
+            };
     };
 
-    inherit (nixpkgs) nixosModules;
+    # inherit (nixpkgs_flake) nixosModules;
     
 }

@@ -33,7 +33,7 @@ in rec {
 	};
 	
 	nixosSystem = nixos_25_05.lib.nixosSystem {
-		system = "x86_64-linux";
+		pkgs = nixos_25_05.legacyPackages.x86_64-linux;
 		modules = [
 			mainModule
 		];

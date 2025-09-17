@@ -1,8 +1,8 @@
 { komputiloj, hello-infra, nixos_25_05, ... }:
 rec {
     nixosSystem = nixos_25_05.lib.nixosSystem {
-        # TODO this should not work, we don't specify a system!
         modules = [ mainModule ];
+        pkgs = nixos_25_05.legacyPackages.x86_64-linux;
     };
 
     mainModule = { config, pkgs, lib, ... }: {
@@ -29,9 +29,6 @@ rec {
             experimental-features = [ "nix-command" "flakes" ];
         };
 
-        nixpkgsAllowUnfreePackages = [
-            "android-studio"
-        ];
         nixpkgs.overlays = [
             komputiloj.overlays.undesired-packages
             (final: prev: {
@@ -51,7 +48,6 @@ rec {
                 komputiloj.modules.apple-superdrive
                 komputiloj.modules.build-for-raspberry
                 komputiloj.modules.ludanto
-                komputiloj.modules.unfree
                 komputiloj.modules.ai
             ];
   

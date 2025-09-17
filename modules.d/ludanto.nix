@@ -23,12 +23,6 @@ in {
         enable = true;
     };
     
-    nixpkgsAllowUnfreePackages = [
-        "steam"
-        "steam-unwrapped"
-        "steam-run"
-        "steam-original"
-    ];
 
     systemd.services."getty@tty6" = {
         serviceConfig = {
