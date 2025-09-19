@@ -80,6 +80,7 @@ let
         };
         platform = {
             localSystem = builtins.currentSystem; # IMPURE. Make this a pin?
+            emulatedSystems = attrNames (readDir /run/binfmt); # IMPURE
         };
         nixos_25_05 = import ./sources.d/nixos_25_05/capsule.nix {
             inherit (new_capsules) platform boltons;
@@ -95,7 +96,7 @@ let
             nixpkgs // {
                 # TODO move closer to flakes by getting rid of x64_64-linux default
                 #      (i.e. the part before the // operator)
-                packages = nixpkgs.legacyPackages.x86_64-linux // nixpkgs.legacyPackages;
+                packages = nixpkgs.legacyPackages.native.x86_64-linux // nixpkgs.legacyPackages;
 
                 # TODO remove this and use nixosModules everywhere instead
                 modules = nixpkgs.nixosModules;

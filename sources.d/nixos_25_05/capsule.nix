@@ -10,6 +10,10 @@ let
     nixpkgs_nonflake = source.value_nonflake;
     nixpkgs_lib = import (source.nix_path + "/lib");
     nixpkgs_nixos_lib_eval-config = import (source.nix_path + "/nixos/lib/eval-config.nix");
+    nixpkgs_config = {
+        allowUnfreePredicate = pkg:
+            elem (nixpkgs_lib.getName pkg) allowedUnfreePackages;
+    };
 in rec {
     # If you import the outPath, it should result in 'old' nixpkgs. See https://stackoverflow.com/a/74465514
     # (not sure if still applicable when not going through flake)
@@ -58,51 +62,43 @@ in rec {
     #           (some discussion I have not read at
     #           https://discourse.nixos.org/t/new-reader-finding-documentation-unnecessarily-confusing/40722/6
 
-    # TODO uitsplitsen in buildTools, crossBuildTools and emulatedBuildTools?
-    buildTools = {
-        # the only buildTools we can provide unemulated are
-        # those for the system komputiloj runs on
-        ${localSystem} = legacyPackages.${localSystem};
-        aarch64-linux-emulated = legacyPackages.aarch64-linux;
-        # echte aarch64-linux gaat niet lukken zolang we via de nixpkgs-flake
-        # gaan, want die stelt localPlatform en crossPlatform gelijk
+    legacyBuildTools = {
+        # NOTE: only cross is interesting, the rest is really the same as legacyPackages
+        native = mapAttrs (nm: pkgs: pkgs.pkgsBuildHost) legacyPackages.native;
+        qemu   = mapAttrs (nm: pkgs: pkgs.pkgsBuildHost) legacyPackages.qemu;
+        cross  = mapAttrs (nm: pkgs: pkgs.pkgsBuildHost) legacyPackages.cross;
     };
     
     legacyPackages = {
-        # this is okay as long as we only build things on x86_64-linux.
-        # in the unlikely event that we were to run komputiloj on, say, a
-        # raspberry pi, this would result in emulation
-        x86_64-linux = nixpkgs_nonflake {
-            system = "x86_64-linux";
-            config = {
-                allowUnfreePredicate = pkg:
-                    elem (nixpkgs_lib.getName pkg) allowedUnfreePackages;
+        native = {
+            ${localSystem} = nixpkgs_nonflake {
+                system = localSystem;
+                config = nixpkgs_config;
             };
         };
-        
-        # these packages are built using emulation
-        # on non-aarch64 (versus cross compiled).
-        # this is what flakes do in their legacyPackages output,
-        # let's not deviate from that in flakes-defined outputs.
-        # we have a separate crossLegacyPackages output for cross compilation.
-        aarch64-linux = nixpkgs_nonflake {
-            system = "aarch64-linux";
-            config = {
-                allowUnfreePredicate = pkg:
-                    elem (nixpkgs_lib.getName pkg) allowedUnfreePackages;
-            };
-        };
-    };
 
-    crossLegacyPackages = {
-        aarch64-linux = nixpkgs_nonflake {
-            system = localSystem;
-            crossSystem = "aarch64-linux";
-            config = {
-                allowUnfreePredicate = pkg:
-                    elem (nixpkgs_lib.getName pkg) allowedUnfreePackages;
+        qemu = let
+            gensystem = system:
+                if elem system platform.emulatedSystems
+                then nixpkgs_nonflake {
+                    inherit system;
+                    config = nixpkgs_config;
+                } else throw "Please add ${system} to binfmt.emulatedSystem";
+        in removeAttrs {
+            x86_64-linux  = gensystem "x86_64-linux";
+            aarch64-linux = gensystem "aarch64-linux";
+        } [ localSystem ];
+
+        cross = let
+            gensystem = system: nixpkgs_nonflake {
+                system = localSystem;
+                crossSystem = system;
+                config = nixpkgs_config;
             };
-        };
+        in removeAttrs {
+            x86_64-linux  = gensystem "x86_64-linux";
+            aarch64-linux = gensystem "aarch64-linux";
+        } [ localSystem ];
     };
 
     packages = let
@@ -114,15 +110,7 @@ in rec {
             select = attr: let tried = tryEval (nixpkgs_lib.isDerivation attr.value); in tried.success && tried.value;
         in filterAttrs select pkgs;
     in {
-        # same notes about emulation vs cross-compilations apply as those with legacyPackages
-        x86_64-linux = realPackages legacyPackages.x86_64-linux;
-        aarch64-linux = realPackages legacyPackages.aarch64-linux;
-    };
-
-    crossPackages = {
-        aarch64-linux = {
-            # TODO buildPlatform = localSystem, hostPlatform = aarch64-linux
-        };
+        # TODO same structure with native/qemu/cross as legacyPackages
     };
 
     lib = nixpkgs_lib // {
