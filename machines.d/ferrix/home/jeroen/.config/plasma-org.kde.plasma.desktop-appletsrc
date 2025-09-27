@@ -49,6 +49,7 @@ popupWidth=560
 
 [Containments][2][Applets][19][Configuration][Appearance]
 fontWeight=400
+showWeekNumbers=true
 
 [Containments][2][Applets][20]
 immutability=1
