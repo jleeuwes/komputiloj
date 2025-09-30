@@ -7,7 +7,7 @@ builtins // rec {
     
     # Given an attrset of attrsets, make sure each attrsets has a name attribute.
     # If an attrset already has a name attribute, it is kept as-is.
-    # Otherwise, name is set to the name to with the attrset is assigned in the
+    # Otherwise, name is set to the name to which the attrset is assigned in the
     # outer attrset.
     named = mapAttrs (name: value: { name = name; } // value);
 
@@ -25,7 +25,7 @@ builtins // rec {
         loc = nm: set: let
             l = unsafeGetAttrPos nm set;
         in if l == null then "<unknown>" else "${l.file}:${toString l.line}";
-        mkError = nm: "mergeAtts: attribute \"${nm}\" is defined in both ${loc nm a} and ${loc nm b}";
+        mkError = nm: "mergeAttrs: attribute \"${nm}\" is defined in both ${loc nm a} and ${loc nm b}";
     in if duplicates == []
     then (a // b)
     else throw (mkError (head duplicates));
