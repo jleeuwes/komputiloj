@@ -92,8 +92,9 @@ in rec {
     qemu = let
         checksystem = system:
             if elem system platform.emulatedSystems
-            then throw "Please add ${system} to binfmt.emulatedSystem" # TODO make this a warning?
-            else system;
+            then system
+            else throw "Please add ${system} to binfmt.emulatedSystem" # TODO make this a warning?
+            ;
         gensystem = system: let
             pkgs = nixpkgs_nonflake {
                 inherit system;

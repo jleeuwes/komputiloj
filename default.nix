@@ -25,8 +25,8 @@ let
         };
 
         lib = {
-            # TODO this is a 'metapackage', not a lib, because its system-dependent!
-            writeCommand = args: let
+            # TODO get rid of this, this is a 'metapackage', not a lib, because its system-dependent!
+            writeCommand = warn "DON'T USE THIS. Use the packageBuilder from command-platform." (args: let
                 # TODO somehow enhance writeShellApplication to produce a clean PATH inside the script
                 # Currently it is too easy to rely on some undeclared dependency.
                 scriptDir = capsules.nixpkgsCurrent.packages.writeShellApplication {
@@ -34,7 +34,7 @@ let
                     runtimeInputs = args.runtimeInputs or [];
                     text = args.text;
                 };
-            in capsules.nixpkgsCurrent.packages.concatScript args.name [ "${scriptDir}/bin/script" ];
+            in capsules.nixpkgsCurrent.packages.concatScript args.name [ "${scriptDir}/bin/script" ]);
         };
 
         modules = importDirAndApply ./modules.d {
@@ -64,6 +64,10 @@ let
         wolk = (import ./apps/wolk) capsules_and_boltons;
         thee = (import ./apps/thee) capsules_and_boltons;
         notie = (import ./apps/notie) capsules_and_boltons;
+        hello-infra = sources.hello-infra.value {
+            inherit (new_capsules) boltons platform nixos_25_05 command-platform komputiloj-bootstrap;
+            inherit (capsules) raspberry-pi-nix; # TODO this is keeping hello-infra from becoming a proper new_capsule
+        };
     };
     all_capsule = let
         cs = attrValues (named (real_capsules // fake_capsules // new_capsules));
@@ -93,14 +97,28 @@ let
             inherit (new_capsules) platform boltons;
         };
         mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix;
+        command-platform = {
+            native.${new_capsules.platform.localSystem} = {
+                packageBuilders = {
+                    writeCommand = args: let
+                        # TODO somehow enhance writeShellApplication to produce a clean PATH inside the script
+                        # Currently it is too easy to rely on some undeclared dependency.
+                        scriptDir =
+                        new_capsules.nixos_25_05.native.${new_capsules.platform.localSystem}.packageBuilders.writeShellApplication {
+                            name = "script";
+                            runtimeInputs = args.runtimeInputs or [];
+                            text = args.text;
+                        };
+                    in
+                    new_capsules.nixos_25_05.portable.packageBuilders.concatScript args.name [ "${scriptDir}/bin/script" ];
+                };
+            };
+        };
         komputiloj-privata = sources.komputiloj-privata.value {
             inherit (new_capsules) boltons;
         };
         komputiloj-bootstrap = sources.komputiloj-bootstrap.value {
             inherit (new_capsules) boltons;
-        };
-        hello-infra = sources.hello-infra.value {
-            inherit (new_capsules) boltons platform nixos_25_05;
         };
     };
     fake_capsules = rec {
