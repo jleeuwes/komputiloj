@@ -38,12 +38,12 @@ in komputiloj.lib.writeCommand {
             "$KOMPUTILOJ_PATH"/secrets/jeroen@lwstn.eu@versio.nl)
         export TRANSIP_USER TRANSIP_PRIVKEY VERSIO_USER
 
-        ${unlines (attrValues (mapAttrs
-            (name: value:
-                "printf 'Updating domain %s at %s\\n' ${escape name} ${escape value.provider} >&2"
+        ${unlines (map
+            (domain:
+                "printf 'Updating domain %s at %s\\n' ${escape domain.name} ${escape domain.provider} >&2"
                 + "\n" +
-                "${providerScripts.${value.provider}} ${escape name} ${recordsFile value}"
+                "${providerScripts.${domain.provider}} ${escape domain.name} ${recordsFile domain}"
             )
-            all.domains))}
+            (attrValues all.domains))}
     '';
 }

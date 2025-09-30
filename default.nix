@@ -42,6 +42,10 @@ let
             # The capsules we inherit in each output (modules, packages, ...)
             # will be the dependencies of the proper komputiloj capsule.
             inherit (new_capsules) boltons komputiloj-privata hello-infra;
+
+            # pass the capsule that we are constructing to itself.
+            # TODO we would like to get rid of such magic
+            komputiloj = komputiloj_capsule;
         };
 
         overlays = rec {
@@ -49,15 +53,12 @@ let
         };
         
         machines = importDirAndApply ./machines.d (capsules_and_boltons // {
-            inherit (new_capsules) nixos_25_05 mailserver_25_05;
+            inherit (new_capsules) nixos_25_05 mailserver_25_05 hello-infra;
         });
     };
     real_capsules = {
         komputiloj = komputiloj_capsule;
         privata = new_capsules.komputiloj-privata; # alias, TODO get rid of it
-        hello-infra = sources.hello-infra.value (capsules_and_boltons // {
-            inherit (new_capsules) nixos_25_05;
-        });
         gorinchemindialoog = sources.gorinchemindialoog.value;
         sleutel = (import ./apps/sleutel) capsules_and_boltons;
         wolk = (import ./apps/wolk) capsules_and_boltons;
@@ -65,13 +66,19 @@ let
         notie = (import ./apps/notie) capsules_and_boltons;
     };
     all_capsule = let
-        cs = attrValues (real_capsules // fake_capsules);
+        cs = attrValues (named (real_capsules // fake_capsules // new_capsules));
+        prefixWith = pre: s: "${pre}:${s}";
+        flatten = aspect:
+            mergeAttrsets (map (capsule: mapNames (prefixWith capsule.name) (aspect capsule)) cs);
     in {
         # special capsule which aggregates stuff from all other capsules
-        # TODO how do new capsules fit into this, if at all?
-        users = mergeAttrsets (catAttrs "users" cs);
-        lib = mergeAttrsets (catAttrs "lib" cs);
-        domains = mergeAttrsets (catAttrs "domains" cs);
+        # TODO: Put the things that use this capsule into a new capsule.
+        #       Let that capsules depend on a proper komputiloj capsule (work in progress)
+        #       that exports all other capsules.
+        #       The flattening that happens here should be applied to all capsules
+        #       by way of some helper function that each capsule applies to itself.
+        users = flatten (capsule: capsule.users or {});
+        domains = flatten (capsule: capsule.domains or {});
     };
     new_capsules = {
         # Keep STRICT dependency order here and ONLY take from new_capsules!
@@ -89,51 +96,48 @@ let
         komputiloj-privata = sources.komputiloj-privata.value {
             inherit (new_capsules) boltons;
         };
+        komputiloj-bootstrap = sources.komputiloj-bootstrap.value {
+            inherit (new_capsules) boltons;
+        };
+        hello-infra = sources.hello-infra.value {
+            inherit (new_capsules) boltons platform nixos_25_05;
+        };
     };
     fake_capsules = rec {
         # TODO get rid of this backwards compatible abomination
         nixpkgsCurrent = let nixpkgs = getAttr default_nixos new_capsules; in
             nixpkgs // {
-                # TODO move closer to flakes by getting rid of x64_64-linux default
-                #      (i.e. the part before the // operator)
-                packages = nixpkgs.legacyPackages.native.x86_64-linux // nixpkgs.legacyPackages;
+                packages = nixpkgs.native.x86_64-linux.legacyPackages;
 
                 # TODO remove this and use nixosModules everywhere instead
                 modules = nixpkgs.nixosModules;
             };
         nixpkgsFuture = let
             override = old: new: trace ("🕑🕐🕛 nixpkgsFuture: Replacing " + old.name + " with " + new.name) new;
-            unstable = sources.nixos_unstable.value.outputs { self = unstable; }
-                // {
-                    outPath = sources.nixos_unstable.nix_path;
-                    inherit
-                        (fake_flakes.info_from_nixpkgs sources.nixos_unstable.nix_path)
-                        rev shortRev lastModifiedDate;
-                };
         in {
             # NOTE: Each time we use something from unstable, we should pin
             # that exact source. That way, we can someday move away from the
             # unstable version when it hits the stable channels.  If we would
             # take packages directly from one perpetually updated unstable
             # source, we will never catch up.
+            
+            # TODO these are flake-like outputs, not our multiarch capsule
+            # outputs. This nixpkgsFuture mess should be removed anyway
+            # so I guess we can live with that for now?
 
             packages.aarch64-linux = let
-                callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages.aarch64-linux pkg;
+                callPackage = pkg: callPackageWith nixpkgsCurrent.qemu.aarch64-linux.legacyPackages pkg;
             in {
                 ebusd = override
-                    nixpkgsCurrent.packages.aarch64-linux.ebusd
+                    nixpkgsCurrent.qemu.aarch64-linux.legacyPackages.ebusd
                     (callPackage ./pkgs/ebusd {});
             };
             packages.x86_64-linux = let
-                callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages.x86_64-linux pkg;
+                callPackage = pkg: callPackageWith nixpkgsCurrent.native.x86_64-linux.legacyPackages pkg;
             in {
                 silverbullet = override
-                    nixpkgsCurrent.packages.x86_64-linux.silverbullet
+                    nixpkgsCurrent.native.x86_64-linux.legacyPackages.silverbullet
                     (callPackage ./pkgs/silverbullet {});
-                ollama = override
-                    nixpkgsCurrent.packages.x86_64-linux.ollama
-                    unstable.legacyPackages.x86_64-linux.ollama;
-
             };
         };
         nextcloud = {

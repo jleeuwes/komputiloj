@@ -33,7 +33,7 @@ in rec {
 	};
 	
 	nixosSystem = nixos_25_05.lib.nixosSystem {
-		pkgs = nixos_25_05.legacyPackages.x86_64-linux;
+		pkgs = nixos_25_05.native.x86_64-linux.legacyPackages;
 		modules = [
 			mainModule
 		];
@@ -73,10 +73,10 @@ in rec {
 			komputiloj.modules.ssh-client-config
 			komputiloj.modules.secrets
 			mailserver_25_05.nixosModules.mailserver
-			hello.modules."70004-backup"
-			hello.modules."70004-autocommit"
-			hello.modules."70004-ingest-data"
-			hello.modules."70004-known-host"
+			hello.nixosModules."70004-backup"
+			hello.nixosModules."70004-autocommit"
+			hello.nixosModules."70004-ingest-data"
+			hello.nixosModules."70004-known-host"
 			sleutel.modules.all_in_one
 			wolk.modules.all_in_one
 			notie.modules.all_in_one

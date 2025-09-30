@@ -6,8 +6,8 @@
     _file = __curPos.file;
 
     imports = [
-        komputiloj-privata.modules.ssh-client-config
-        hello-infra.modules.ssh-client-config
+        komputiloj-privata.nixosModules.ssh-client-config
+        hello-infra.nixosModules.ssh-client-config
     ];
     
     programs.ssh = {

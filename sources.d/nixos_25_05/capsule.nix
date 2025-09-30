@@ -62,44 +62,78 @@ in rec {
     #           (some discussion I have not read at
     #           https://discourse.nixos.org/t/new-reader-finding-documentation-unnecessarily-confusing/40722/6
 
-    legacyBuildTools = {
-        # NOTE: only cross is interesting, the rest is really the same as legacyPackages
-        native = mapAttrs (nm: pkgs: pkgs.pkgsBuildHost) legacyPackages.native;
-        qemu   = mapAttrs (nm: pkgs: pkgs.pkgsBuildHost) legacyPackages.qemu;
-        cross  = mapAttrs (nm: pkgs: pkgs.pkgsBuildHost) legacyPackages.cross;
+    portable = {
+        packageBuilders = {
+            inherit (native.${localSystem}.legacyPackages)
+                writeTextFile writeText writeTextDir writeScript writeScriptBin
+                concatTextFile concatText concatScript
+                symlinkJoin;
+
+            # TODO ideally we would have some sort of 'safe' mkDerivation here that
+            #      can only produce portable packages.
+        };
     };
-    
-    legacyPackages = {
-        native = {
-            ${localSystem} = nixpkgs_nonflake {
-                system = localSystem;
+
+    # NOTE: native is only always one system, but we still force using the system name
+    # to make things unambiguous.
+    native.${localSystem} = let
+        pkgs = nixpkgs_nonflake {
+            system = localSystem;
+            config = nixpkgs_config;
+        };
+    in {
+        legacyPackages = pkgs;
+        packageBuilders = {
+            inherit (pkgs.stdenv) mkDerivation;
+            inherit (pkgs) writeShellScript writeShellScriptBin writeShellApplication;
+        };
+    };
+
+    qemu = let
+        checksystem = system:
+            if elem system platform.emulatedSystems
+            then throw "Please add ${system} to binfmt.emulatedSystem" # TODO make this a warning?
+            else system;
+        gensystem = system: let
+            pkgs = nixpkgs_nonflake {
+                inherit system;
                 config = nixpkgs_config;
             };
-        };
-
-        qemu = let
-            gensystem = system:
-                if elem system platform.emulatedSystems
-                then nixpkgs_nonflake {
-                    inherit system;
-                    config = nixpkgs_config;
-                } else throw "Please add ${system} to binfmt.emulatedSystem";
+            in {
+                # Packages built using emulation.
+                # Pro: matches the binary cache (if it exists), so should have to compile less.
+                # Pro: installed packages are exactly as native. That's useful if we want to
+                #      sometimes rebuild the system on the target system itself.
+                # Con: if compilation is needed, it's slower than cross compilation.
+                # Some more info:
+                # https://discourse.nixos.org/t/error-building-a-raspberry-pi-image-using-nix-on-a-x86-64-system/37968/3
+                # https://discourse.nixos.org/t/how-do-i-get-my-aarch64-linux-machine-to-build-x86-64-linux-extra-platforms-doesnt-seem-to-work/38106/2
+                legacyPackages = pkgs;
+            };
         in removeAttrs {
-            x86_64-linux  = gensystem "x86_64-linux";
-            aarch64-linux = gensystem "aarch64-linux";
+            x86_64-linux  = gensystem (checksystem "x86_64-linux");
+            aarch64-linux = gensystem (checksystem "aarch64-linux");
         } [ localSystem ];
 
-        cross = let
-            gensystem = system: nixpkgs_nonflake {
+    cross = let
+        gensystem = system: let
+            pkgs = nixpkgs_nonflake {
                 system = localSystem;
                 crossSystem = system;
                 config = nixpkgs_config;
             };
+            in {
+                # Packages built using cross compilation.
+                # Pro: builds faster than emulated.
+                # Con: cannot use the binary cache.
+                # Con: cross compilation can leak and cause bugs sometimes?
+                #      I read this but can't find it anymore.
+                legacyPackages = pkgs;
+            };
         in removeAttrs {
             x86_64-linux  = gensystem "x86_64-linux";
             aarch64-linux = gensystem "aarch64-linux";
         } [ localSystem ];
-    };
 
     packages = let
         # TODO: discover packages in attrsets and flatten them?
