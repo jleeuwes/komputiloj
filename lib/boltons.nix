@@ -46,7 +46,7 @@ builtins // rec {
         };
         importedDirs = map importDir entries.directories;
         importedFiles = map importFile
-            (filter (matches ".*\.nix") entries.files);
+            (filter (matches ".*\.nix") entries.regulars);
     in listToAttrs (importedFiles ++ importedDirs);
 
     importDirAndApply = path: arg: mapValues (f: f arg) (importDir path);
@@ -59,8 +59,13 @@ builtins // rec {
         directories = only "directory";
         regulars = only "regular";
         symlinks = only "symlink";
-        files    = only' (type: elem type [ "regular" "symlink" ]);
         others   = only' (type: !elem type [ "directory" "regular" "symlink" ]);
+
+        # Putting regular files and symlinks on one pile was misguided:
+        # 1. we assume symlinks to be files, but they can be directories.
+        # 2. symlink handling is confusing in nix, see https://github.com/NixOS/nix/issues/2109
+        files    = warn "Don't use readDirPerType's files result. Use regulars and/or symlinks directly"
+            (only' (type: elem type [ "regular" "symlink" ]));
     };
 
     lines = input:
