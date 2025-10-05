@@ -10,7 +10,9 @@ let
 
         domains = importDir ./domains.d;
 
-        commands = importDirAndApply ./commands.d capsules_and_boltons;
+        commands = importDirAndApply ./commands.d (capsules_and_boltons // {
+            inherit (new_capsules) nixos_25_05 command-platform;
+        });
 
         packages = let
             callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages pkg capsules_and_boltons;
@@ -101,8 +103,10 @@ let
             inherit (new_capsules) platform boltons;
         };
         mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix;
-        command-platform = {
-            native.${new_capsules.platform.localSystem} = {
+        command-platform = rec {
+            # extra local scope because it's stupid that we would always need command-platform
+            # *and* platform to do command-platform.native.${platform.localSystem}
+            local = {
                 packageBuilders = {
                     writeCommand = args: let
                         # TODO somehow enhance writeShellApplication to produce a clean PATH inside the script
@@ -117,6 +121,8 @@ let
                     new_capsules.nixos_25_05.portable.packageBuilders.concatScript args.name [ "${scriptDir}/bin/script" ];
                 };
             };
+
+            native.${new_capsules.platform.localSystem} = local;
         };
         komputiloj-privata = sources.komputiloj-privata.value {
             inherit (new_capsules) boltons;
@@ -133,6 +139,8 @@ let
 
                 # TODO remove this and use nixosModules everywhere instead
                 modules = nixpkgs.nixosModules;
+
+                pins = {};
             };
         nixpkgsFuture = let
             override = old: new: trace ("🕑🕐🕛 nixpkgsFuture: Replacing " + old.name + " with " + new.name) new;

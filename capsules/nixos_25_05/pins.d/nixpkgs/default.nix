@@ -1,15 +1,16 @@
 { lib, legacyPackages, ... }:
 let
     esc = lib.strings.escapeShellArg;
-in {
     channel_url = "https://channels.nixos.org/nixos-25.05";
+in {
+    inherit channel_url;
     lock = import ./lock.nix;
     updateScript = let
         nix-instantiate = "${legacyPackages.nix}/bin/nix-instantiate";
         nix-prefetch-url = "${legacyPackages.nix}/bin/nix-prefetch-url";
         curl = "${legacyPackages.curl}/bin/curl";
     in ''
-        channel_url=$(${nix-instantiate} --eval -A channel_url --raw)
+        channel_url=${esc channel_url}
         current_overview_url=$(${curl} --head --silent --write-out "%{redirect_url}\n" --output /dev/null "$channel_url")
         if [[ -z "$current_overview_url" ]]; then
         	echo "Could not determine current url for channel $channel_url" >&2
