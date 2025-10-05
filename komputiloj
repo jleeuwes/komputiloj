@@ -51,7 +51,7 @@ main() {
 		*)
 			cmdpath=commands."$cmd"
 			export NIX_PATH=komputiloj="$KOMPUTILOJ_PATH"
-			# The stupid attrset is a trick to prevent a multiple derivations to be built in case of a mistake in the nix files.
+			# The stupid attrset is a trick to prevent multiple derivations to be built in case of a mistake in the nix files.
 			# nix-build otherwise happily builds multiple derivations and we would execute an arbitrary one of them :-(
 			# TODO: run nix in pure evaluation mode to prevent influence from
 			#       unwanted environment variables etc.
