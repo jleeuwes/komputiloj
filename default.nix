@@ -83,6 +83,7 @@ let
         #       by way of some helper function that each capsule applies to itself.
         users = flatten (capsule: capsule.users or {});
         domains = flatten (capsule: capsule.domains or {});
+        pins = flatten (capsule: capsule.pins or {});
     };
     new_capsules = {
         # Keep STRICT dependency order here and ONLY take from new_capsules!
@@ -93,7 +94,7 @@ let
             localSystem = builtins.currentSystem; # IMPURE. Make this a pin?
             emulatedSystems = attrNames (readDir /run/binfmt); # IMPURE
         };
-        nixos_25_05 = import ./sources.d/nixos_25_05/capsule.nix {
+        nixos_25_05 = import ./capsules/nixos_25_05 {
             inherit (new_capsules) platform boltons;
         };
         mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix;
