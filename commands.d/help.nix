@@ -1,15 +1,10 @@
-capsules@{ boltons, komputiloj, nixpkgsCurrent, ... }:
+capsules@{ boltons, nixos_25_05, command-platform, komputiloj, ... }:
 with boltons;
 let
-    machine = komputiloj.machines.scarif;
-    esc = nixpkgsCurrent.lib.strings.escapeShellArg;
-    escapeShellArgs = nixpkgsCurrent.lib.strings.escapeShellArgs;
-    prefix = cname: name: if cname == "komputiloj" then name else "${cname}.${name}";
-    listCapsule = cname: cvalue: attrValues (mapAttrs (name: value: prefix cname name) (cvalue.commands or {}));
-    commandsList = concatLists (attrValues (mapAttrs listCapsule capsules));
-in komputiloj.lib.writeCommand {
+    escapeShellArgs = nixos_25_05.lib.strings.escapeShellArgs;
+    commandsList = attrNames komputiloj.all.commands;
+in command-platform.local.packageBuilders.writeCommand {
     name = "help";
-    runtimeInputs = [ nixpkgsCurrent.packages.nix ];
     text = ''
         echo "Available commands:"
         echo

@@ -6,6 +6,14 @@ let
     callPackageWith = capsules.nixpkgsCurrent.lib.callPackageWith;
     fake_flakes = import ./lib/fake-flakes.nix;
     komputiloj_capsule = {
+        
+        # capsules (other than komputiloj) should be defined here eventually,
+        # making new_capsules and the separate result attrset of default.nix unnecessary
+        # Currently this is used for the 'all' construct.
+        capsules = new_capsules;
+
+        all = new_capsules.platform.lib.makeAll komputiloj_capsule;
+
         users = importDir ./users.d;
 
         domains = importDir ./domains.d;
@@ -91,6 +99,33 @@ let
         platform = {
             localSystem = builtins.currentSystem; # IMPURE. Make this a pin?
             emulatedSystems = attrNames (readDir /run/binfmt); # IMPURE
+
+            lib.makeAll = capsule:
+                let
+                    prefixAttrs = pre: mapNames (nm: "${pre}:${nm}");
+                    subcapsules = attrValues (named (capsule.capsules or {}));
+                in {
+
+                    # TODO: I'm not sure how much generic manipulation I want to do on capsules.
+                    # Things like applying `named` to all attrsets seems like a tempting convenience,
+                    # but if we do that, it becomes important when we apply such a `wrapCapsule` function
+                    # when constructing a capsule. If passing self within a capsule, do we want that
+                    # to be the 'raw' capsule or the capsule with `wrapCapsule` applied?
+                    # Do we want that to matter (much)?
+                    # Maybe we're stepping into the framework versus library trap here.
+                    # Let's do it like this for now:
+                    #
+                    # 1. Don't do any manipulation. Only provide a function to construct the `all` attr.
+                    # 2. Use convention for that (like this whole capsule business already is)
+                    #    and be robust/lenient where possible.
+                    # 3. Maybe provide a function to apply to the whole capsule
+                    #    that _checks_ our conventions without doing any manipulation.
+                    
+                    # CONVENTION: a capsule's all should have the same structure as a capsule (except it should not have all itself)
+                    commands = mergeAttrsets ([capsule.commands] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.commands or {})) subcapsules);
+                    capsules = mergeAttrsets ([capsule.capsules] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.capsules or {})) subcapsules);
+                };
+        };
         flake-compat = {
             # TODO use a pin instead of a source
             lib.flake-compat = sources.flake-compat.value;
@@ -188,20 +223,4 @@ let
         # make boltons.lib already work in sloppy capsules
         boltons = boltons // { lib = boltons; };
     };
-in {
-    boltons = boltons;
-    default_nixos = default_nixos; # extracted by komputiloj script
-    sources = sources;
-    capsules = capsules;
-    # waarom staat dit hier?
-    # apps.thee = import ./apps/thee {
-    #     inherit boltons;
-    #     inherit capsules;
-    # };
-    commands = let
-        meta_commands = {};
-        capsule_commands = capsuleName: capsule: mapNames (commandName: "${capsuleName}.${commandName}") (capsule.commands or {});
-        per_capsule_commands = attrValues (mapAttrs capsule_commands capsules);
-    # We flatten the commands so we can easily pull one out with getAttr
-    in mergeAttrsets ([ meta_commands capsules.komputiloj.commands ] ++ per_capsule_commands );
-}
+in komputiloj_capsule
