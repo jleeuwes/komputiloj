@@ -57,7 +57,7 @@ let
         };
         
         machines = importDirAndApply ./machines.d (capsules_and_boltons // {
-            inherit (new_capsules) nixos_25_05 mailserver_25_05;
+            inherit (new_capsules) komputiloj-bootstrap nixos_25_05 mailserver_25_05;
             inherit (sloppy_capsules) hello-infra;
         });
     };
@@ -127,7 +127,7 @@ let
         komputiloj-privata = sources.komputiloj-privata.value {
             inherit (new_capsules) boltons;
         };
-        komputiloj-bootstrap = sources.komputiloj-bootstrap.value {
+        komputiloj-bootstrap = import ./capsules/komputiloj-bootstrap {
             inherit (new_capsules) boltons;
         };
     };

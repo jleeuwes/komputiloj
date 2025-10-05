@@ -1,4 +1,4 @@
-{ komputiloj, hello-infra, nixos_25_05, ... }:
+{ komputiloj-bootstrap, komputiloj, hello-infra, nixos_25_05, ... }:
 rec {
     nixosSystem = nixos_25_05.lib.nixosSystem {
         modules = [ mainModule ];
@@ -481,8 +481,8 @@ rec {
         # Define a user account. Don't forget to set a password with ‘passwd’.
         users.users.jeroen = {
             isNormalUser = true;
-            uid = komputiloj.users.jeroen.linux.uid;
-            description = komputiloj.users.jeroen.fullName;
+            uid = komputiloj-bootstrap.users.jeroen.linux.uid;
+            description = komputiloj-bootstrap.users.jeroen.fullName;
             extraGroups = [ "wheel"
                 "adbusers"
                 # "lp" # for scanning with Canon

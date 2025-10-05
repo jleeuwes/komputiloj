@@ -1,4 +1,4 @@
-{ komputiloj, privata, hello-infra, nixos_25_05, ... }:
+{ komputiloj-bootstrap, komputiloj, privata, hello-infra, nixos_25_05, ... }:
 rec {
     targetHost = "scarif.radstand.nl";
     inherit (privata.machines.scarif) masterAgeKey;
@@ -218,15 +218,15 @@ rec {
         users.users.root = {
             openssh.authorizedKeys.keys = [
                 # Always have a key here, otherwise we can't deploy.
-                komputiloj.users.jeroen.sshKeys.ferrix
+                komputiloj-bootstrap.users.jeroen.sshKeys.ferrix
             ];
             
         };
         # Define a user account. Don't forget to set a password with ‘passwd’.
         users.extraUsers.jeroen = {
-            uid = komputiloj.users.jeroen.linux.uid;
+            uid = komputiloj-bootstrap.users.jeroen.linux.uid;
             isNormalUser = true;
-            description = komputiloj.users.jeroen.fullName;
+            description = komputiloj-bootstrap.users.jeroen.fullName;
             extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video" "audio" ];
         };
         users.users.karin = {

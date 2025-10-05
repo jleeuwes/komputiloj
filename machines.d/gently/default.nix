@@ -1,4 +1,4 @@
-{ boltons, nixos_25_05, mailserver_25_05, komputiloj,
+{ boltons, nixos_25_05, mailserver_25_05, komputiloj-bootstrap, komputiloj,
   privata, gorinchemindialoog, hello-infra,
   sleutel, wolk, thee, notie, ...  }:
 with boltons;
@@ -422,7 +422,7 @@ in rec {
 				hashedPasswordFile = "/root/password";
 				openssh.authorizedKeys.keys = [
 					# Always have a key here, otherwise we can't deploy.
-					komputiloj.users.jeroen.sshKeys.ferrix
+					komputiloj-bootstrap.users.jeroen.sshKeys.ferrix
 				];
 			};
 
@@ -492,7 +492,7 @@ in rec {
 					# We already have restrictions in sshd_config,
 					# but there is no full equivalent to restrict in sshd_config,
 					# so we add restrict here just as an extra layer of security.
-					"restrict ${komputiloj.users.jeroen.sshKeys.ferrix}"
+					"restrict ${komputiloj-bootstrap.users.jeroen.sshKeys.ferrix}"
 				];
 			};
 			groups.git-annex = {
