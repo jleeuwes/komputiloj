@@ -43,9 +43,7 @@ let
             # NEVER pass new_capsules as a whole
             # The capsules we inherit in each output (modules, packages, ...)
             # will be the dependencies of the proper komputiloj capsule.
-            inherit (new_capsules) boltons komputiloj-privata;
-
-            inherit (sloppy_capsules) hello-infra;
+            inherit (new_capsules) boltons komputiloj-privata hello-infra;
 
             # pass the capsule that we are constructing to itself.
             # TODO we would like to get rid of such magic
@@ -57,8 +55,7 @@ let
         };
         
         machines = importDirAndApply ./machines.d (capsules_and_boltons // {
-            inherit (new_capsules) komputiloj-bootstrap nixos_25_05 mailserver_25_05;
-            inherit (sloppy_capsules) hello-infra;
+            inherit (new_capsules) komputiloj-bootstrap nixos_25_05 mailserver_25_05 hello-infra;
         });
     };
     real_capsules = {
@@ -69,10 +66,6 @@ let
         wolk = (import ./apps/wolk) capsules_and_boltons;
         thee = (import ./apps/thee) capsules_and_boltons;
         notie = (import ./apps/notie) capsules_and_boltons;
-        hello-infra = sources.hello-infra.value {
-            inherit (new_capsules) boltons platform nixos_25_05 command-platform komputiloj-bootstrap;
-            inherit (capsules) raspberry-pi-nix; # TODO this is keeping hello-infra from becoming a proper new_capsule
-        };
     };
     all_capsule = let
         cs = attrValues (named (real_capsules // fake_capsules // new_capsules));
@@ -98,6 +91,9 @@ let
         platform = {
             localSystem = builtins.currentSystem; # IMPURE. Make this a pin?
             emulatedSystems = attrNames (readDir /run/binfmt); # IMPURE
+        flake-compat = {
+            # TODO use a pin instead of a source
+            lib.flake-compat = sources.flake-compat.value;
         };
         nixos_25_05 = import ./capsules/nixos_25_05 {
             inherit (new_capsules) platform boltons;
@@ -129,6 +125,9 @@ let
         };
         komputiloj-bootstrap = import ./capsules/komputiloj-bootstrap {
             inherit (new_capsules) boltons;
+        };
+        hello-infra = sources.hello-infra.value {
+            inherit (new_capsules) boltons platform flake-compat nixos_25_05 command-platform komputiloj-bootstrap;
         };
     };
     fake_capsules = rec {
@@ -180,14 +179,6 @@ let
                 apps = sources.nextcloud_31_apps.value nixpkgsCurrent.packages;
             };
         };
-        raspberry-pi-nix = (sources.flake-compat.value {
-            # warning: raspberry-pi-nix will use its own version of nixpkgs as
-            # defined in its flake.lock file because of how flake-compat works
-            # TODO switch to flakes ourselves so we can upgrade nixpkgs,
-            # or, if that takes too long, hack on flake-compat so we can pass
-            # our own nixpkgs
-            src = sources.raspberry-pi-nix.nix_path;
-        }).outputs;
     };
     sloppy_capsules = real_capsules // fake_capsules // { all = all_capsule; };
     capsules = new_capsules // sloppy_capsules;
