@@ -41,7 +41,9 @@ let
             # NEVER pass new_capsules as a whole
             # The capsules we inherit in each output (modules, packages, ...)
             # will be the dependencies of the proper komputiloj capsule.
-            inherit (new_capsules) boltons komputiloj-privata hello-infra;
+            inherit (new_capsules) boltons komputiloj-privata;
+
+            inherit (sloppy_capsules) hello-infra;
 
             # pass the capsule that we are constructing to itself.
             # TODO we would like to get rid of such magic
@@ -53,7 +55,8 @@ let
         };
         
         machines = importDirAndApply ./machines.d (capsules_and_boltons // {
-            inherit (new_capsules) nixos_25_05 mailserver_25_05 hello-infra;
+            inherit (new_capsules) nixos_25_05 mailserver_25_05;
+            inherit (sloppy_capsules) hello-infra;
         });
     };
     real_capsules = {
