@@ -422,7 +422,6 @@ in rec {
 				hashedPasswordFile = "/root/password";
 				openssh.authorizedKeys.keys = [
 					# Always have a key here, otherwise we can't deploy.
-					komputiloj.users.jeroen.sshKeys.scarif
 					komputiloj.users.jeroen.sshKeys.ferrix
 				];
 			};
@@ -493,7 +492,7 @@ in rec {
 					# We already have restrictions in sshd_config,
 					# but there is no full equivalent to restrict in sshd_config,
 					# so we add restrict here just as an extra layer of security.
-					"restrict ${komputiloj.users.jeroen.sshKeys.scarif}"
+					"restrict ${komputiloj.users.jeroen.sshKeys.ferrix}"
 				];
 			};
 			groups.git-annex = {
