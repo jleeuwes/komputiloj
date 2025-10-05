@@ -89,7 +89,6 @@ let
         #       by way of some helper function that each capsule applies to itself.
         users = flatten (capsule: capsule.users or {});
         domains = flatten (capsule: capsule.domains or {});
-        pins = flatten (capsule: capsule.pins or {});
     };
     new_capsules = {
         # Keep STRICT dependency order here and ONLY take from new_capsules!
@@ -122,18 +121,31 @@ let
                     #    that _checks_ our conventions without doing any manipulation.
                     
                     # CONVENTION: a capsule's all should have the same structure as a capsule (except it should not have all itself)
-                    commands = mergeAttrsets ([capsule.commands] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.commands or {})) subcapsules);
-                    capsules = mergeAttrsets ([capsule.capsules] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.capsules or {})) subcapsules);
+                    # TODO: warn about missing all
+                    capsules = mergeAttrsets ([capsule.capsules or {}] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.capsules or {})) subcapsules);
+                    commands = mergeAttrsets ([capsule.commands or {}] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.commands or {})) subcapsules);
+                    pins     = mergeAttrsets ([capsule.pins     or {}] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.pins     or {})) subcapsules);
                 };
         };
         flake-compat = {
-            # TODO use a pin instead of a source
+            all = new_capsules.platform.lib.makeAll new_capsules.flake-compat;
+
             lib.flake-compat = sources.flake-compat.value;
+
+            pins = {
+                flake-compat = {
+                    # TODO use an actual pin instead of a source
+                    opaque = "sorry";
+                };
+            };
         };
         nixos_25_05 = import ./capsules/nixos_25_05 {
             inherit (new_capsules) platform boltons;
         };
-        mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix;
+        mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix {
+            # TODO make the pin updatable so it can replace the source update mechanism and this can be moved to capsules
+            inherit (new_capsules) platform;
+        };
         command-platform = rec {
             # extra local scope because it's stupid that we would always need command-platform
             # *and* platform to do command-platform.native.${platform.localSystem}

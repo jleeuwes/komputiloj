@@ -1,4 +1,4 @@
-{ boltons, command-platform, nixos_25_05, all, ... }:
+{ boltons, command-platform, nixos_25_05, komputiloj, ... }:
 with boltons.lib;
 let
     machine = komputiloj.machines.gently;
@@ -24,6 +24,6 @@ in command-platform.local.packageBuilders.writeCommand {
                     "printf 'Skipping pin without updateScript: %s\\n' ${esc qualified_name} >&2"
                     + "\n"
             )
-            all.pins))}
+            komputiloj.all.pins))}
     '';
 }

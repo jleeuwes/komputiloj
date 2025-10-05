@@ -30,6 +30,8 @@ self = {
     # (not sure if still applicable when not going through flake)
     outPath = lock.nix_path;
 
+    all = platform.lib.makeAll self;
+
     inherit pins;
 
     # commands: system is the system on which the command should run.
