@@ -1,13 +1,14 @@
-{ boltons, komputiloj, nixpkgsCurrent, ... }:
+{ boltons, nixos_25_05, command-platform, komputiloj, ... }:
 with boltons;
 let
     machine = komputiloj.machines.gently;
     sshTarget = "root@${machine.targetHost}";
-    escapeShellArg = nixpkgsCurrent.lib.strings.escapeShellArg;
+    targetSystem = "x86_64-linux";
+    escapeShellArg = nixos_25_05.lib.strings.escapeShellArg;
     esc = escapeShellArg;
-    escapeShellArgs = nixpkgsCurrent.lib.strings.escapeShellArgs;
+    escapeShellArgs = nixos_25_05.lib.strings.escapeShellArgs;
     secrets_to_upload = attrValues (mapAttrs (name: value: { inherit name; } // value) machine.secrets);
-    scriptToReceiveMasterKey = komputiloj.lib.writeCommand {
+    scriptToReceiveMasterKey = command-platform.native.${targetSystem}.packageBuilders.writeCommand {
         name = "receive-masterkey";
         text = ''
             rm -f /run/keys/masterkey.new
@@ -26,11 +27,11 @@ let
         '';
     };
     sshCmd = "ssh ${esc sshTarget}";
-in komputiloj.lib.writeCommand {
+in command-platform.local.packageBuilders.writeCommand {
     name = "send-keys-to-gently";
     runtimeInputs = [
-        nixpkgsCurrent.packages.nix
-        nixpkgsCurrent.packages.openssh
+        nixos_25_05.local.legacyPackages.nix
+        nixos_25_05.local.legacyPackages.openssh
         komputiloj.packages.wachtwoord
     ];
     text = ''

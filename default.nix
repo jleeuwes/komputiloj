@@ -28,7 +28,7 @@ let
 
         lib = {
             # TODO get rid of this, this is a 'metapackage', not a lib, because its system-dependent!
-            writeCommand = warn "DON'T USE THIS. Use the packageBuilder from command-platform." (args: let
+            writeCommand = warn "DON'T USE komputiloj.lib.writeCommand. Use the packageBuilder from command-platform." (args: let
                 # TODO somehow enhance writeShellApplication to produce a clean PATH inside the script
                 # Currently it is too easy to rely on some undeclared dependency.
                 scriptDir = capsules.nixpkgsCurrent.packages.writeShellApplication {

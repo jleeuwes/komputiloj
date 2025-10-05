@@ -92,6 +92,10 @@ self = {
             inherit (pkgs) writeShellScript writeShellScriptBin writeShellApplication;
         };
     };
+    
+    # Alias for cases in which we clearly want to run everything locally.
+    # For instance for commands.
+    local = self.native.${localSystem};
 
     qemu = let
         checksystem = system:
