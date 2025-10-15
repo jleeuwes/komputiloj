@@ -176,14 +176,6 @@ rec {
             # xorg.xdpyinfo
             # xorg.xev
             
-            # Install scanimage (saneBackends) and scanadf (saneFrontends),
-            # among other scanning tools.
-            # I can't get ADF scanning to work. 'Best' command line is:
-            #     scanimage -d pixma:04A91824_214FE1 --batch=scan%02d.png --format tiff --batch-start 1 --batch-double --batch-count 3 --source "Automatic Document Feeder"
-            # But it gives "scanimage: sane_read: Operation was cancelled"
-            # - this is probably related to https://gitlab.com/sane-project/backends/-/merge_requests/213
-            # sane-backends sane-frontends
-            
             # programming:
             # (python3.withPackages myPythonPackages)
             dejsonlz4 # for reading firefox jsonlz4 files
@@ -351,6 +343,16 @@ rec {
             # but running this does:
             #   lpoptions -d canon-tr7550
         };
+
+        # Install scanimage (saneBackends) and scanadf (saneFrontends),
+        # among other scanning tools.
+        # I can't get ADF scanning to work. 'Best' command line is:
+        #     scanimage -d pixma:04A91824_214FE1 --batch=scan%02d.png --format tiff --batch-start 1 --batch-double --batch-count 3 --source "Automatic Document Feeder"
+        # But it gives "scanimage: sane_read: Operation was cancelled"
+        # - this is probably related to https://gitlab.com/sane-project/backends/-/merge_requests/213
+        hardware.sane = {
+            enable = true;
+        };
         
         # enable gvfs to have ftp support etcetera in thunar
         # (doesn't work; maybe use
@@ -485,7 +487,7 @@ rec {
             description = komputiloj-bootstrap.users.jeroen.fullName;
             extraGroups = [ "wheel"
                 "adbusers"
-                # "lp" # for scanning with Canon
+                # "lp" # for scanning with Canon (seems to work without this?)
             ];
         };
 
