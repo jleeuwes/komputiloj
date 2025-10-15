@@ -14,9 +14,10 @@ CommandAllWheel=Previous/Next Desktop
 
 [NightColor]
 Active=true
+EveningBeginFixed=2130
 LatitudeFixed=50.50249168722685
 LongitudeFixed=3.564374351486606
-Mode=Location
+Mode=Times
 NightTemperature=3000
 
 [Plugins]
