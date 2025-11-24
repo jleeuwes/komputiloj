@@ -2,8 +2,8 @@
 with builtins;
 rec {
     nix_path = fetchTarball {
-        url    = "https://releases.nixos.org/nixos/unstable/nixos-25.11pre861038.c23193b943c6/nixexprs.tar.xz";
-        sha256 = "0iqqv8c9cbf056fvpl8cbb61qkimnzz12lj0q964zd833vl9jv5f";
+        url    = "https://releases.nixos.org/nixos/unstable/nixos-25.11pre900642.050e09e09111/nixexprs.tar.xz";
+        sha256 = "0q1ng485ch61783a3rpj4lf6izhvmw1d0djakd1hlq948p1nfd4z";
     };
     value = import (nix_path + "/flake.nix");
     value_nonflake = import nix_path;
