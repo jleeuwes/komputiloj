@@ -149,7 +149,12 @@ rec {
         services.avahi.enable = false;
 
         # Enable the OpenSSH daemon.
-        services.openssh.enable = true;
+        services.openssh = {
+            enable = true;
+            settings = {
+                PasswordAuthentication = false;
+            };
+        };
         programs.ssh = {
             knownHosts = {
                 "[u362967.your-storagebox.de]:23" = {
