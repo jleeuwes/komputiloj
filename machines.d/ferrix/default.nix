@@ -306,7 +306,12 @@ rec {
         services.avahi.enable = false;
 
         # Enable the OpenSSH daemon.
-        # services.openssh.enable = true;
+        services.openssh = {
+            enable = true;
+            settings = {
+                PasswordAuthentication = false;
+            };
+        };
         programs.ssh = {
             knownHosts = {
                 "[u362967.your-storagebox.de]:23" = {
@@ -493,6 +498,10 @@ rec {
             extraGroups = [ "wheel"
                 "adbusers"
                 # "lp" # for scanning with Canon (seems to work without this?)
+            ];
+            openssh.authorizedKeys.keys = [
+                # TODO remove this, this is just for testing the warpzone stuff
+                komputiloj-definitions.users.jeroen.ssh.publicKeys.ferrix
             ];
         };
 
