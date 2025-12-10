@@ -1,4 +1,6 @@
 
+vim.cmd("autocmd! nvim.swapfile") -- https://github.com/neovim/neovim/discussions/29675
+
 vim.opt.syntax = "enable"
 
 vim.opt.ignorecase = true
