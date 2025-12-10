@@ -4,7 +4,7 @@
 {
     services.ollama = {
         enable = true;
-        acceleration = "rocm";
+        # acceleration = "rocm";
         package = nixos_25_11.native.${pkgs.system}.legacyPackages.ollama;
     };
 
