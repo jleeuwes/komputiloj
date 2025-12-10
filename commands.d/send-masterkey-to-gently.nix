@@ -7,7 +7,6 @@ let
     escapeShellArg = nixos_25_05.lib.strings.escapeShellArg;
     esc = escapeShellArg;
     escapeShellArgs = nixos_25_05.lib.strings.escapeShellArgs;
-    secrets_to_upload = attrValues (mapAttrs (name: value: { inherit name; } // value) machine.secrets);
     scriptToReceiveMasterKey = command-platform.native.${targetSystem}.packageBuilders.writeCommand {
         name = "receive-masterkey";
         text = ''

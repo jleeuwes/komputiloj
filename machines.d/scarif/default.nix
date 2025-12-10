@@ -169,7 +169,7 @@ rec {
         hardware.printers = rec {
             ensurePrinters = [ hello-infra.printers.canon-ts8750 ];
             
-            # TODO does this work?
+            # TODO does this to work?
             ensureDefaultPrinter = hello-infra.printers.canon-ts8750.name;
 
         };

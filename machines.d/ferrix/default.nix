@@ -193,7 +193,7 @@ rec {
             # haskellPackages.ghc
             godot
             
-            # unstable.android-studio
+            # android-studio
             apktool dex2jar
 
             # LaTeX and PDF:
