@@ -157,7 +157,8 @@ rec {
             # usefull programs:
             mkpasswd
             unicode-paracode
-            gitFull vim file subversionClient pciutils pmount squashfsTools
+            gitFull file subversionClient pciutils pmount squashfsTools
+            vim neovim
             parted gparted
             wget rtorrent
             git-annex git-annex-remote-rclone rclone
