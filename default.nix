@@ -51,7 +51,7 @@ let
             # NEVER pass new_capsules as a whole
             # The capsules we inherit in each output (modules, packages, ...)
             # will be the dependencies of the proper komputiloj capsule.
-            inherit (new_capsules) boltons komputiloj-privata hello-infra;
+            inherit (new_capsules) boltons komputiloj-privata hello-infra nixos_25_11;
 
             # pass the capsule that we are constructing to itself.
             # TODO we would like to get rid of such magic
@@ -140,6 +140,9 @@ let
             };
         };
         nixos_25_05 = import ./capsules/nixos_25_05 {
+            inherit (new_capsules) platform boltons;
+        };
+        nixos_25_11 = import ./capsules/nixos_25_11 {
             inherit (new_capsules) platform boltons;
         };
         mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix {
