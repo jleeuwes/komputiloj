@@ -219,6 +219,7 @@ rec {
             imagemagick scrot
             libreoffice antiword
             audacity
+            musescore
             ocrad # OCR
             
             pstree
