@@ -55,6 +55,8 @@ vim.opt.textwidth = 80
 
 -- Don't enable modelines! They should not be executed
 -- on untrusted files.
+-- Or use something like securemodelines:
+-- https://security.stackexchange.com/questions/36001/vim-modeline-vulnerabilities/229675#229675
 vim.opt.modeline = false
 
 -- Haskell en Java bestandstypen
