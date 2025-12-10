@@ -29,39 +29,18 @@ in rec {
                     "restrict"
                     # then allow port-forwarding (only permitlisten does not work)
                     "port-forwarding"
-                    # but disallow forward port-forwarding by only allowing an empty hostname
-                    "permitopen=\":1234\""
-                    # finally, allow reverse port-forwarding
+                    # forward forwards:
+                    "permitopen=\"localhost:42001\""
+                    # reverse forwards:
                     "permitlisten=\"localhost:${toString port}\""
-                ];
-                user_options = concatStringsSep "," [
-                    # command executed if the user were to try a normal ssh login
-                    # (won't actually do anything if the user has no shell configured)
-                    "command=\"echo WELCOME TO WARP ZONE\""
-                    # start by restricting everything
-                    "restrict"
-                    # then allow port-forwarding
-                    "port-forwarding"
-                    # but disallow reverse port-forwarding by only allowing an empty hostname
-                    "permitlisten=\":1234\""
                 ];
                 in [
                     "${host_options 42001} ${komputiloj-definitions.machines.ferrix.ssh.publicKey}"
                     # "${make_options 42002} ${komputiloj-definitions.machines.scarif.ssh.publicKey}"
-
-                    "${user_options} ${komputiloj-definitions.users.jeroen.ssh.publicKeys.ferrix}"
                 ];
             };
             users.groups.warp.gid = 70008;
         };
-        # WarpUserOnClient = { pkgs, ... }: {
-        #     users.users.warp = {
-        #         uid = 70008;
-        #         group = "warp";
-        #         isSystemUser = true;
-        #     };
-        #     users.groups.warp.gid = 70008;
-        # };
         WarpGateServiceOnFerrix = { pkgs, ... }: {
             systemd.services.warpgate = {
                 serviceConfig = {
@@ -72,7 +51,7 @@ in rec {
                 wantedBy = [ "multi-user.target" ];
                 path = [ pkgs.openssh ];
                 script = ''
-                    ssh -i /etc/ssh/ssh_host_ed25519_key -R 42001:localhost:22 warp@gently.radstand.nl -N
+                    ssh -i /etc/ssh/ssh_host_ed25519_key -R 42001:localhost:22 -L 42001:localhost:42001 warp@gently.radstand.nl -N
                 '';
             };
         };
@@ -83,7 +62,6 @@ in rec {
                 };
                 extraConfig = ''
                     Host ferrix
-                        ProxyJump warp@gently.radstand.nl
                         Hostname localhost
                         Port 42001
                         HostKeyAlias ferrix
