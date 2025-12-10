@@ -63,7 +63,7 @@ let
         };
         
         machines = importDirAndApply ./machines.d (capsules_and_boltons // {
-            inherit (new_capsules) komputiloj-bootstrap nixos_25_05 mailserver_25_05 hello-infra;
+            inherit (new_capsules) komputiloj-definitions nixos_25_05 mailserver_25_05 hello-infra warpzone;
         });
     };
     real_capsules = {
@@ -173,11 +173,14 @@ let
         komputiloj-privata = sources.komputiloj-privata.value {
             inherit (new_capsules) boltons;
         };
-        komputiloj-bootstrap = import ./capsules/komputiloj-bootstrap {
+        komputiloj-definitions = import ./capsules/komputiloj-definitions {
             inherit (new_capsules) boltons;
         };
+        warpzone = import ./capsules/warpzone {
+            inherit (new_capsules) boltons nixos_25_05 komputiloj-definitions;
+        };
         hello-infra = sources.hello-infra.value {
-            inherit (new_capsules) boltons platform flake-compat nixos_25_05 command-platform komputiloj-bootstrap;
+            inherit (new_capsules) boltons platform flake-compat nixos_25_05 command-platform komputiloj-definitions;
         };
     };
     fake_capsules = rec {

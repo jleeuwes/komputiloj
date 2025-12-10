@@ -1,5 +1,6 @@
-{ komputiloj-bootstrap, komputiloj, hello-infra, nixos_25_05, ... }:
+{ komputiloj-definitions, komputiloj, hello-infra, nixos_25_05, warpzone, ... }:
 rec {
+
     nixosSystem = nixos_25_05.lib.nixosSystem {
         modules = [ mainModule ];
         pkgs = nixos_25_05.native.x86_64-linux.legacyPackages;
@@ -49,6 +50,8 @@ rec {
                 komputiloj.modules.build-for-raspberry
                 komputiloj.modules.ludanto
                 komputiloj.modules.ai
+                # TODO add a module that checks if the SSH hostkey from komputiloj-definitions matches the one in use on the machine
+                warpzone.nixosModules.Ferrix
             ];
   
         # override some stuff from hardware-configuration:
@@ -485,8 +488,8 @@ rec {
         # Define a user account. Don't forget to set a password with ‘passwd’.
         users.users.jeroen = {
             isNormalUser = true;
-            uid = komputiloj-bootstrap.users.jeroen.linux.uid;
-            description = komputiloj-bootstrap.users.jeroen.fullName;
+            uid = komputiloj-definitions.users.jeroen.linux.uid;
+            description = komputiloj-definitions.users.jeroen.fullName;
             extraGroups = [ "wheel"
                 "adbusers"
                 # "lp" # for scanning with Canon (seems to work without this?)

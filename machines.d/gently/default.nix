@@ -1,6 +1,6 @@
-{ boltons, nixos_25_05, mailserver_25_05, komputiloj-bootstrap, komputiloj,
+{ boltons, nixos_25_05, mailserver_25_05, komputiloj-definitions, komputiloj,
   privata, gorinchemindialoog, hello-infra,
-  sleutel, wolk, thee, notie, ...  }:
+  sleutel, wolk, thee, notie, warpzone, ...  }:
 with boltons;
 let
 	hello   = hello-infra; # TODO why this alias?
@@ -17,7 +17,6 @@ in rec {
 	
 	targetHost = "gently.radstand.nl";
 	inherit (privata.machines.gently) masterAgeKey;
-	sshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHmMPh91t1reE1ddLcFYyddQs0hx4v41KcaNBS2UVnEA";
 	# TODO move the secrets from here to below (nixos config)
 	# (the capsule secrets remain, because those also provide information about updating a secret)
 	secrets = {
@@ -81,6 +80,7 @@ in rec {
 			wolk.modules.all_in_one
 			notie.modules.all_in_one
 			thee.modules.all_in_one
+			warpzone.nixosModules.JumpHost
 		];
 
 		secrets = secrets; # SEE ABOVE
@@ -422,7 +422,7 @@ in rec {
 				hashedPasswordFile = "/root/password";
 				openssh.authorizedKeys.keys = [
 					# Always have a key here, otherwise we can't deploy.
-					komputiloj-bootstrap.users.jeroen.sshKeys.ferrix
+					komputiloj-definitions.users.jeroen.sshKeys.ferrix
 				];
 			};
 
@@ -492,7 +492,7 @@ in rec {
 					# We already have restrictions in sshd_config,
 					# but there is no full equivalent to restrict in sshd_config,
 					# so we add restrict here just as an extra layer of security.
-					"restrict ${komputiloj-bootstrap.users.jeroen.sshKeys.ferrix}"
+					"restrict ${komputiloj-definitions.users.jeroen.sshKeys.ferrix}"
 				];
 			};
 			groups.git-annex = {
