@@ -4,8 +4,8 @@ rec {
     inherit (privata.machines.scarif) masterAgeKey;
     sshPublicKeys = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFN+m0J0mjJBDho4cTqt9OlnbMUtYuj6OacT7VWi/ahC";
     nixosSystem = nixos_25_05.lib.nixosSystem {
-        system = "x86_64-linux";
         modules = [ mainModule ];
+        pkgs = nixos_25_05.native.x86_64-linux.legacyPackages;
     };
 
     mainModule = { config, pkgs, lib, ... }: {
