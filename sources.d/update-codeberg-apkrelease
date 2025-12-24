@@ -2,6 +2,12 @@
 
 set -Eeu -o pipefail
 
+# crudely check dependencies
+# until this is a proper komputiloj pin updater with dependencies
+command -v curl > /dev/null || ( echo curl missing >&2 ; exit 1 )
+command -v jq > /dev/null || ( echo jq missing >&2 ; exit 1 )
+command -v apksigner || ( echo apksigner missing >&2 ; exit 1 )
+
 codeberg_repo=$(cat codeberg_repo)
 codeberg_owner=${codeberg_repo%/*}
 codeberg_reponame=${codeberg_repo##*/}

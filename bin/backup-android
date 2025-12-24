@@ -35,8 +35,19 @@ do_tar() {
 	adb shell "tar -c -X$excludes $dir" > $localfile
 }
 
+# user files but also includes some app data:
 do_adb_pull /data/media/0 data.media.0
+
+# mostly app data?
 do_tar /data/user/0 data.user.0.tar
+# /data/data is the same inode as /data/user/0, although I don't know through which mechanism:
+# do_tar /data/data data.data.tar
+
+# more app data? (already part of data.media.0 above)
 do_tar /data/media/0/Android/data data.media.0.Android.data.tar
+
+# system settings:
+do_tar /data/system data.system.tar
+do_tar /data/system_de/0 data.system_de.0.tar
 
 echo "Done."
