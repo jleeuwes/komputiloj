@@ -59,31 +59,40 @@ vim.opt.textwidth = 80
 -- https://security.stackexchange.com/questions/36001/vim-modeline-vulnerabilities/229675#229675
 vim.opt.modeline = false
 
--- Haskell en Java bestandstypen
--- FIXME: dit heeft qwen3-coder gemaakt op basis van mijn vimrc
---        maar BufRead,BufNewFile werkt niet.
--- vim.api.nvim_create_autocmd("BufRead,BufNewFile", {
---   pattern = "*.ag",
---   callback = function()
---     vim.cmd("set filetype=haskell")
---   end,
--- })
--- 
--- vim.api.nvim_create_autocmd("BufRead,BufNewFile", {
---   pattern = "*.cag",
---   callback = function()
---     vim.cmd("set filetype=haskell")
---   end,
--- })
---
--- java voor il is handiger ivm commentaar (update: ik weet niet eens meer wat
---    il-files zijn...)
--- vim.api.nvim_create_autocmd("BufRead,BufNewFile", {
---   pattern = "*.il",
---   callback = function()
---     vim.cmd("set filetype=java")
---   end,
--- })
+--[[
+Haskell en Java bestandstypen
+
+FIXME: dit heeft qwen3-coder gemaakt op basis van mijn vimrc
+       maar BufRead,BufNewFile werkt niet.
+
+```
+vim.api.nvim_create_autocmd("BufRead,BufNewFile", {
+  pattern = "*.ag",
+  callback = function()
+    vim.cmd("set filetype=haskell")
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufRead,BufNewFile", {
+  pattern = "*.cag",
+  callback = function()
+    vim.cmd("set filetype=haskell")
+  end,
+})
+```
+
+Volgens mijn vroegere zelf is java handiger ivm commentaar.
+Geen idee wat ik daarmee bedoelde of wat il-files zijn.
+
+```
+vim.api.nvim_create_autocmd("BufRead,BufNewFile", {
+  pattern = "*.il",
+  callback = function()
+    vim.cmd("set filetype=java")
+  end,
+})
+```
+--]]
 
 -- laat tab-switchen werken in urxvt (gebruik ik niet meer)
 -- vim.api.nvim_set_keymap("n", "<ESC>[6^", "<C-PageDown>", { noremap = true, silent = true })
