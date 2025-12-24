@@ -25,8 +25,8 @@ DialogWidth=720
 positions={"1440x960":[]}
 
 [Containments][1][Wallpaper][org.kde.image][General]
-Image=/home/jeroen/Afbeeldingen/Louie Mantia - rebel-alliance.jpg
-PreviewImage=/home/jeroen/Afbeeldingen/Louie Mantia - rebel-alliance.jpg
+Image=/nix/store/21nkzhzxpwiy14xql0zx9nwsimrksc4j-plasma-workspace-wallpapers-6.2.5/share/wallpapers/SafeLanding/
+PreviewImage=/nix/store/21nkzhzxpwiy14xql0zx9nwsimrksc4j-plasma-workspace-wallpapers-6.2.5/share/wallpapers/SafeLanding/
 SlidePaths=/nix/store/5la157c0ia4wdpv1rjrxr4dzz63f59x5-breeze-6.2.5/share/wallpapers/,/run/current-system/sw/share/wallpapers/
 
 [Containments][2]
@@ -51,6 +51,10 @@ popupWidth=560
 fontWeight=400
 showWeekNumbers=true
 
+[Containments][2][Applets][19][Configuration][ConfigDialog]
+DialogHeight=540
+DialogWidth=720
+
 [Containments][2][Applets][20]
 immutability=1
 plugin=org.kde.plasma.showdesktop
@@ -61,8 +65,8 @@ plugin=org.kde.plasma.kickoff
 
 [Containments][2][Applets][28][Configuration]
 PreloadWeight=100
-popupHeight=510
-popupWidth=667
+popupHeight=508
+popupWidth=665
 
 [Containments][2][Applets][28][Configuration][ConfigDialog]
 DialogHeight=540
@@ -122,11 +126,11 @@ DialogHeight=540
 DialogWidth=720
 
 [Containments][24][General]
-positions={"1280x1440":[],"2560x1440":[]}
+positions={"1280x1440":[],"2560x1440":[],"3840x2160":[]}
 
 [Containments][24][Wallpaper][org.kde.image][General]
-Image=/nix/store/21nkzhzxpwiy14xql0zx9nwsimrksc4j-plasma-workspace-wallpapers-6.2.5/share/wallpapers/SafeLanding/
-PreviewImage=/nix/store/21nkzhzxpwiy14xql0zx9nwsimrksc4j-plasma-workspace-wallpapers-6.2.5/share/wallpapers/SafeLanding/
+Image=/home/jeroen/Afbeeldingen/Louie Mantia - rebel-alliance.jpg
+PreviewImage=/home/jeroen/Afbeeldingen/Louie Mantia - rebel-alliance.jpg
 SlidePaths=/nix/store/5la157c0ia4wdpv1rjrxr4dzz63f59x5-breeze-6.2.5/share/wallpapers/,/run/current-system/sw/share/wallpapers/
 
 [Containments][8]
@@ -192,6 +196,7 @@ plugin=org.kde.plasma.volume
 PreloadWeight=100
 
 [Containments][8][Applets][18][Configuration][General]
+currentTab=streams
 migrated=true
 
 [Containments][8][Applets][21]
@@ -199,7 +204,7 @@ immutability=1
 plugin=org.kde.plasma.battery
 
 [Containments][8][Applets][21][Configuration]
-PreloadWeight=65
+PreloadWeight=74
 
 [Containments][8][Applets][22]
 immutability=1
