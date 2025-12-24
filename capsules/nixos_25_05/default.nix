@@ -126,7 +126,7 @@ self = {
             aarch64-linux = gensystem (checksystem "aarch64-linux");
         } [ localSystem ];
 
-    cross = let
+    cross.${localSystem} = let
         gensystem = system: let
             pkgs = nixpkgs_nonflake {
                 system = localSystem;
