@@ -96,7 +96,7 @@ export RCLONE_PASSWORD_COMMAND="wachtwoord cat /home/jeroen/passwords/RCLONE_CON
 alias webcamshot='fswebcam --no-banner --png 9 webcamshot-"$(date -Iseconds)"'
 alias webcam='vlc v4l2:///dev/video0'
 
-qr-open() {
+qr-open-webcam() {
 	local url
 	url=$(zbarcam --oneshot --raw)
 	if [[ $url == http://* || $url == https://* ]]; then
