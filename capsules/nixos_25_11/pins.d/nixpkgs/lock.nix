@@ -1,8 +1,8 @@
 # GENERATED
 with builtins;
 rec {
-    url = "https://releases.nixos.org/nixos/25.11/nixos-25.11beta5.a320ce8e6e2c/nixexprs.tar.xz";
-    sha256 = "0pgjbcfh0qxnmg046ml1fk053zp088r290kw0nzk1y6ks06dg8h0";
+    url = "https://releases.nixos.org/nixos/25.11/nixos-25.11.2403.76701a179d3a/nixexprs.tar.xz";
+    sha256 = "0d1nbibrj8sd13v4vvdr4b6vw9bf3wqzilfnlalf6mhcv0jc9y22";
     nix_path = fetchTarball {
         inherit url sha256;
     };
