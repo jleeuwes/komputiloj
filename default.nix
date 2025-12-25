@@ -2,7 +2,7 @@ let boltons = import ./lib/boltons.nix;
 in with boltons;
 let
     sources = importDir ./sources.d;
-    default_nixos = "nixos_25_05"; # defines default nixos used by all of komputiloj
+    default_nixos = "nixos_25_05"; # defines default nixos used by parts of komputiloj
     callPackageWith = capsules.nixpkgsCurrent.lib.callPackageWith;
     fake_flakes = import ./lib/fake-flakes.nix;
     komputiloj_capsule = {
