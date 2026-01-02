@@ -96,6 +96,9 @@ rec {
         };
         boot.loader.efi.canTouchEfiVariables = true;
 
+        # https://wiki.nixos.org/wiki/Fwupd for BIOS updates
+        services.fwupd.enable = true;
+
         systemd.sleep.extraConfig = ''
             AllowSuspend=no
             AllowHibernation=yes
