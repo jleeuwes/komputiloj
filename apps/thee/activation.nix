@@ -1,8 +1,10 @@
-{ boltons, nixpkgsCurrent, komputiloj, all }:
+{ boltons, nixos_25_05, command-platform, all }:
 with boltons;
-with nixpkgsCurrent.lib.strings;
+with nixos_25_05.lib.strings;
 let
-    inherit (nixpkgsCurrent.packages) writeShellApplication writeTextDir symlinkJoin;
+    nixos = nixos_25_05;
+    inherit (nixos.local.packageBuilders) writeShellApplication;
+    inherit (nixos.portable.packageBuilder) writeTextDir symlinkJoin;
     url_base = "https://thee.radstand.nl";
     api_base = "${url_base}/api/v1";
 
@@ -51,7 +53,7 @@ let
             (writeTextDir "update.json" (user2gitea_update_enabled user))
             (writeShellApplication {
                 name = "generate-password";
-                runtimeInputs = [ nixpkgsCurrent.packages.pwgen ];
+                runtimeInputs = [ nixos.local.legacyPackages.pwgen ];
                 text = stripTabs ''
                     ${if user.isHuman
                     then "pwgen 10 1"
@@ -66,9 +68,9 @@ let
             (writeTextDir "update.json" (user2gitea_update_disabled user))
         ];
     };
-    script_drv = komputiloj.lib.writeCommand {
+    script_drv = command-platform.local.packageBuilders.writeCommand {
         name = "activate";
-        runtimeInputs = [ nixpkgsCurrent.packages.jq ];
+        runtimeInputs = [ nixos.local.legacyPackages.jq ];
         text = ''
             cd -- "$KOMPUTILOJ_PATH"
             THEE_USER=jeroen

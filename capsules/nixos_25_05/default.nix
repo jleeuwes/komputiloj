@@ -69,6 +69,14 @@ self = {
     #           https://discourse.nixos.org/t/new-reader-finding-documentation-unnecessarily-confusing/40722/6
 
     portable = {
+        # These packageBuilders produce portable packages (i.e. that can 'run'
+        # on any platform). They can also be build on any platform.
+        # But still the hash will differ between platforms.
+        # This can matter for the binary cache. But we don't use that for
+        # our own packages, so in practice it doesn't matter.
+        # Using packages or packageBuilders means we don't care about
+        # such details. I'm not sure how that would work in a larger
+        # ecosystem...
         packageBuilders = {
             inherit (self.native.${localSystem}.legacyPackages)
                 writeTextFile writeText writeTextDir writeScript writeScriptBin
