@@ -241,7 +241,9 @@ rec {
             llvmPackages.bintools # to get ar (to extract .deb files)
             sqlite
             
-            komputiloj.packages.wachtwoord # TODO remove if we use dekstopomveging
+            komputiloj.packages.wachtwoord
+
+            komputiloj.packages.mdview # packaged 'alias' for reading md files
         ];
 
         environment.wordlist = {
