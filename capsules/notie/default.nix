@@ -1,4 +1,4 @@
-{ nixos_future, ... }: {
+{ nixos_future }: {
     modules = rec {
         all_in_one = {
             imports = [

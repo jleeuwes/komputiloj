@@ -6,7 +6,6 @@ in {
     inherit channel_url;
     lock = import ./lock.nix;
     updateScript = let
-        nix-instantiate = "${legacyPackages.nix}/bin/nix-instantiate";
         nix-prefetch-url = "${legacyPackages.nix}/bin/nix-prefetch-url";
         curl = "${legacyPackages.curl}/bin/curl";
     in ''
