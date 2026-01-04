@@ -42,6 +42,10 @@ main() {
 		backup)
 			do_backup "$@"
 		;;
+		thee:activate)
+			echo TODO this command is currently unreachable
+			exit 42
+		;;
 		*)
 			cmdpath=commands."$cmd"
 			export NIX_PATH=komputiloj="$KOMPUTILOJ_PATH"

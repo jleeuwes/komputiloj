@@ -419,6 +419,11 @@ rec {
             echo 1 > /sys/class/sound/hwC1D0/reconfig
           '';
         };
+
+        systemd.services.detect-headset = {
+            # TODO ideetje: connection status van mijn koptelefoon naar
+            # homeassistant sturen zodat men weet dat ik mijn telefoon niet hoor
+        };
         
         systemd.user.timers.librewolf-backup = {
             wantedBy = [ "timers.target" ];
