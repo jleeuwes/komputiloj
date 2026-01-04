@@ -90,7 +90,44 @@ let
         users = flatten (capsule: capsule.users or {});
         domains = flatten (capsule: capsule.domains or {});
     };
-    new_capsules = {
+    capsule_makeAll = capsule:
+        let
+            prefixAttrs = pre: mapNames (nm: "${pre}:${nm}");
+            subcapsules = attrValues (named (capsule.capsules or {}));
+        in {
+
+            # TODO: I'm not sure how much generic manipulation I want to do on capsules.
+            # Things like applying `named` to all attrsets seems like a tempting convenience,
+            # but if we do that, it becomes important when we apply such a `wrapCapsule` function
+            # when constructing a capsule. If passing self within a capsule, do we want that
+            # to be the 'raw' capsule or the capsule with `wrapCapsule` applied?
+            # Do we want that to matter (much)?
+            # Maybe we're stepping into the framework versus library trap here.
+            # Let's do it like this for now:
+            #
+            # 1. Don't do any manipulation. Only provide a function to construct the `all` attr.
+            # 2. Use convention for that (like this whole capsule business already is)
+            #    and be robust/lenient where possible.
+            # 3. Maybe provide a function to apply to the whole capsule
+            #    that _checks_ our conventions without doing any manipulation.
+            
+            # CONVENTION: a capsule's all should have the same structure as a capsule (except it should not have all itself)
+            # TODO: warn about missing all
+            capsules = mergeAttrsets ([capsule.capsules or {}] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.capsules or {})) subcapsules);
+            commands = mergeAttrsets ([capsule.commands or {}] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.commands or {})) subcapsules);
+            pins     = mergeAttrsets ([capsule.pins     or {}] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.pins     or {})) subcapsules);
+        };
+    new_capsules = let
+        alias = capsule: let
+            self = capsule // {
+                # Some hacky stuff to remove the updateScript from pins,
+                # to prevent double updating the same pins.
+                # Is this really a good idea?
+                pins = mapAttrs (_: pin: removeAttrs pin ["updateScript"]) capsule.pins;
+                all = capsule_makeAll self;
+            };
+            in self;
+    in {
         # Keep STRICT dependency order here and ONLY take from new_capsules!
         boltons = {
             lib = boltons;
@@ -98,34 +135,7 @@ let
         platform = {
             localSystem = builtins.currentSystem; # IMPURE. Make this a pin?
             emulatedSystems = attrNames (readDir /run/binfmt); # IMPURE
-
-            lib.makeAll = capsule:
-                let
-                    prefixAttrs = pre: mapNames (nm: "${pre}:${nm}");
-                    subcapsules = attrValues (named (capsule.capsules or {}));
-                in {
-
-                    # TODO: I'm not sure how much generic manipulation I want to do on capsules.
-                    # Things like applying `named` to all attrsets seems like a tempting convenience,
-                    # but if we do that, it becomes important when we apply such a `wrapCapsule` function
-                    # when constructing a capsule. If passing self within a capsule, do we want that
-                    # to be the 'raw' capsule or the capsule with `wrapCapsule` applied?
-                    # Do we want that to matter (much)?
-                    # Maybe we're stepping into the framework versus library trap here.
-                    # Let's do it like this for now:
-                    #
-                    # 1. Don't do any manipulation. Only provide a function to construct the `all` attr.
-                    # 2. Use convention for that (like this whole capsule business already is)
-                    #    and be robust/lenient where possible.
-                    # 3. Maybe provide a function to apply to the whole capsule
-                    #    that _checks_ our conventions without doing any manipulation.
-                    
-                    # CONVENTION: a capsule's all should have the same structure as a capsule (except it should not have all itself)
-                    # TODO: warn about missing all
-                    capsules = mergeAttrsets ([capsule.capsules or {}] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.capsules or {})) subcapsules);
-                    commands = mergeAttrsets ([capsule.commands or {}] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.commands or {})) subcapsules);
-                    pins     = mergeAttrsets ([capsule.pins     or {}] ++ map (subcapsule: prefixAttrs subcapsule.name (subcapsule.all.pins     or {})) subcapsules);
-                };
+            lib.makeAll = capsule_makeAll;
         };
         flake-compat = {
             all = new_capsules.platform.lib.makeAll new_capsules.flake-compat;
@@ -154,8 +164,8 @@ let
         
         # Most of the time, we don't want to depend on a specific nixos version,
         # we just want the latest. We can use these aliases in that case.
-        nixos = new_capsules.nixos_25_05;
-        mailserver = new_capsules.mailserver_25_05;
+        nixos = alias new_capsules.nixos_25_05;
+        mailserver = alias new_capsules.mailserver_25_05;
 
         nixos_future = import ./capsules/nixos_future {
             inherit (new_capsules) platform nixos;
