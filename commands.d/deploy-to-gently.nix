@@ -1,13 +1,13 @@
-{ boltons, nixos_25_05, command-platform, komputiloj, ... }:
+{ boltons, nixos, command-platform, komputiloj, ... }:
 with boltons;
 let
     machine = komputiloj.machines.gently;
-    esc = nixos_25_05.lib.strings.escapeShellArg;
+    esc = nixos.lib.strings.escapeShellArg;
     sshTarget = "root@${machine.targetHost}";
     sshCmd = "ssh ${esc sshTarget}";
 in command-platform.local.packageBuilders.writeCommand {
     name = "deploy-to-gently";
-    runtimeInputs = [ nixos_25_05.local.legacyPackages.openssh ];
+    runtimeInputs = [ nixos.local.legacyPackages.openssh ];
     text = ''
         new_toplevel=${machine.nixosSystem.config.system.build.toplevel}
 

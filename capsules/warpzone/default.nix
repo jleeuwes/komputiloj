@@ -1,7 +1,7 @@
-{ boltons, nixos_25_05, komputiloj-definitions, ... }:
+{ boltons, nixos, komputiloj-definitions }:
 with boltons.lib;
 let
-    inherit (nixos_25_05.lib.strings) escapeShellArg escapeShellArgs;
+    inherit (nixos.lib.strings) escapeShellArg escapeShellArgs;
 in rec {
     nixosModules = rec {
         JumpHost = {

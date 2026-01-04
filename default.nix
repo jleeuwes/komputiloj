@@ -2,8 +2,7 @@ let boltons = import ./lib/boltons.nix;
 in with boltons;
 let
     sources = importDir ./sources.d;
-    default_nixos = "nixos_25_05"; # defines default nixos used by parts of komputiloj
-    callPackageWith = capsules.nixpkgsCurrent.lib.callPackageWith;
+    callPackageWith = capsules.nixos.lib.callPackageWith;
     fake_flakes = import ./lib/fake-flakes.nix;
     komputiloj_capsule = {
         
@@ -19,7 +18,7 @@ let
         domains = importDir ./domains.d;
 
         commands = importDirAndApply ./commands.d (capsules_and_boltons // {
-            inherit (new_capsules) nixos_25_05 command-platform;
+            inherit (new_capsules) nixos command-platform;
         });
 
         packages = let
@@ -64,8 +63,8 @@ let
         };
         
         machines = importDirAndApply ./machines.d (capsules_and_boltons // {
-            inherit (new_capsules) komputiloj-definitions nixos_25_05
-            mailserver_25_05 nixos_future hello-infra warpzone notie;
+            inherit (new_capsules) komputiloj-definitions
+            nixos mailserver nixos_future hello-infra warpzone notie;
         });
     };
     real_capsules = {
@@ -143,16 +142,25 @@ let
         nixos_25_05 = import ./capsules/nixos_25_05 {
             inherit (new_capsules) platform boltons;
         };
-        nixos_future = import ./capsules/nixos_future {
-            inherit (new_capsules) platform nixos_25_05;
+        mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix {
+            # NOTE: this capsule doesn't have updatable pins, it needs
+            # update-sources (but we're fixing that with the next nixos version,
+            # see below)
+            inherit (new_capsules) platform;
         };
         nixos_25_11 = import ./capsules/nixos_25_11 {
             inherit (new_capsules) platform boltons;
         };
-        mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix {
-            # TODO make the pin updatable so it can replace the source update mechanism and this can be moved to capsules
-            inherit (new_capsules) platform;
+        
+        # Most of the time, we don't want to depend on a specific nixos version,
+        # we just want the latest. We can use these aliases in that case.
+        nixos = new_capsules.nixos_25_05;
+        mailserver = new_capsules.mailserver_25_05;
+
+        nixos_future = import ./capsules/nixos_future {
+            inherit (new_capsules) platform nixos;
         };
+
         notie = import ./capsules/notie {
             inherit (new_capsules) nixos_future;
         };
@@ -165,13 +173,13 @@ let
                         # TODO somehow enhance writeShellApplication to produce a clean PATH inside the script
                         # Currently it is too easy to rely on some undeclared dependency.
                         scriptDir =
-                        new_capsules.nixos_25_05.native.${new_capsules.platform.localSystem}.packageBuilders.writeShellApplication {
+                        new_capsules.nixos.native.${new_capsules.platform.localSystem}.packageBuilders.writeShellApplication {
                             name = "script";
                             runtimeInputs = args.runtimeInputs or [];
                             text = args.text;
                         };
                     in
-                    new_capsules.nixos_25_05.portable.packageBuilders.concatScript args.name [ "${scriptDir}/bin/script" ];
+                    new_capsules.nixos.portable.packageBuilders.concatScript args.name [ "${scriptDir}/bin/script" ];
                 };
             };
 
@@ -184,15 +192,15 @@ let
             inherit (new_capsules) boltons;
         };
         warpzone = import ./capsules/warpzone {
-            inherit (new_capsules) boltons nixos_25_05 komputiloj-definitions;
+            inherit (new_capsules) boltons nixos komputiloj-definitions;
         };
         hello-infra = sources.hello-infra.value {
-            inherit (new_capsules) boltons platform flake-compat nixos_25_05 command-platform komputiloj-definitions;
+            inherit (new_capsules) boltons platform flake-compat nixos command-platform komputiloj-definitions;
         };
     };
     fake_capsules = rec {
         # TODO get rid of this backwards compatible abomination
-        nixpkgsCurrent = let nixpkgs = getAttr default_nixos new_capsules; in
+        nixpkgsCurrent = let nixpkgs = new_capsules.nixos; in
             nixpkgs // {
                 packages = nixpkgs.native.x86_64-linux.legacyPackages;
 

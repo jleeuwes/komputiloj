@@ -1,8 +1,8 @@
-{ boltons, command-platform, nixos_25_05, ... }:
+{ boltons, command-platform, nixos, ... }:
 with boltons;
 command-platform.local.packageBuilders.writeCommand {
     name = "moo";
-    runtimeInputs = [ nixos_25_05.local.legacyPackages.cowsay ];
+    runtimeInputs = [ nixos.local.legacyPackages.cowsay ];
     text = ''
         if [[ $# -eq 0 ]]; then
             cowsay 'MOO!'

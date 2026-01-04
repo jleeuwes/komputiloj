@@ -1,11 +1,11 @@
-{ boltons, nixos_25_05, mailserver_25_05, komputiloj-definitions, komputiloj,
+{ boltons, nixos, mailserver, komputiloj-definitions, komputiloj,
   privata, gorinchemindialoog, hello-infra,
   sleutel, wolk, thee, notie, warpzone, ...  }:
 with boltons;
 let
 	hello   = hello-infra; # TODO why this alias?
 	                       # should the hello-infra capsule be renamed?
-	inherit (nixos_25_05.lib.strings) escapeShellArgs;
+	inherit (nixos.lib.strings) escapeShellArgs;
 in rec {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
 
@@ -31,8 +31,8 @@ in rec {
 		};
 	};
 	
-	nixosSystem = nixos_25_05.lib.nixosSystem {
-		pkgs = nixos_25_05.native.x86_64-linux.legacyPackages;
+	nixosSystem = nixos.lib.nixosSystem {
+		pkgs = nixos.native.x86_64-linux.legacyPackages;
 		modules = [
 			mainModule
 		];
@@ -71,7 +71,7 @@ in rec {
 			komputiloj.modules.storage-volume
 			komputiloj.modules.ssh-client-config
 			komputiloj.modules.secrets
-			mailserver_25_05.nixosModules.mailserver
+			mailserver.nixosModules.mailserver
 			hello.nixosModules."70004-backup"
 			hello.nixosModules."70004-autocommit"
 			hello.nixosModules."70004-ingest-data"

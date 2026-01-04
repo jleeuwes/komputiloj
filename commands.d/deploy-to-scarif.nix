@@ -1,13 +1,13 @@
-{ boltons, komputiloj, command-platform, nixos_25_05, ... }:
+{ boltons, komputiloj, command-platform, nixos, ... }:
 with boltons;
 let
     machine = komputiloj.machines.scarif;
-    esc = nixos_25_05.lib.strings.escapeShellArg;
+    esc = nixos.lib.strings.escapeShellArg;
     sshTarget = "root@${machine.targetHost}";
     sshCmd = "ssh ${esc sshTarget}";
 in command-platform.local.packageBuilders.writeCommand {
     name = "deploy-to-scarif";
-    runtimeInputs = [ nixos_25_05.local.legacyPackages.openssh ];
+    runtimeInputs = [ nixos.local.legacyPackages.openssh ];
     text = ''
         new_toplevel=${machine.nixosSystem.config.system.build.toplevel}
 

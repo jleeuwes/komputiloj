@@ -1,8 +1,8 @@
-{ boltons, command-platform, nixos_25_05, komputiloj, ... }:
+{ boltons, command-platform, nixos, komputiloj, ... }:
 with boltons.lib;
 let
     machine = komputiloj.machines.gently;
-    esc = nixos_25_05.lib.strings.escapeShellArg;
+    esc = nixos.lib.strings.escapeShellArg;
     sshTarget = "root@${machine.targetHost}";
     sshCmd = "ssh ${esc sshTarget}";
 in command-platform.local.packageBuilders.writeCommand {

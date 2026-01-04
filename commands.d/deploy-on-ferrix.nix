@@ -1,11 +1,11 @@
-{ boltons, command-platform, nixos_25_05, komputiloj, ... }:
+{ boltons, command-platform, nixos, komputiloj, ... }:
 with boltons;
 let
     machine = komputiloj.machines.ferrix;
-    esc = nixos_25_05.lib.strings.escapeShellArg;
+    esc = nixos.lib.strings.escapeShellArg;
 in command-platform.local.packageBuilders.writeCommand {
     name = "deploy-on-ferrix";
-    runtimeInputs = [ nixos_25_05.local.legacyPackages.nix ];
+    runtimeInputs = [ nixos.local.legacyPackages.nix ];
     text = ''
         if [ "$HOSTNAME" != ferrix ]; then
             echo "This config is supposed to be deployed on ferrix, not $HOSTNAME" >&2

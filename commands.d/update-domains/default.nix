@@ -1,7 +1,7 @@
-{ boltons, command-platform, komputiloj, nixos_25_05, all, ... }:
+{ boltons, command-platform, komputiloj, nixos, all, ... }:
 with boltons;
 let
-    escape = nixos_25_05.lib.strings.escapeShellArg;
+    escape = nixos.lib.strings.escapeShellArg;
     updateVersioDomain = command-platform.local.packageBuilders.writeCommand {
         name = "update-versio-domain";
         # no runtimeInputs because PATH is (currently) inherited from calling script
@@ -16,17 +16,17 @@ let
         versio = updateVersioDomain;
         transip = updateTransipDomain;
     };
-    recordsFile = domain: nixos_25_05.portable.packageBuilders.writeTextFile {
+    recordsFile = domain: nixos.portable.packageBuilders.writeTextFile {
         name = "records";
         text = domain.records;
     };
 in command-platform.local.packageBuilders.writeCommand {
     name = "update-domains";
     runtimeInputs = [
-        nixos_25_05.local.legacyPackages.curl
-        nixos_25_05.local.legacyPackages.gnugrep
-        nixos_25_05.local.legacyPackages.coreutils
-        nixos_25_05.local.legacyPackages.jq
+        nixos.local.legacyPackages.curl
+        nixos.local.legacyPackages.gnugrep
+        nixos.local.legacyPackages.coreutils
+        nixos.local.legacyPackages.jq
         komputiloj.packages.wachtwoord
         komputiloj.packages.tipctl
     ];

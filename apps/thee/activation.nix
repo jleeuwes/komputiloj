@@ -1,8 +1,8 @@
-{ boltons, nixos_25_05, command-platform, all }:
+{ boltons, nixos, command-platform, all }:
 with boltons;
-with nixos_25_05.lib.strings;
+with nixos.lib.strings;
 let
-    nixos = nixos_25_05;
+    nixos = nixos;
     inherit (nixos.local.packageBuilders) writeShellApplication;
     inherit (nixos.portable.packageBuilder) writeTextDir symlinkJoin;
     url_base = "https://thee.radstand.nl";
