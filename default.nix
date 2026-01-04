@@ -51,7 +51,7 @@ let
             # NEVER pass new_capsules as a whole
             # The capsules we inherit in each output (modules, packages, ...)
             # will be the dependencies of the proper komputiloj capsule.
-            inherit (new_capsules) boltons komputiloj-privata hello-infra nixos_25_11;
+            inherit (new_capsules) boltons komputiloj-privata hello-infra nixos;
 
             # pass the capsule that we are constructing to itself.
             # TODO we would like to get rid of such magic
