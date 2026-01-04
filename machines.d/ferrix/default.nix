@@ -1,4 +1,4 @@
-{ komputiloj-definitions, komputiloj, hello-infra, nixos_25_05, warpzone, ... }:
+{ komputiloj-definitions, komputiloj, hello-infra, nixos_25_05, nixos_future, warpzone, ... }:
 rec {
 
     nixosSystem = nixos_25_05.lib.nixosSystem {
@@ -194,7 +194,11 @@ rec {
             # love_11
             # arduino
             # haskellPackages.ghc
+            
+            # gamedev
             godot
+            goxel
+            nixos_future.native.x86_64-linux.packages.vengi-tools
             
             # android-studio
             apktool dex2jar

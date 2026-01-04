@@ -1,4 +1,4 @@
-{ boltons, nixpkgsFuture, privata, all, ... }: {
+{ nixos_future, ... }: {
     modules = rec {
         all_in_one = {
             imports = [
@@ -11,7 +11,7 @@
         _silverbullet = {config, pkgs, ...}: {
             services.silverbullet = {
                 enable = true; # DO NOT ENABLE WITHOUT SETTING A BASICAUTH PASSWORD BELOW
-                package = nixpkgsFuture.packages.${pkgs.system}.silverbullet;
+                package = nixos_future.native.${pkgs.system}.packages.silverbullet;
                 # currently only one space is supported
                 spaceDir = "/mnt/storage/live/silverbullet/spaces/hello";
                 envFile = "/run/silverbullet.hello.env";
@@ -31,7 +31,7 @@
         _secrets = { pkgs, ... }: {
             # secrets = {
             #     silverbullet-token = {
-            #         encryptedContent = privata.secrets.silverbullet-token.encryptedContent;
+            #         encryptedContent = komputiloj-privata.secrets.silverbullet-token.encryptedContent;
             #         user = "silverbullet";
             #         group = "silverbullet";
             #         permissions = "u=r,go=";

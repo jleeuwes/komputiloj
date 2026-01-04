@@ -64,7 +64,8 @@ let
         };
         
         machines = importDirAndApply ./machines.d (capsules_and_boltons // {
-            inherit (new_capsules) komputiloj-definitions nixos_25_05 mailserver_25_05 hello-infra warpzone;
+            inherit (new_capsules) komputiloj-definitions nixos_25_05
+            mailserver_25_05 nixos_future hello-infra warpzone notie;
         });
     };
     real_capsules = {
@@ -74,7 +75,6 @@ let
         sleutel = (import ./apps/sleutel) capsules_and_boltons;
         wolk = (import ./apps/wolk) capsules_and_boltons;
         thee = (import ./apps/thee) capsules_and_boltons;
-        notie = (import ./apps/notie) capsules_and_boltons;
     };
     all_capsule = let
         cs = attrValues (named (real_capsules // fake_capsules // new_capsules));
@@ -143,12 +143,18 @@ let
         nixos_25_05 = import ./capsules/nixos_25_05 {
             inherit (new_capsules) platform boltons;
         };
+        nixos_future = import ./capsules/nixos_future {
+            inherit (new_capsules) platform nixos_25_05;
+        };
         nixos_25_11 = import ./capsules/nixos_25_11 {
             inherit (new_capsules) platform boltons;
         };
         mailserver_25_05 = import ./sources.d/mailserver_25_05/capsule.nix {
             # TODO make the pin updatable so it can replace the source update mechanism and this can be moved to capsules
             inherit (new_capsules) platform;
+        };
+        notie = import ./capsules/notie {
+            inherit (new_capsules) nixos_future;
         };
         command-platform = rec {
             # extra local scope because it's stupid that we would always need command-platform
@@ -195,34 +201,6 @@ let
 
                 pins = {};
             };
-        nixpkgsFuture = let
-            override = old: new: trace ("🕑🕐🕛 nixpkgsFuture: Replacing " + old.name + " with " + new.name) new;
-        in {
-            # NOTE: Each time we use something from unstable, we should pin
-            # that exact source. That way, we can someday move away from the
-            # unstable version when it hits the stable channels.  If we would
-            # take packages directly from one perpetually updated unstable
-            # source, we will never catch up.
-            
-            # TODO these are flake-like outputs, not our multiarch capsule
-            # outputs. This nixpkgsFuture mess should be removed anyway
-            # so I guess we can live with that for now?
-
-            packages.aarch64-linux = let
-                callPackage = pkg: callPackageWith nixpkgsCurrent.qemu.aarch64-linux.legacyPackages pkg;
-            in {
-                ebusd = override
-                    nixpkgsCurrent.qemu.aarch64-linux.legacyPackages.ebusd
-                    (callPackage ./pkgs/ebusd {});
-            };
-            packages.x86_64-linux = let
-                callPackage = pkg: callPackageWith nixpkgsCurrent.native.x86_64-linux.legacyPackages pkg;
-            in {
-                silverbullet = override
-                    nixpkgsCurrent.native.x86_64-linux.legacyPackages.silverbullet
-                    (callPackage ./pkgs/silverbullet {});
-            };
-        };
         nextcloud = {
             packages = let
                 callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages.x86_64-linux pkg;
