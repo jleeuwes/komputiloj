@@ -223,12 +223,11 @@ let
                 pins = {};
             };
         nextcloud = {
+            # TODO this stuff should move to a nextcloud or wolk capsule
             packages = let
                 callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages.x86_64-linux pkg;
             in {
-                # nextcloud = nixpkgsCurrent.packages.nextcloud31;
-                # nextcloud = callPackage ./pkgs/nextcloud31-systemtags {}; #  { nextcloud = nixpkgsCurrent.packages.nextcloud31; };
-                nextcloud = (import ./pkgs/nextcloud31-systemtags) { nextcloud31 = nixpkgsCurrent.packages.nextcloud31; };
+                nextcloud = new_capsules.nixos.native.x86_64-linux.legacyPackages.nextcloud31;
                 apps = sources.nextcloud_31_apps.value nixpkgsCurrent.packages;
             };
         };
