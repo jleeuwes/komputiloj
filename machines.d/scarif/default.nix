@@ -1,4 +1,4 @@
-{ komputiloj-definitions, komputiloj, privata, hello-infra, nixos, ... }:
+{ komputiloj-definitions, komputiloj, privata, hello-infra-definitions, nixos, ... }:
 rec {
     targetHost = "scarif.radstand.nl";
     inherit (privata.machines.scarif) masterAgeKey;
@@ -167,10 +167,10 @@ rec {
             stateless = true;
         };
         hardware.printers = rec {
-            ensurePrinters = [ hello-infra.printers.canon-ts8750 ];
+            ensurePrinters = [ hello-infra-definitions.printers.canon-ts8750 ];
             
             # TODO does this to work?
-            ensureDefaultPrinter = hello-infra.printers.canon-ts8750.name;
+            ensureDefaultPrinter = hello-infra-definitions.printers.canon-ts8750.name;
 
         };
         
@@ -234,9 +234,9 @@ rec {
             extraGroups = [ "wheel" "network-manager" "dialout" "adbusers" "video" "audio" ];
         };
         users.users.karin = {
-            uid = hello-infra.users.karin.linux.uid;
+            uid = hello-infra-definitions.users.karin.linux.uid;
             isNormalUser = true;
-            description = hello-infra.users.karin.fullName;
+            description = hello-infra-definitions.users.karin.fullName;
         };
 
         # The NixOS release to be compatible with for stateful data such as databases.

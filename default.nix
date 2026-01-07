@@ -64,7 +64,7 @@ let
         
         machines = importDirAndApply ./machines.d (capsules_and_boltons // {
             inherit (new_capsules) komputiloj-definitions
-            nixos mailserver nixos_future hello-infra warpzone notie;
+            nixos mailserver nixos_future hello-infra-definitions hello-infra warpzone notie;
         });
     };
     real_capsules = {
@@ -207,8 +207,13 @@ let
         warpzone = import ./capsules/warpzone {
             inherit (new_capsules) boltons nixos komputiloj-definitions;
         };
-        hello-infra = sources.hello-infra.value {
-            inherit (new_capsules) boltons platform flake-compat nixos command-platform komputiloj-definitions;
+        hello-infra-bundle = sources.hello-infra.value {
+            inherit (new_capsules) boltons platform
+                komputiloj-definitions komputiloj-privata;
+        };
+        hello-infra-definitions = new_capsules.hello-infra-bundle.capsules.definitions;
+        hello-infra = new_capsules.hello-infra-bundle.capsuleRecipes.proper {
+            inherit (new_capsules) command-platform flake-compat nixos;
         };
     };
     fake_capsules = rec {

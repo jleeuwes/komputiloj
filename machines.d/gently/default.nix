@@ -1,10 +1,8 @@
 { boltons, nixos, mailserver, komputiloj-definitions, komputiloj,
-  privata, gorinchemindialoog, hello-infra,
+  privata, gorinchemindialoog, hello-infra-definitions, hello-infra,
   sleutel, wolk, thee, notie, warpzone, ...  }:
 with boltons;
 let
-	hello   = hello-infra; # TODO why this alias?
-	                       # should the hello-infra capsule be renamed?
 	inherit (nixos.lib.strings) escapeShellArgs;
 in rec {
 	# Inspiration taken from https://github.com/nh2/nixops-tutorial/blob/master/example-nginx-deployment.nix
@@ -24,7 +22,7 @@ in rec {
 			encryptedContent = privata.secrets.luks-storage-key.encryptedContent;
 		};
 		bigstorage1-git-annex-hello-creds = {
-			encryptedContent = hello.secrets.bigstorage1-git-annex-hello-creds.encryptedContent;
+			encryptedContent = hello-infra-definitions.secrets.bigstorage1-git-annex-hello-creds.encryptedContent;
 			user = "git-annex";
 			group = "git-annex";
 			permissions = "u=r,go=";
@@ -72,10 +70,10 @@ in rec {
 			komputiloj.modules.ssh-client-config
 			komputiloj.modules.secrets
 			mailserver.nixosModules.mailserver
-			hello.nixosModules."70004-backup"
-			hello.nixosModules."70004-autocommit"
-			hello.nixosModules."70004-ingest-data"
-			hello.nixosModules."70004-known-host"
+			hello-infra.nixosModules."70004-backup"
+			hello-infra.nixosModules."70004-autocommit"
+			hello-infra.nixosModules."70004-ingest-data"
+			hello-infra.nixosModules."70004-known-host"
 			sleutel.modules.all_in_one
 			wolk.modules.all_in_one
 			notie.modules.all_in_one
@@ -451,16 +449,16 @@ in rec {
 				gid = komputiloj.users.radicale.linux.uid;
 			};
 			users."70004" = {
-				name = hello.users."70004".name;
-				group = hello.users."70004".name;
-				uid = hello.users."70004".linux.uid;
+				name  = hello-infra-definitions.users."70004".name;
+				group = hello-infra-definitions.users."70004".name;
+				uid   = hello-infra-definitions.users."70004".linux.uid;
 				isSystemUser = true;
-				home = "/mnt/storage/live/home/${hello.users."70004".name}";
+				home = "/mnt/storage/live/home/${hello-infra-definitions.users."70004".name}";
 				createHome = false;
 			};
 			groups."70004" = {
-				name = hello.users."70004".name;
-				gid = hello.users."70004".linux.uid;
+				name = hello-infra-definitions.users."70004".name;
+				gid  = hello-infra-definitions.users."70004".linux.uid;
 			};
 			groups.sftp_only = {
 				gid = 2001;
@@ -623,8 +621,8 @@ in rec {
 					enableACME = true;
 					root = "/mnt/storage/live/http-hodgepodge/radstand.nl";
 					locations = {
-						"${hello.nginxLocations.liedjes.location}" =
-							hello.nginxLocations.liedjes.config;
+						"${hello-infra.nginxLocations.liedjes.location}" =
+							hello-infra.nginxLocations.liedjes.config;
 					};
 					extraConfig = stripTabs ''
 						disable_symlinks if_not_owner from=$document_root/dump;

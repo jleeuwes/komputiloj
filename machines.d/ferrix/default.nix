@@ -1,4 +1,4 @@
-{ komputiloj-definitions, komputiloj, hello-infra, nixos, nixos_future, warpzone, ... }:
+{ komputiloj-definitions, komputiloj, hello-infra-definitions, nixos, nixos_future, warpzone, ... }:
 rec {
 
     nixosSystem = nixos.lib.nixosSystem {
@@ -349,10 +349,10 @@ rec {
             # stateless = true;
         };
         hardware.printers = rec {
-            ensurePrinters = [ hello-infra.printers.canon-tr7550 ];
+            ensurePrinters = [ hello-infra-definitions.printers.canon-tr7550 ];
 
             # this doesn't seem to work:
-            ensureDefaultPrinter = hello-infra.printers.canon-tr7550.name;
+            ensureDefaultPrinter = hello-infra-definitions.printers.canon-tr7550.name;
             # but running this does:
             #   lpoptions -d canon-tr7550
         };

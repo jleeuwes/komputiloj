@@ -86,11 +86,19 @@ A capsule can exist in one of two forms:
 1. an attribute set with objects grouped by category.
 2. a function taking other capsules and returning such an attribute set.
 
+Form 2 is called a _capsule recipe_ when an explicit term is needed.
+
 Capsules seem similar to the input/output part of Nix flakes.
 We might one day switch to flakes.
 I try to keep my capsules in line with my understanding of flakes.
 That way I can pick the benefits of the flakes concept that I want,
 without fully committing yet, while also making it potentially easy to switch later.
+
+A special case of capsule is a _definitions capsule_.
+It's a capsule that does not contain any 'unrealized' parts
+(functions, but probably also derivations).
+It can in principle be strictly evaluated and turned into json,
+unless for practical reasons like it being too large.
 
 #### Machines
 
