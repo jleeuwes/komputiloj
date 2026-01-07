@@ -21,9 +21,6 @@ self = {
                     # for some reason not present in top-level packages when going through the flake:
                     libX11 = nixos.native.${localSystem}.legacyPackages.xorg.libX11;
                 });
-            silverbullet = modernize
-                nixos.native.${localSystem}.legacyPackages.silverbullet
-                (callPackage ./pkgs/silverbullet {});
         };
     };
 };

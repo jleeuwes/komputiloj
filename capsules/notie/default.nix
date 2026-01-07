@@ -11,7 +11,6 @@
         _silverbullet = {config, pkgs, ...}: {
             services.silverbullet = {
                 enable = true; # DO NOT ENABLE WITHOUT SETTING A BASICAUTH PASSWORD BELOW
-                package = nixos_future.native.${pkgs.system}.packages.silverbullet;
                 # currently only one space is supported
                 spaceDir = "/mnt/storage/live/silverbullet/spaces/hello";
                 envFile = "/run/silverbullet.hello.env";
