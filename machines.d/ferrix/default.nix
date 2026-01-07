@@ -32,12 +32,6 @@ rec {
 
         nixpkgs.overlays = [
             komputiloj.overlays.undesired-packages
-            (final: prev: {
-                beets = prev.beets.override {
-                    # embedart plugin has a broken test
-                    pluginOverrides = { embedart.enable = false; };
-                };
-            })
         ];
 
         imports =
@@ -149,7 +143,7 @@ rec {
             enableDefaultPackages = true;
             packages = [
                 pkgs.dejavu_fonts
-                pkgs.ubuntu_font_family
+                pkgs.ubuntu-classic
             ];
         };
 
@@ -188,7 +182,7 @@ rec {
             dejsonlz4 # for reading firefox jsonlz4 files
             remarshal # for yaml2json etc
             jq # json manipulation
-            jetbrains.idea-community
+            # jetbrains.idea-community # TODO pick the right one
             openjdk21 maven
             # visualvm
             # love_11
@@ -198,7 +192,7 @@ rec {
             # gamedev
             godot
             goxel
-            nixos_future.native.x86_64-linux.packages.vengi-tools
+            # nixos_future.native.x86_64-linux.packages.vengi-tools # TODO FIXME compilation segfaults with NixOS 25.11
             
             # android-studio
             apktool dex2jar
@@ -207,7 +201,7 @@ rec {
             # (Not sure if rubber uses the chosen texlive distribution)
             # texlive.combined.scheme-medium
             # rubber
-            poppler_utils
+            poppler-utils
             qpdf pdftk
             
             # (firefox and librewolf are configured through programs.*)

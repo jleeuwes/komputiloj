@@ -167,8 +167,8 @@ let
         
         # Most of the time, we don't want to depend on a specific nixos version,
         # we just want the latest. We can use these aliases in that case.
-        nixos = alias new_capsules.nixos_25_05;
-        mailserver = alias new_capsules.mailserver_25_05;
+        nixos = alias new_capsules.nixos_25_11;
+        mailserver = alias new_capsules.mailserver_25_11;
 
         nixos_future = import ./capsules/nixos_future {
             inherit (new_capsules) platform nixos;

@@ -638,6 +638,8 @@ in rec {
 
 		mailserver = {
 			enable = true;
+
+			stateVersion = 3;
 			
 			# We won't get nameservers from DHCP if this if true (the default)!
 			# See https://discourse.nixos.org/t/how-to-use-a-nameserver-with-a-static-networking-configuration/10932/3
@@ -675,7 +677,7 @@ in rec {
 		systemd.services.postfix = {
 			needsStorageVolume = "requires";
 		};
-		systemd.services.dovecot2 = {
+		systemd.services.dovecot = {
 			needsStorageVolume = "requires";
 		};
 
@@ -708,7 +710,7 @@ in rec {
 			cryptsetup btrfs-progs parted
 			mailutils
 			gitMinimal
-			gitAndTools.git-annex
+			git-annex
 			btdu # btrfs disk usage profiler
 			zip unzip
 
