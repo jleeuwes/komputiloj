@@ -171,7 +171,7 @@ let
         mailserver = alias new_capsules.mailserver_25_11;
 
         nixos_future = import ./capsules/nixos_future {
-            inherit (new_capsules) platform nixos;
+            inherit (new_capsules) platform nixos nixos_25_05;
         };
 
         notie = import ./capsules/notie {

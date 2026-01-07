@@ -192,7 +192,7 @@ rec {
             # gamedev
             godot
             goxel
-            # nixos_future.native.x86_64-linux.packages.vengi-tools # TODO FIXME compilation segfaults with NixOS 25.11
+            nixos_future.native.x86_64-linux.packages.vengi-tools
             
             # android-studio
             apktool dex2jar
