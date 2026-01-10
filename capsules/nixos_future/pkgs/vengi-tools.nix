@@ -102,10 +102,13 @@ stdenv.mkDerivation (finalAttrs: {
       # one.
       # This is not needed on darwin, since on that platform data files are saved
       # in *.app/Contents/Resources/ too, and are picked up automatically.
+      #
+      # Also, work around https://github.com/vengi-voxel/vengi/issues/576
       ''
         for prog in $out/bin/*; do
           wrapProgram "$prog" \
-            --set CORE_PATH $out/share/$(basename "$prog")/
+            --set CORE_PATH $out/share/$(basename "$prog")/ \
+            --set SDL_VIDEODRIVER x11
         done
       '';
 
