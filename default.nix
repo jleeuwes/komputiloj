@@ -60,6 +60,7 @@ let
 
         overlays = rec {
             undesired-packages = import ./overlays/undesired-packages.nix { inherit boltons; };
+            fix-hibernate = import ./overlays/fix-hibernate.nix;
         };
         
         machines = importDirAndApply ./machines.d (capsules_and_boltons // {

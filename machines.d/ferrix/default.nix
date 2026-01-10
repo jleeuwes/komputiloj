@@ -32,6 +32,7 @@ rec {
 
         nixpkgs.overlays = [
             komputiloj.overlays.undesired-packages
+            komputiloj.overlays.fix-hibernate
         ];
 
         imports =
