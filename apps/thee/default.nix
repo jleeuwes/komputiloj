@@ -135,7 +135,7 @@ in {
             export FORGEJO_WORK_DIR=${stateDir}
             export FORGEJO_CUSTOM=${stateDir}/custom
             
-            sudo --preserve-env=GITEA_WORK_DIR,GITEA_CUSTOM,FORGEJO_WORK_DIR,FORGEJO_CUSTOM -u gitea gitea "$@"
+            sudo --preserve-env=GITEA_WORK_DIR,GITEA_CUSTOM,FORGEJO_WORK_DIR,FORGEJO_CUSTOM -u gitea forgejo "$@"
         '';
     };
 }
