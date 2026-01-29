@@ -116,6 +116,35 @@ To make the storage size bigger:
 
 (Maybe we can replace steps 2 to 4 with a single remount step.)
 
+### Maintenance
+
+#### Errors about a no space left on device while `df` reports space left
+
+This is an issue with metadata blocks and/or fragmentation. I forgot the details
+but they are here:
+
+* <https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Problem_FAQ.html#I_get_.22No_space_left_on_device.22_errors.2C_but_df_says_I.27ve_got_lots_of_space>
+* <https://old.reddit.com/r/btrfs/comments/15a1pw2/unallocated_vs_free_space/>
+* <https://old.reddit.com/r/btrfs/comments/xxlju2/how_full_is_too_full/>
+
+There's a timer running on gently that rebalances each night.
+If that doesn't help, I start deleting some backups,
+presuming the problem is that there are too many files.
+
+#### Unreachable data according to `btdu`
+
+Dit komt door bestanden die regelmatig een klein beetje worden aangepast.
+Dit laat veel rommel achter in btrfs, want die blijft graag verwijzen naar vorige versies van extents.
+Normaal is dat handig, maar niet als een groot bestand constant kleine wijzigingen krijgt.
+
+Het kan dan helpen om het bestand los te koppelen van de oude extents.
+Dat kan door `cp --reflink=never file file.rebuilt` en dan `mv file.rebuilt file`.
+
+Let op dat dit in eerste instantie kan zorgen voor _meer_ ruimtegebruik,
+omdat er ook nog snapshots zijn van de oude versie van het betreffende bestand.
+Door het loskoppelen gaan de snapshot en het _rebuilt_ bestand apart ruimte
+innnemen.
+
 ## Install NixOS on a Hetzner VPS
 
 On Hetzner, create a virtual machine with the following settings:

@@ -181,11 +181,7 @@ in rec {
 								en moeten er dingen worden weggegooid
 								of moet het volume worden vergroot.
 
-								Meer info hier:
-
-								* https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Problem_FAQ.html#I_get_.22No_space_left_on_device.22_errors.2C_but_df_says_I.27ve_got_lots_of_space
-								* https://old.reddit.com/r/btrfs/comments/15a1pw2/unallocated_vs_free_space/
-								* https://old.reddit.com/r/btrfs/comments/xxlju2/how_full_is_too_full/
+								Meer info hier: https://github.com/jleeuwes/komputiloj/blob/master/serviloj.md#maintenance
 
 								Succes ermee!
 							EOF
