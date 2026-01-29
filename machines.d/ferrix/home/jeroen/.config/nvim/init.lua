@@ -14,6 +14,10 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.softtabstop = 4
 
+-- make sure we can find the cursor when searching for one-letter strings:
+vim.opt.cursorline = true
+vim.opt.cursorcolumn = true
+
 -- Haskell wants spaces and I want less indentation:
 function haskellike()
 	vim.opt_local.expandtab = true
