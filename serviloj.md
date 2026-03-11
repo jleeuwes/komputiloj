@@ -110,7 +110,7 @@ To make the storage size bigger:
 
 1. Resize the volume through Hetzner's web interface.
 2. Reboot the server for LUKS to pick up the new size.
-3. Resend keys with `komputiloj send-keys-to-$HOST`.
+3. Resend keys with `komputiloj send-masterkey-to-$HOST`.
 4. Wait until `/mnt/storage` is mounted.
 5. Resize the filesystem with `btrfs filesystem resize max /mnt/storage`.
 
