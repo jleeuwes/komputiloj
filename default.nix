@@ -208,12 +208,12 @@ let
         warpzone = import ./capsules/warpzone {
             inherit (new_capsules) boltons nixos komputiloj-definitions;
         };
-        hello-infra-bundle = sources.hello-infra.value {
+        hello-infra-entrypoint = sources.hello-infra.value {
             inherit (new_capsules) boltons platform
                 komputiloj-definitions komputiloj-privata;
         };
-        hello-infra-definitions = new_capsules.hello-infra-bundle.capsules.definitions;
-        hello-infra = new_capsules.hello-infra-bundle.capsuleRecipes.proper {
+        hello-infra-definitions = new_capsules.hello-infra-entrypoint.capsules.hello-infra-definitions;
+        hello-infra = new_capsules.hello-infra-entrypoint.capsuleRecipes.hello-infra {
             inherit (new_capsules) command-platform flake-compat nixos;
         };
     };
