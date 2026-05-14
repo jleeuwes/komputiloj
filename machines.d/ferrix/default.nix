@@ -45,6 +45,7 @@ rec {
                 komputiloj.modules.build-for-raspberry
                 komputiloj.modules.ludanto
                 komputiloj.modules.ai
+                komputiloj.modules.disable-kernel-crypto
                 # TODO add a module that checks if the SSH hostkey from komputiloj-definitions matches the one in use on the machine
                 warpzone.nixosModules.Ferrix
             ];

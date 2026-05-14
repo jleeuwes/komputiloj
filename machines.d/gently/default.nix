@@ -69,6 +69,7 @@ in rec {
 			komputiloj.modules.storage-volume
 			komputiloj.modules.ssh-client-config
 			komputiloj.modules.secrets
+			komputiloj.modules.disable-kernel-crypto
 			mailserver.nixosModules.mailserver
 			hello-infra.nixosModules."70004-backup"
 			hello-infra.nixosModules."70004-autocommit"
