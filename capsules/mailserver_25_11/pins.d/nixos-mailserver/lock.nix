@@ -1,8 +1,8 @@
 # GENERATED
 with builtins;
 rec {
-    url = "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/23f0a53ca6e58e61e1ea2b86791c69b79c91656d/nixos-mailserver-23f0a53ca6e58e61e1ea2b86791c69b79c91656d.tar.gz";
-    sha256 = "0pqc7bay9v360x2b7irqaz4ly63gp4z859cgg5c04imknv0pwjqw";
+    url = "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/25e6dbb8fca3b6e779c5a46fd03bd760b2165bb5/nixos-mailserver-25e6dbb8fca3b6e779c5a46fd03bd760b2165bb5.tar.gz";
+    sha256 = "0f1mq2gdmx9wd0k89f6w61sbfzpd1wwz857l2xvyp1x0msmd2z20";
     nix_path = fetchTarball {
         inherit url sha256;
     };

@@ -194,7 +194,9 @@ rec {
             # gamedev
             godot
             goxel
-            nixos_future.native.x86_64-linux.packages.vengi-tools
+
+            # games
+            # openraPackages.engines.bleed # Red Alert
             
             # android-studio
             apktool dex2jar
@@ -260,8 +262,8 @@ rec {
                 # https://mozilla.github.io/policy-templates/
                 ExtensionSettings = {
                     "*" = {
-                        blocked_install_message = "Dit moet via Nix.";
-                        installation_mode = "blocked";
+                        blocked_install_message = lib.mkForce "Dit moet via Nix.";
+                        installation_mode = lib.mkForce "blocked";
                     };
                     "gdpr@cavi.au.dk" = {
                         # TODO figure out how to do updates and/or pinning
@@ -273,8 +275,8 @@ rec {
                     # having an ExtensionSettings policy overrides that
                     # completely. So we need to have ublock here.
                     "uBlock0@raymondhill.net" = {
-                        install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
-                        installation_mode = "force_installed";
+                        # install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+                        installation_mode = lib.mkForce "force_installed";
                     };
                 };
             };

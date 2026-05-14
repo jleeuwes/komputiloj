@@ -2,8 +2,8 @@
 with builtins;
 rec {
     nix_path = fetchTarball {
-        url    = "https://github.com/edolstra/flake-compat/archive/65f23138d8d09a92e30f1e5c87611b23ef451bf3.tar.gz";
-        sha256 = "1c5f7vfn205bj4bmkgzgyw9504xh5j7gcwi8jf7yh581bwzlwl71";
+        url    = "https://github.com/edolstra/flake-compat/archive/5edf11c44bc78a0d334f6334cdaf7d60d732daab.tar.gz";
+        sha256 = "0yqfa6rx8md81bcn4szfp0hjq2f3h9i8zjzhqqyfqdkrj5559nmw";
     };
     value = import nix_path;
 }

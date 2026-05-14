@@ -24,6 +24,9 @@ nixpkgs_nixos_lib_eval-config = import (lock.nix_path + "/nixos/lib/eval-config.
 nixpkgs_config = {
     allowUnfreePredicate = pkg:
         elem (nixpkgs_lib.getName pkg) allowedUnfreePackages;
+    permittedInsecurePackages = [
+        "python3.13-beets-2.5.1"
+    ];
 };
 self = {
     # If you import the outPath, it should result in 'old' nixpkgs. See https://stackoverflow.com/a/74465514
