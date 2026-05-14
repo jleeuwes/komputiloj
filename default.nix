@@ -233,8 +233,8 @@ let
             packages = let
                 callPackage = pkg: callPackageWith capsules.nixpkgsCurrent.packages.x86_64-linux pkg;
             in {
-                nextcloud = new_capsules.nixos.native.x86_64-linux.legacyPackages.nextcloud31;
-                apps = sources.nextcloud_31_apps.value nixpkgsCurrent.packages;
+                nextcloud = new_capsules.nixos.native.x86_64-linux.legacyPackages.nextcloud32;
+                apps = sources.nextcloud_32_apps.value nixpkgsCurrent.packages;
             };
         };
     };
