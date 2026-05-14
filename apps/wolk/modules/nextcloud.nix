@@ -242,6 +242,12 @@ in {
                 preview_max_y = 1024;
                 preview_max_filesize_image = 5;
 
+                # Force 2fa. Must be the string "true", not a boolean!
+                # The TOTP app should be enabled through the admin interface
+                # (TODO can we do that declaratively here?)
+                # On lost device, restore access with: nextcloud-occ twofactorauth:disable USERNAME totp
+                twofactor_enforced = "true";
+
                 # https://docs.nextcloud.com/server/30/admin_manual/configuration_server/background_jobs_configuration.html#maintenance-window-start
                 maintenance_window_start = 1;
                 
