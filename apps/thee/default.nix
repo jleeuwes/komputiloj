@@ -63,9 +63,13 @@ in {
                     TIMEOUT = "15m";
                     NOTICE_ON_SUCCESS = true;
                 };
-                # security = {
-                #     PASSWORD_HASH_ALGO = "bcrypt$12";
-                # };
+                security = {
+                    # Force 2fa. Not yet working at time of writing,
+                    # but will kick in from Forgejo 13.
+                    # In case of lost device, restore access with: thee-forgejo admin user reset-mfa -u USERNAME
+                    GLOBAL_TWO_FACTOR_REQUIREMENT = "all";
+                    # PASSWORD_HASH_ALGO = "bcrypt$12";
+                };
                 other = {
                     SHOW_FOOTER_VERSION = false;
                 };
