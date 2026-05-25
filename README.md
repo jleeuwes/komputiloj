@@ -188,6 +188,14 @@ A work in progress. Some insights we gained already:
   maybe we should make a documentation PR.
   See also
   <https://discourse.nixos.org/t/where-can-one-find-more-info-on-the-motivation-s-behind-nix-instantiate-read-write-mode/14641>
+* A fixed output derivation can be made by adding three attributes to a
+  derivation:
+  ```
+  outputHashAlgo = "sha256";
+  outputHashMode = "recursive";
+  outputHash = ""; # will mismatch, copy it from the error and fill it in
+  ```
+  Learned from <https://phip1611.de/blog/accessing-network-from-a-nix-derivation/>
 
 This is a work in progress package definition that provides a capsule, putting some things together,
 based on <https://phip1611.de/blog/accessing-network-from-a-nix-derivation/>:
