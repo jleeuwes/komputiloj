@@ -208,7 +208,10 @@ let
         warpzone = import ./capsules/warpzone {
             inherit (new_capsules) boltons nixos komputiloj-definitions;
         };
-        hello-infra-entrypoint = sources.hello-infra.value {
+        komputiloj-sources = import ./capsules/komputiloj-sources {
+            inherit (new_capsules) nixos;
+        };
+        hello-infra-entrypoint = import new_capsules.komputiloj-sources.portable.packages.hello-infra {
             inherit (new_capsules) boltons platform
                 komputiloj-definitions komputiloj-privata;
         };
