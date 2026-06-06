@@ -10,6 +10,14 @@ fi
 
 DEVICE="$1"
 
+if [[ $DEVICE =~ ^/.* ]]; then
+	SAFE_DEVICE="$DEVICE"
+else
+	# make everything not starting with / safe for cd-discid, which does not
+	# follow the -- convention
+	SAFE_DEVICE=./"$DEVICE"
+fi
+
 if [[ $# -ge 2 ]]; then
 	DIRNAME="$2"
 else
@@ -18,6 +26,9 @@ fi
 
 mkdir -- "$DIRNAME"
 cd -- "$DIRNAME"
-cdda2mp3 dev="$DEVICE" track '--preset insane'
-rename -- -track '' *-track.mp3
+tracks=$(cd-discid "$SAFE_DEVICE"|awk '{print $2}')
+for track in $(seq -w -- 1 "$tracks"); do
+	cdparanoia --force-cdrom-device="$DEVICE" --abort-on-skip --output-wav $track - |
+		lame --preset insane - $track.mp3
+done
 printf '\nCD ripped into %s\n' "$PWD" >&2
