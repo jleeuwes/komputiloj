@@ -13,7 +13,7 @@ item_fields:
         import math
         return f'%0{math.floor(math.log10(disctotal))}i' % disc
 paths:
-    default: CDs/$albumartist/$album%aunique{}/%if{$multidisc,CD$disc_unpadded/}$track. $title
+    default: CDs/$albumartist/$album%aunique{}/%if{$multidisc,CD$disc_unpadded%if{$disctitle, $disctitle}/}$track. $title
     singleton: los/$artist - $title
     comp: verzamelCDs/$album%aunique{}/$track. $title
     albumtype:soundtrack: soundtracks/$album/$track. $title
