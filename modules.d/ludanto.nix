@@ -49,6 +49,14 @@ in {
                 # autostart wayland:
                 cat <<'EOF' > .bash_profile
                 if [[ -z $DISPLAY && $XDG_VTNR = 6 ]]; then
+                    # Een draaiende KDE-sessie op de achtergrond,
+                    # terwijl ik bezig ben in de normale KDE-sessie,
+                    # slaat regelmatig op hol qua CPU-gebruik.
+                    # Dus pauzeer alvorens wayland te starten.
+                    # Dan kunnen we na spelen uitloggen van de sessie
+                    # zonder dat er meteen een nieuwe sessie start.
+                    read -p 'Press any key to insert coin...' -r -s -n 1
+
                     exec ${pkgs.kdePackages.plasma-workspace}/bin/startplasma-wayland
                 fi
                 EOF
