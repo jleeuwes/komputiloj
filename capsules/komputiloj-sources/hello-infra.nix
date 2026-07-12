@@ -5,7 +5,7 @@ packageBuilders.mkDerivation {
     name = "hello-infra";
     src = builtins.fetchGit {
         url = "gitea@thee.radstand.nl:hello/infra.git";
-        rev = "fec9955b19e44742d32a87a4233ed9797ce837c9";
+        rev = "3f31bd0dcef8af8380e916b90e72973ecdaa2086";
         submodules = true;
         
         # ref prevents an SSH attempt somehow.
@@ -22,5 +22,5 @@ packageBuilders.mkDerivation {
     '';
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
-    outputHash = "sha256-pjhfUNSgL8IQxi0i0y92i0E+BXx5d4Aq8qEguM8G9YU=";
+    outputHash = "sha256-xjGbGzISklqp5dT+8aPWCGXI8E7NMG+nEIPlUjQsPUI=";
 }
