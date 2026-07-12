@@ -290,19 +290,12 @@ in rec {
 							git annex enableremote 3ba01384-b195-4696-a200-732ed3b89647
 						fi
 
-						# TODO manage wanted content:
-						# - git annex get * in all dirs that have some WANTED marker file
-						#   (or some recursive variant of the marker file in a parent)
-						# - git annex drop * in all other dirs
-						# (wantedcontent should be set to manual)
-						
-						# TODO manage non-present files (put a filename.NIET_HIER
-						#      which should not be checked in,
-						#      empty or maybe with whereis information in it)
-						
-						# TODO manage empty dirs (put .gitkeep in them?)
-						
 						git annex assist --explain
+						# git annex drop --auto # TODO faalt omdat wolk maar
+						# toegang heeft tot 1 andere repo (bigstorage1) dus niet
+						# kan checken dat het bestand nog in 2 repo's
+						# overblijft.
+						# Wat kunnen we daarop verzinnen?
 
 						# Make the wolk-exposed subdir group-writeable
 						find Hello -type d,f -exec chmod g+w {} \; |& {
@@ -328,7 +321,8 @@ in rec {
 					# git config --global user.email git-annex@radstand.nl
 					# git annex init
 					# git commit -m 'Initial empty commit' --allow-empty
-					# git annex adjust --unlock-present
+					# TODO de juiste wanted-expressie hier zetten wanneer ik die heb gevonden
+					# git annex adjust --unlock
 					# mkdir Hello # this is the subdir we share on wolk, to hide the .git dir
 					# chmod g+rwxs Hello
 					# touch Hello/.gitkeep
