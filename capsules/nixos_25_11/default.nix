@@ -26,6 +26,8 @@ nixpkgs_config = {
         elem (nixpkgs_lib.getName pkg) allowedUnfreePackages;
     permittedInsecurePackages = [
         "python3.13-beets-2.5.1"
+        "librewolf-bin-152.0-1"
+        "librewolf-bin-unwrapped-152.0-1"
     ];
 };
 self = {

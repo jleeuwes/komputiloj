@@ -3,9 +3,9 @@ with boltons.lib;
 # proper module starts here
 { pkgs, config, lib, ... }:
 let
-  package = pkgs.librewolf;
+  package = pkgs.librewolf-bin;
 
-  firefoxVersion = replaceRegex "-[0-9]+$" "" pkgs.librewolf.version;
+  firefoxVersion = replaceRegex "-[0-9]+$" "" package.version;
 
   cfg = config.programs.librewolf;
 
@@ -24,7 +24,7 @@ let
   # if it exists, completely overrides Librewolf's policies.
   # So we merge Librewolf's policies into our own policies,
   # from which we generate policies.json.
-  policiesFileFromDistribution = "${package}/lib/librewolf/distribution/policies.json";
+  policiesFileFromDistribution = "${package}/lib/librewolf-bin-${package.version}/distribution/policies.json";
   policiesFromDistribution = {
     _file = policiesFileFromDistribution;
     programs.librewolf.policies =
