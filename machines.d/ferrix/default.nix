@@ -172,6 +172,8 @@ rec {
             tree
             wl-clipboard
             # losslesscut-bin # simpele videobewerking
+            iw # the packages iw and wirelesstools (iwconfig, iwlist, etc.) are no longer installed implicitly if wireless networking has been enabled.
+               # (wirelesstools are deprecated, so we only install iw)
 
             # pamix pavucontrol alsaUtils # not sure what we need for pipewire
             zstd # for unpacking arch packages

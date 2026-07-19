@@ -166,6 +166,12 @@ let
         mailserver_25_11 = import ./capsules/mailserver_25_11 {
             inherit (new_capsules) boltons platform nixos_25_11;
         };
+        nixos_26_05 = import ./capsules/nixos_26_05 {
+            inherit (new_capsules) platform boltons;
+        };
+        mailserver_26_05 = import ./capsules/mailserver_26_05 {
+            inherit (new_capsules) boltons platform nixos_26_05;
+        };
         
         # Most of the time, we don't want to depend on a specific nixos version,
         # we just want the latest. We can use these aliases in that case.
