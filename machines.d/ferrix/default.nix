@@ -209,6 +209,7 @@ rec {
             qpdf pdftk
             
             # (firefox and librewolf are configured through programs.*)
+            komputiloj.packages.firefox-sync-client
             komputiloj.packages.moz-recover-as-bookmarks
             thunderbird
             # isync # for e-mail backups (eigenlijk mbsync)

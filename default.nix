@@ -26,6 +26,7 @@ let
         in rec {
             wachtwoord = callPackage ./pkgs/wachtwoord;
             moz-recover-as-bookmarks = callPackage ./pkgs/moz-recover-as-bookmarks;
+            firefox-sync-client = callPackage ./pkgs/firefox-sync-client;
             sleutel = callPackage ./pkgs/sleutel;
             radicale-commit-hook = callPackage ./pkgs/radicale-commit-hook;
             tipctl = callPackage ./pkgs/tipctl;
